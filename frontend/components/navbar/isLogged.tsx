@@ -1,6 +1,5 @@
 "use client";
 
-import { Separator } from "@radix-ui/react-separator"
 import Login from "./login"
 import Profile from "./profile"
 import { Register } from "./register"
@@ -15,10 +14,9 @@ export default function IsLogged() {
 
 
     return (
-        <>
+        <div className="md:flex-row flex-col space-x-2">
             <Login />
-            <Separator orientation="vertical" />
             <Register />
-        </>
+        </div>
     )
 }

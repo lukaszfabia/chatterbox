@@ -7,8 +7,8 @@ import { Input } from "./ui/input";
 
 export default function Footer() {
     return (
-        <footer className="md:p-5 p-4 bg-accent">
-            <div className="md:px-5 px-3">
+        <footer className="md:p-5 p-4 bg-accent mt-auto">
+            <div className="md:px-5 px-3 py-5">
                 <div className="flex flex-col md:flex-row justify-between gap-10">
                     <div className="flex-1">
                         <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
@@ -27,7 +27,7 @@ export default function Footer() {
                                 aliquam fugiat!
                             </p>
                             <div className="flex w-full max-w-sm items-center space-x-2">
-                                <Input type="email" placeholder="Email" />
+                                <Input type="email" placeholder="joe.doe@example.com" />
                                 <Button type="submit">Subscribe</Button>
                             </div>
                         </div>
@@ -46,7 +46,7 @@ export default function Footer() {
                 </div>
 
                 <div className="py-5">
-                    <Separator />
+                    <div className="flex-1 h-px bg-gray-700"></div>
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-between items-center">
