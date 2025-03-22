@@ -1,4 +1,5 @@
 from typing import Optional
+from fastapi import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import or_, and_
@@ -31,17 +32,16 @@ class UserRepository:
             else False
         )
 
-    async def create(self, username: str, email: str, password: str):
-        password = User.hash_password(password=password)
+    async def create(self, username: str, email: str, password: str) -> Optional[User]:
+        hashed_password = User.hash_password(password=password)
 
-        user = User(password=password, email=email, username=username)
+        user = User(password=hashed_password, email=email, username=username)
 
         try:
-            await self.db.add(user)
-            self.db.commit()
+            self.db.add(user)
+            await self.db.commit()
 
             return user
-
         except Exception as e:
             await self.db.rollback()
             raise e

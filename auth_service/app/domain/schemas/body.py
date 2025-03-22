@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 # Incoming form body
 
@@ -15,7 +15,7 @@ class LoginCredentials(BaseModel):
 class RegisterCredentials(BaseModel):
     username: str
     password: str
-    email: str
+    email: EmailStr
 
     @staticmethod
     def exmaple():

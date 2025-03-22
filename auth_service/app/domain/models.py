@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date
+from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.ext.declarative import declarative_base
-from app.config import pwd_context
+import bcrypt
 
 Base = declarative_base()
 
@@ -14,7 +14,7 @@ class User(Base):
 
     username = Column(String, nullable=False, unique=True)
     email = Column(String, nullable=False, unique=True)
-    hashed_password = Column(String, nullable=True)
+    password = Column(String, nullable=True)
     sso_provider = Column(String, nullable=True)
 
     def __repr__(self):
@@ -23,11 +23,14 @@ class User(Base):
     @staticmethod
     def hash_password(password: str) -> str:
         """Hashes the password using bcrypt"""
-        return pwd_context.hash(password)
+        password_bytes = password.encode("UTF-8")
+        return bcrypt.hashpw(password_bytes, bcrypt.gensalt()).decode("UTF-8")
 
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str | None) -> bool:
         """Verifies a plain password against a hashed password"""
         if hashed_password is None:
             return False
-        return pwd_context.verify(plain_password, hashed_password)
+        return bcrypt.checkpw(
+            plain_password.encode("utf-8"), hashed_password.encode("utf-8")
+        )

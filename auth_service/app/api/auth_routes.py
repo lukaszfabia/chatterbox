@@ -52,7 +52,7 @@ async def register(
     token, user = await auth_service.register(
         email=credentials.email,
         username=credentials.username,
-        passoword=credentials.password,
+        password=credentials.password,
     )
 
     # call to profile service to save data like email, username, id

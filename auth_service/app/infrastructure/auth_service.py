@@ -1,3 +1,4 @@
+from fastapi import Depends
 from app.domain.exceptions import (
     InvalidCredentials,
     UserAlreadyExists,
@@ -7,6 +8,7 @@ from app.domain.schemas.model import TokenModel
 from app.infrastructure.repository.user_repo import UserRepository
 from app.infrastructure.utils.jwt.jwt import JWTSerivce
 from app.domain.models import User
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class AuthService:
@@ -16,7 +18,7 @@ class AuthService:
         self.jwt = JWTSerivce()
 
     async def login(self, email_or_username: str, password: str) -> TokenModel:
-        user = self.repo.get_user_by_email_or_username(s=email_or_username)
+        user = await self.repo.get_user_by_email_or_username(s=email_or_username)
         if not user:
             raise InvalidCredentials()
 
@@ -31,8 +33,12 @@ class AuthService:
         return token
 
     async def register(
-        self, email: str, username: str, password: str
+        self,
+        email: str,
+        username: str,
+        password: str,
     ) -> tuple[User, TokenModel]:
+
         if await self.repo.is_user_exists(email=email, username=username):
             raise UserAlreadyExists()
 
