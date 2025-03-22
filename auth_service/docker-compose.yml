@@ -1,0 +1,22 @@
+services:
+  db:
+    container_name: auth_service_postgres
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "${DB_USERNAME}" ]
+      interval: 30s
+      retries: 3
+
+    networks:
+      - auth_service_network
+
+networks:
+  auth_service_network:
+    driver: bridge

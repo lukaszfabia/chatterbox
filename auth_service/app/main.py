@@ -1,29 +1,19 @@
-from contextlib import asynccontextmanager
-import datetime
-import logging
-from typing import List
-from fastapi import FastAPI, logger
+import os
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.auth_routes import auth_router
+from dotenv import load_dotenv
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # db init
-    app.database = app.mongo.db
-
-    try:
-        yield
-    finally:
-        app.mongo.close()
-        app.scheduler.shutdown(wait=False)
+from app.config import APP_NAME
 
 
 def create_app() -> FastAPI:
+    load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+
     app = FastAPI(
-        title="Official Areo API",
-        description="Areo API helps to handle users and weather",
+        title=f"{APP_NAME} - Auth Serivce",
+        description="Help to authenticate user",
         version="1.0.0",
-        lifespan=lifespan,
     )
 
     app.add_middleware(
@@ -34,9 +24,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # app.include_router(general_router, prefix="/api/v1")
-    # app.include_router(user_router, prefix="/api/v1")
-    # app.include_router(weather_router, prefix="/api/v1")
+    app.include_router(auth_router, prefix="/api/v1")
     return app
 
 

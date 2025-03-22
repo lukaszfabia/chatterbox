@@ -1,7 +1,6 @@
 fastapi[standard]
 fastapi-cors
 uvicorn[standard]
-pyjwt
 pytest
 pydantic
 passlib[bcrypt]
@@ -9,3 +8,9 @@ passlib[bcrypt]
 psycopg2-binary
 alembic
 sqlalchemy
+
+requests
+oauthlib
+pyOpenSSL
+python-jose
+asyncpg
