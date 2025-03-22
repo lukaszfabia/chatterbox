@@ -1,4 +1,8 @@
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
 class CreateUserCommand:
-    def __init__(self, user_id: str | int, username: str):
-        self.user_id = user_id
-        self.username = username
+    user_id: int | str
+    email: str
+    username: str

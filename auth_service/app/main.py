@@ -3,7 +3,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth_routes import auth_router
 from dotenv import load_dotenv
-
 from app.config import APP_NAME
 
 
@@ -28,4 +27,9 @@ def create_app() -> FastAPI:
     return app
 
 
-app = create_app()
+if __name__ == "__main__":
+    import uvicorn
+
+    app = create_app()
+
+    uvicorn.run(app, host="localhost", port=8000)

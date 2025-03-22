@@ -1,4 +1,3 @@
-from fastapi import Depends
 from app.domain.exceptions import (
     InvalidCredentials,
     UserAlreadyExists,
@@ -8,7 +7,6 @@ from app.domain.schemas.model import TokenModel
 from app.infrastructure.repository.user_repo import UserRepository
 from app.infrastructure.utils.jwt.jwt import JWTSerivce
 from app.domain.models import User
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class AuthService:

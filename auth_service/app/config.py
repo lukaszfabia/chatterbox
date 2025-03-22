@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 
-# from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 import logging
 
@@ -15,7 +14,6 @@ APP_NAME = ""
 HANDLED_PROVIDERS = "google"
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")

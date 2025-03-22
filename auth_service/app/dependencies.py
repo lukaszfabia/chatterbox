@@ -1,5 +1,5 @@
 from fastapi import Depends
-from app.infrastructure.auth_service import AuthService
+from app.application.service.auth_service import AuthService
 from app.infrastructure.repository.user_repo import UserRepository
 from app.infrastructure.database import get_session
 from sqlalchemy.ext.asyncio import AsyncSession

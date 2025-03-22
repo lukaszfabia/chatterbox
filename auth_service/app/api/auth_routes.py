@@ -17,8 +17,7 @@ from app.domain.schemas.model import TokenModel
 from app.domain.schemas.body import LoginCredentials, RegisterCredentials
 from fastapi import Depends
 import requests
-
-from app.infrastructure.auth_service import AuthService
+from app.application.service.auth_service import AuthService
 
 
 auth_router = APIRouter(tags=["auth endpoints"], prefix="/auth")

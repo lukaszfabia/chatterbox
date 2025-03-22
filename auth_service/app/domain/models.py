@@ -23,8 +23,8 @@ class User(Base):
     @staticmethod
     def hash_password(password: str) -> str:
         """Hashes the password using bcrypt"""
-        password_bytes = password.encode("UTF-8")
-        return bcrypt.hashpw(password_bytes, bcrypt.gensalt()).decode("UTF-8")
+        password_bytes = password.encode("utf-8")
+        return bcrypt.hashpw(password_bytes, bcrypt.gensalt()).decode("utf-8")
 
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str | None) -> bool:
