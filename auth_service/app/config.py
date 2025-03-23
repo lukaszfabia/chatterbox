@@ -1,8 +1,26 @@
+from dataclasses import dataclass
 import os
 from dotenv import load_dotenv
 
 from fastapi.security import OAuth2PasswordBearer
 import logging
+
+
+@dataclass(frozen=True)
+class RabbitConfig:
+    login: str
+    password: str
+    port: int
+    host: str
+
+
+config_for_rabbit = RabbitConfig(
+    login=os.getenv("RABBITMQ_DEFAULT_USER"),
+    password=os.getenv("RABBITMQ_DEFAULT_PASS"),
+    port=os.getenv("RABBIT_PORT"),
+    host=os.getenv("RABBIT_HOST"),
+)
+
 
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 

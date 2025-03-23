@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.ext.declarative import declarative_base
 import bcrypt
 
+from app.domain.events import UserAuthEvent, UserCreatedEvent
+
 Base = declarative_base()
 
 
@@ -34,3 +36,13 @@ class User(Base):
         return bcrypt.checkpw(
             plain_password.encode("utf-8"), hashed_password.encode("utf-8")
         )
+
+    @classmethod
+    def get_created_user_event(cls) -> UserCreatedEvent:
+        return UserCreatedEvent(
+            userID=str(cls.id), email=cls.email, username=cls.username
+        )
+
+    @classmethod
+    def get_auth_user_event(cls) -> UserAuthEvent:
+        return UserAuthEvent(userID=str(cls.id), email=cls.email)

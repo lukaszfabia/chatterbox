@@ -3,8 +3,13 @@ from pydantic import BaseModel
 
 
 @dataclass(frozen=True)
-class UserLoggedEvent:
+class UserCreatedEvent:
     userID: str
     email: str
     username: str
-    isNew: bool
+
+
+@dataclass(frozen=True)
+class UserAuthEvent:
+    userID: str
+    email: str

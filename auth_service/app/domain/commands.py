@@ -1,8 +1,13 @@
 from dataclasses import dataclass
 
+from pydantic import BaseModel, EmailStr
 
-@dataclass(frozen=True)
-class CreateUserCommand:
-    user_id: int | str
-    email: str
+
+class CreateUserCommand(BaseModel):
+    email: EmailStr
     username: str
+    password: str
+
+    @staticmethod
+    def exmaple():
+        return {"email": "joe.doe@example.com", "password": "secret", "username": "joe"}

@@ -1,9 +1,7 @@
-# Add custom exceptions..
-
-
 from fastapi import HTTPException
-
 from fastapi import status
+
+# Add custom exceptions..
 
 
 class FailedToRegister(HTTPException):
@@ -44,10 +42,6 @@ class InvalidToken(HTTPException):
         headers=None,
     ):
         super().__init__(status_code, detail)
-
-
-class InvalidSSOLogin(HTTPException):
-    pass
 
 
 class UnsupportedProvider(HTTPException):

@@ -1,8 +1,10 @@
 from fastapi import Depends
-from app.application.service.auth_service import AuthService
+from app.application.handler import Handler
+from app.infrastructure.rabbitmq import RabbitMQHandler
 from app.infrastructure.repository.user_repo import UserRepository
 from app.infrastructure.database import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.config import config_for_rabbit
 
 
 async def get_user_repository(
@@ -11,7 +13,15 @@ async def get_user_repository(
     return UserRepository(db)
 
 
-def get_auth_service(
-    user_repository: UserRepository = Depends(get_user_repository),
-) -> AuthService:
-    return AuthService(user_repository)
+async def get_rabbitmq():
+    return RabbitMQHandler(config=config_for_rabbit)
+
+
+# def get_auth_service(
+#     user_repository: UserRepository = Depends(get_user_repository),
+# ) -> AuthService:
+#     return AuthService(user_repository)
+
+
+def get_handler(user_repository: UserRepository = Depends(get_user_repository)):
+    return Handler(user_repo=user_repository, rabbit_handler=get_rabbitmq())

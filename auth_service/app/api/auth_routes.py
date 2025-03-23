@@ -2,6 +2,8 @@ from fastapi import APIRouter, Body, HTTPException
 from fastapi import status
 from fastapi import Depends
 import jwt
+from app.application.command_handlers import CreateUserCommandHandler
+from app.application.query_handlers import AuthUserQueryHandler
 from app.config import (
     DECODE_ALGO,
     GOOGLE_CLIENT_ID,
@@ -11,13 +13,13 @@ from app.config import (
     GOOGLE_REDIRECT_URI,
     oauth2_scheme,
 )
-from app.dependencies import get_auth_service
+from app.dependencies import get_auth_service, get_handler
+from app.domain.commands import CreateUserCommand
 from app.domain.exceptions import UnsupportedProvider
-from app.domain.schemas.model import TokenModel
-from app.domain.schemas.body import LoginCredentials, RegisterCredentials
+from app.domain.queries import AuthUserQuery
+from app.domain.schemas.model import TokenDTO
 from fastapi import Depends
 import requests
-from app.application.service.auth_service import AuthService
 
 
 auth_router = APIRouter(tags=["auth endpoints"], prefix="/auth")
@@ -27,34 +29,35 @@ auth_router = APIRouter(tags=["auth endpoints"], prefix="/auth")
     "/login",
     tags=["login with email or username"],
     status_code=status.HTTP_200_OK,
-    response_model=TokenModel,
+    response_model=TokenDTO,
 )
 async def login(
-    credentials: LoginCredentials = Body(..., example=LoginCredentials.exmaple()),
-    auth_service: AuthService = Depends(get_auth_service),
+    credentials: AuthUserQuery = Body(..., example=AuthUserQuery.exmaple()),
+    handler: AuthUserQueryHandler = Depends(get_handler),
 ):
-    return await auth_service.login(
-        email_or_username=credentials.username_or_email, password=credentials.password
-    )
+    user, token = await handler.handle(ent=credentials)
+
+    await handler.publish_event(event=user.get_auth_user_event())
+
+    return token
 
 
 @auth_router.post(
     "/register",
     description="create an account",
-    response_model=TokenModel,
+    response_model=TokenDTO,
     status_code=status.HTTP_202_ACCEPTED,
 )
 async def register(
-    credentials: RegisterCredentials = Body(..., example=RegisterCredentials.exmaple()),
-    auth_service: AuthService = Depends(get_auth_service),
+    credentials: CreateUserCommand = Body(..., example=CreateUserCommand.exmaple()),
+    handler: CreateUserCommandHandler = Depends(get_handler),
 ):
-    token, user = await auth_service.register(
-        email=credentials.email,
-        username=credentials.username,
-        password=credentials.password,
-    )
+    user, token = await handler.handle(ent=credentials)
 
-    # call to profile service to save data like email, username, id
+    # publish event
+    event = user.get_created_user_event()
+
+    await handler.publish_event(event)
 
     return token
 

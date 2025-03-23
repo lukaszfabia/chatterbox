@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 from app.infrastructure.rabbitmq import RabbitMQHandler
 from app.infrastructure.repository.user_repo import UserRepository
 
@@ -9,5 +10,9 @@ class Handler(ABC):
         self.repo = user_repo
 
     @abstractmethod
-    def handle(self):
+    async def handle(self, ent: Any):
+        pass
+
+    @abstractmethod
+    async def publish_event(self, event: Any):
         pass
