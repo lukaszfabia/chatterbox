@@ -39,10 +39,8 @@ class User(Base):
 
     @classmethod
     def get_created_user_event(cls) -> UserCreatedEvent:
-        return UserCreatedEvent(
-            userID=str(cls.id), email=cls.email, username=cls.username
-        )
+        return UserCreatedEvent(userID=cls.id, email=cls.email, username=cls.username)
 
     @classmethod
     def get_auth_user_event(cls) -> UserAuthEvent:
-        return UserAuthEvent(userID=str(cls.id), email=cls.email)
+        return UserAuthEvent(userID=cls.id, email=cls.email)
