@@ -3,7 +3,7 @@ from app.application.handler import Handler
 from app.domain.exceptions import InvalidCredentials
 from app.domain.models import User
 from app.domain.queries import AuthUserQuery
-from app.domain.schemas.model import TokenDTO
+from app.domain.dto.model import TokenDTO
 from app.infrastructure.utils.jwt.jwt import JWTSerivce
 
 

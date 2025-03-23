@@ -3,7 +3,7 @@ from app.domain.commands import CreateUserCommand
 from app.domain.events import UserCreatedEvent
 from app.domain.exceptions import FailedToRegister, UserAlreadyExists
 from app.domain.models import User
-from app.domain.schemas.model import TokenDTO
+from app.domain.dto.model import TokenDTO
 from app.infrastructure.utils.jwt.jwt import JWTSerivce
 
 

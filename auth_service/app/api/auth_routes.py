@@ -17,7 +17,7 @@ from app.dependencies import get_auth_service, get_handler
 from app.domain.commands import CreateUserCommand
 from app.domain.exceptions import UnsupportedProvider
 from app.domain.queries import AuthUserQuery
-from app.domain.schemas.model import TokenDTO
+from app.domain.dto.model import TokenDTO
 from fastapi import Depends
 import requests
 
