@@ -6,7 +6,7 @@ services:
       - 'POSTGRES_PASSWORD=secret'
       - 'POSTGRES_USER=myuser'
     ports:
-      - '5432'
+      - '5433'
   rabbitmq:
     image: 'rabbitmq:latest'
     environment:
