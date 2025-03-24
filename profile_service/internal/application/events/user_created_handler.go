@@ -2,10 +2,10 @@ package events
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	aggregates "profile_service/internal/domain/aggretates"
 	"profile_service/internal/domain/events"
+	"profile_service/internal/domain/models/writemodels"
 )
 
 type UserCreatedHandler struct {
@@ -18,9 +18,13 @@ func (h *UserCreatedHandler) Handle(body []byte) error {
 		return err
 	}
 
-	// err := h.aggregate.CreateProfile()
+	profile, errr := writemodels.NewProfileFromEvent(event)
 
-	err := fmt.Errorf("")
+	if errr != nil {
+		log.Println(errr.Error())
+	}
+
+	_, err := h.aggregate.CreateProfile(*profile)
 
 	if err != nil {
 		log.Println(err.Error())

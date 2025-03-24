@@ -12,5 +12,5 @@ type UserCreatedEvent struct {
 }
 
 func (e UserCreatedEvent) Log() {
-	log.Printf("%s with %d id has requested for create account\n", e.Username, e.UserID)
+	log.Printf("%s with %s id has requested for create account\n", e.Username, e.UserID)
 }
