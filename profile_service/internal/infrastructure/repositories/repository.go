@@ -2,20 +2,21 @@ package repositories
 
 import (
 	"log"
+	"profile_service/internal/domain/repositories"
 	"profile_service/internal/infrastructure/database"
 )
 
 type Repository interface {
-	ProfileRepository() ProfileRepository
+	ProfileRepository() repositories.ProfileRepository
 }
 
 type repositoryImpl struct {
 	db database.Database
 
-	profileRepo ProfileRepository
+	profileRepo repositories.ProfileRepository
 }
 
-func (r *repositoryImpl) ProfileRepository() ProfileRepository {
+func (r *repositoryImpl) ProfileRepository() repositories.ProfileRepository {
 	return r.profileRepo
 }
 

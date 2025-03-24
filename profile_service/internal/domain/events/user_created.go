@@ -1,10 +1,12 @@
 package events
 
-import "log"
+import (
+	"log"
+)
 
 type UserCreatedEvent struct {
 	BaseEvent
-	UserID   int    `json:"userID"`
+	UserID   string `json:"userID"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
 }

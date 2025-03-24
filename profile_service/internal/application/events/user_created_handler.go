@@ -2,13 +2,14 @@ package events
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
+	aggregates "profile_service/internal/domain/aggretates"
 	"profile_service/internal/domain/events"
-	"profile_service/internal/infrastructure/repositories"
 )
 
 type UserCreatedHandler struct {
-	repo repositories.ProfileRepository
+	aggregate aggregates.ProfileAggregate
 }
 
 func (h *UserCreatedHandler) Handle(body []byte) error {
@@ -17,7 +18,9 @@ func (h *UserCreatedHandler) Handle(body []byte) error {
 		return err
 	}
 
-	err := h.repo.CreateUser(uint(event.UserID), event.Username, event.Email)
+	// err := h.aggregate.CreateProfile()
+
+	err := fmt.Errorf("")
 
 	if err != nil {
 		log.Println(err.Error())

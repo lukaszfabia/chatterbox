@@ -3,20 +3,18 @@ package readmodels
 import (
 	"time"
 
-	"gorm.io/gorm"
+	"github.com/google/uuid"
 )
 
-type Model struct {
-	ID        uint           `gorm:"primarykey" json:"id"`
-	CreatedAt time.Time      `json:"createdAt"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"deletedAt"`
-}
-
+// Denormalized profile for nosql
 type Profile struct {
-	Model
-	Username      string `gorm:"unique;not null;" json:"username"`
-	Email         string `gorm:"unique;not null;" json:"email"`
-	Bio           string `gorm:"size:512" json:"bio"`
-	AvatarURL     string `gorm:"size:512" json:"avatar_url"`
-	BackgroundURL string `gorm:"size:512" json:"background_url"`
+	ID            uuid.UUID  `bson:"_id,omitempty" json:"id"`
+	CreatedAt     time.Time  `bson:"createdAt" json:"createdAt"`
+	UpdatedAt     time.Time  `bson:"updatedAt" json:"updatedAt"`
+	DeletedAt     *time.Time `bson:"deletedAt,omitempty" json:"deletedAt"`
+	Username      string     `bson:"username" json:"username"`
+	Email         string     `bson:"email" json:"email"`
+	Bio           string     `bson:"bio" json:"bio"`
+	AvatarURL     string     `bson:"avatar_url" json:"avatar_url"`
+	BackgroundURL string     `bson:"background_url" json:"background_url"`
 }

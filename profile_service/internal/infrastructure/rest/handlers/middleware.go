@@ -1,14 +1,15 @@
-package api
+package handlers
 
 import (
 	"context"
 	"log"
 	"net/http"
+	"profile_service/internal/infrastructure/rest"
 	"profile_service/pkg"
 	"strings"
 )
 
-func (apiServer *Server) IsAuth(next http.Handler) http.Handler {
+func (h *ProfileHandler) IsAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Validation...")
 		authorization := r.Header.Get("Authorization")
@@ -16,7 +17,7 @@ func (apiServer *Server) IsAuth(next http.Handler) http.Handler {
 		// no bearer token
 		if authorization == "" {
 			log.Println("Unauthorized")
-			NewResponse(w, http.StatusUnauthorized, "")
+			rest.NewResponse(w, http.StatusUnauthorized, "")
 			return
 		}
 
@@ -24,7 +25,7 @@ func (apiServer *Server) IsAuth(next http.Handler) http.Handler {
 
 		if tokenStr == "" {
 			log.Println("Token missing after trimming Bearer prefix")
-			NewResponse(w, http.StatusUnauthorized, "")
+			rest.NewResponse(w, http.StatusUnauthorized, "")
 			return
 		}
 
@@ -33,15 +34,15 @@ func (apiServer *Server) IsAuth(next http.Handler) http.Handler {
 
 		if err != nil {
 			log.Println("Error during decoding token")
-			NewResponse(w, http.StatusUnauthorized, err.Error())
+			rest.NewResponse(w, http.StatusUnauthorized, err.Error())
 			return
 		}
 
-		user, err := apiServer.repo.ProfileRepository().GetUserById(id)
+		user, err := h.queryService.GetProfile(id)
 
 		if err != nil {
 			log.Println("Error retrieving user from database:", err)
-			NewResponse(w, http.StatusUnauthorized, "")
+			rest.NewResponse(w, http.StatusUnauthorized, "")
 			return
 		}
 

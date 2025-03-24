@@ -2,38 +2,39 @@ package repositories
 
 import (
 	"profile_service/internal/domain/models/readmodels"
+	"profile_service/internal/domain/models/writemodels"
+	"profile_service/internal/domain/repositories"
 	"profile_service/internal/infrastructure/database"
 
-	"gorm.io/gorm"
+	"github.com/google/uuid"
 )
 
-type ProfileRepository interface {
-	GetUserById(id uint) (*readmodels.Profile, error)
-	CreateUser(userID uint, username, email string) error
-}
-
 type profileRepoImpl struct {
-	db *gorm.DB
+	database *database.Database
 }
 
-func NewProfileRepository(database *database.Database) ProfileRepository {
+func NewProfileRepository(database *database.Database) repositories.ProfileRepository {
 	return &profileRepoImpl{
-		db: database.ReadModelDB,
+		database: database,
 	}
 }
 
-func (repo *profileRepoImpl) GetUserById(id uint) (*readmodels.Profile, error) {
-	var profile readmodels.Profile
-	err := repo.db.Model(&readmodels.Profile{}).First(&profile, id).Error
-
-	if err != nil {
-		return nil, UserNotFound(err)
-	}
-
-	return &profile, nil
-}
-
-func (repo *profileRepoImpl) CreateUser(userID uint, username, email string) error {
+func (repo *profileRepoImpl) GetUserById(id uuid.UUID) (*readmodels.Profile, error) {
 	// TODO: implement
-	return nil
+	return nil, nil
+}
+
+func (repo *profileRepoImpl) CreateUser(profile writemodels.Profile) (*readmodels.Profile, error) {
+	// TODO: implement
+	return nil, nil
+}
+
+func (repo *profileRepoImpl) GetUserByUsername(username string) (*readmodels.Profile, error) {
+	// TODO: implement
+	return nil, nil
+}
+
+func (repo *profileRepoImpl) UpdateUser(profile writemodels.Profile) (*readmodels.Profile, error) {
+	// TODO: implement
+	return nil, nil
 }

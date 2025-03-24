@@ -7,7 +7,7 @@ import (
 
 func (r *RabbitMQ) Consume(queueName string, dispatcher *events.Dispatcher) error {
 	msgs, err := r.Channel.Consume(
-		queueName, // Nazwa kolejki = nazwa eventu
+		queueName,
 		"",
 		true,
 		false,

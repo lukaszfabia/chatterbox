@@ -6,7 +6,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-func (r *RabbitMQ) Publish(queueName string, event interface{}) error {
+func (r *RabbitMQ) Publish(queueName string, event any) error {
 	_, err := r.Channel.QueueDeclare(
 		queueName,
 		true,  // durable
