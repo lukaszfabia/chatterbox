@@ -1,4 +1,4 @@
-package http
+package api
 
 import (
 	"context"
@@ -7,39 +7,38 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"profile_service/internal/infrastructure/repository"
+	"profile_service/internal/infrastructure/repositories"
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/gorilla/mux"
 )
+
+// type Server interface {
+// }
 
 type Server struct {
 	s    *http.Server
-	repo repository.Repository
+	repo repositories.Repository
 }
 
-func NewServer() *Server {
+func NewServer(repo repositories.Repository, router *mux.Router) *Server {
 	port := os.Getenv("APP_PORT")
 	host := strings.TrimSpace(os.Getenv("APP_ENV"))
 	if host == "" {
 		host = "localhost"
 	}
 
-	server := &Server{
-		repo: repository.New(),
-	}
-
 	s := &http.Server{
 		Addr:         fmt.Sprintf(":%s", port),
-		Handler:      server.RegisterRoutes(),
+		Handler:      router,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
 
-	server.s = s
-
-	return server
+	return &Server{s: s, repo: repo}
 }
 
 func (apiServer *Server) GracefulShutdown(done chan bool) {
@@ -68,6 +67,6 @@ func (apiServer *Server) StartAndListen() {
 	}
 }
 
-func (apiServer *Server) GetProfileRepo() repository.ProfileRepository {
+func (apiServer *Server) GetProfileRepo() repositories.ProfileRepository {
 	return apiServer.repo.ProfileRepository()
 }

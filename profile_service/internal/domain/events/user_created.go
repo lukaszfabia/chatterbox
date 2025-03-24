@@ -1,17 +1,6 @@
-package domain
+package events
 
 import "log"
-
-type Event interface {
-	Log()
-}
-
-type BaseEvent struct {
-	EventName string
-}
-
-func (b *BaseEvent) Log() {
-}
 
 type UserCreatedEvent struct {
 	BaseEvent

@@ -10,7 +10,8 @@ import (
 )
 
 type Database struct {
-	DB *gorm.DB
+	ReadModelDB  *gorm.DB
+	EventStoreDB *gorm.DB
 }
 
 func Connect() (*Database, error) {
@@ -21,13 +22,13 @@ func Connect() (*Database, error) {
 		return nil, FailedToConnect()
 	}
 
-	return &Database{DB: db}, nil
+	return &Database{ReadModelDB: db}, nil
 }
 
 func (d *Database) Close() error {
 	log.Println("Disconnected from database")
 
-	if dbInstance, err := d.DB.DB(); err != nil {
+	if dbInstance, err := d.ReadModelDB.DB(); err != nil {
 		log.Println(err)
 		return FailedToCloseConnection()
 	} else {
@@ -38,7 +39,7 @@ func (d *Database) Close() error {
 }
 
 func (d *Database) Sync() error {
-	if err := d.DB.AutoMigrate(config.Tables...); err != nil {
+	if err := d.ReadModelDB.AutoMigrate(config.Tables...); err != nil {
 		return FailedMigration()
 	}
 

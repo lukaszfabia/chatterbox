@@ -1,4 +1,4 @@
-package domain
+package readmodels
 
 import (
 	"time"

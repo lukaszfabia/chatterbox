@@ -1,4 +1,4 @@
-package http
+package api
 
 import (
 	"encoding/json"
@@ -12,7 +12,7 @@ type response struct {
 }
 
 // Creates new server response
-func (s *Server) NewResponse(w http.ResponseWriter, httpCode int, data any) {
+func NewResponse(w http.ResponseWriter, httpCode int, data any) {
 	w.Header().Set("Content-Type", "application/json")
 
 	w.WriteHeader(httpCode)

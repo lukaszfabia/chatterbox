@@ -1,4 +1,4 @@
-package http
+package api
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func (s *Server) isAuth(next http.Handler) http.Handler {
+func (apiServer *Server) IsAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Validation...")
 		authorization := r.Header.Get("Authorization")
@@ -16,7 +16,7 @@ func (s *Server) isAuth(next http.Handler) http.Handler {
 		// no bearer token
 		if authorization == "" {
 			log.Println("Unauthorized")
-			s.NewResponse(w, http.StatusUnauthorized, "")
+			NewResponse(w, http.StatusUnauthorized, "")
 			return
 		}
 
@@ -24,7 +24,7 @@ func (s *Server) isAuth(next http.Handler) http.Handler {
 
 		if tokenStr == "" {
 			log.Println("Token missing after trimming Bearer prefix")
-			s.NewResponse(w, http.StatusUnauthorized, "")
+			NewResponse(w, http.StatusUnauthorized, "")
 			return
 		}
 
@@ -33,15 +33,15 @@ func (s *Server) isAuth(next http.Handler) http.Handler {
 
 		if err != nil {
 			log.Println("Error during decoding token")
-			s.NewResponse(w, http.StatusUnauthorized, err.Error())
+			NewResponse(w, http.StatusUnauthorized, err.Error())
 			return
 		}
 
-		user, err := s.repo.ProfileRepository().GetUserById(id)
+		user, err := apiServer.repo.ProfileRepository().GetUserById(id)
 
 		if err != nil {
 			log.Println("Error retrieving user from database:", err)
-			s.NewResponse(w, http.StatusUnauthorized, "")
+			NewResponse(w, http.StatusUnauthorized, "")
 			return
 		}
 
