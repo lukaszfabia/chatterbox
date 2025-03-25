@@ -1,6 +1,5 @@
 from app.domain.commands import CreateUserCommand
 from app.domain.exceptions import FailedToRegister, UserAlreadyExists
-from app.domain.models import User
 from app.domain.dto.model import TokenDTO
 from app.infrastructure.rabbitmq import RabbitMQHandler
 from app.infrastructure.repository.user_repo import UserRepository

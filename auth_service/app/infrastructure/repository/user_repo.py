@@ -20,6 +20,9 @@ class UserRepository:
         ).scalar_one_or_none()
 
     async def is_user_exists(self, username: str, email: str) -> bool:
+
+        print(type(self.db))
+
         return (
             True
             if (

@@ -8,25 +8,25 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import config_for_rabbit
 
 
-async def get_user_repository(
+def get_user_repository(
     db: AsyncSession = Depends(get_session),
 ) -> UserRepository:
     return UserRepository(db)
 
 
-async def get_rabbitmq():
+def get_rabbitmq():
     return RabbitMQHandler(config=config_for_rabbit)
 
 
-async def get_create_user_command_service():
-    user_repo = await get_user_repository()
-    rabbit_handler = await get_rabbitmq()
-
+def get_create_user_command_service(
+    user_repo: UserRepository = Depends(get_user_repository),
+    rabbit_handler: RabbitMQHandler = Depends(get_rabbitmq),
+) -> CreateUserCommandService:
     return CreateUserCommandService(user_repo=user_repo, rabbit_handler=rabbit_handler)
 
 
-async def get_auth_user_query_service():
-    user_repo = await get_user_repository()
-    rabbit_handler = await get_rabbitmq()
-
+def get_auth_user_query_service(
+    user_repo: UserRepository = Depends(get_user_repository),
+    rabbit_handler: RabbitMQHandler = Depends(get_rabbitmq),
+) -> AuthUserQueryService:
     return AuthUserQueryService(user_repo=user_repo, rabbit_handler=rabbit_handler)

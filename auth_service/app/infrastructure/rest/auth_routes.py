@@ -34,7 +34,7 @@ auth_router = APIRouter(tags=["auth endpoints"], prefix="/auth")
 )
 async def login(
     credentials: AuthUserQuery = Body(..., example=AuthUserQuery.exmaple()),
-    serivce: AuthUserQueryService = Depends(get_create_user_command_service),
+    serivce: AuthUserQueryService = Depends(get_auth_user_query_service),
 ):
     token = await serivce.handle(ent=credentials)
 
@@ -49,7 +49,7 @@ async def login(
 )
 async def register(
     credentials: CreateUserCommand = Body(..., example=CreateUserCommand.exmaple()),
-    handler: CreateUserCommandService = Depends(get_auth_user_query_service),
+    handler: CreateUserCommandService = Depends(get_create_user_command_service),
 ):
     token = await handler.handle(ent=credentials)
 

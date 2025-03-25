@@ -1,5 +1,6 @@
+from datetime import datetime
 import uuid
-from sqlalchemy import UUID, Column, Integer, String, Date
+from sqlalchemy import UUID, Column, DateTime, Integer, String, Date, func
 from sqlalchemy.ext.declarative import declarative_base
 import bcrypt
 
@@ -14,6 +15,9 @@ class User(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
 
     deleted_at = Column(Date, default=None)
+
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, onupdate=datetime.now)
 
     username = Column(String, nullable=False, unique=True)
     email = Column(String, nullable=False, unique=True)
@@ -38,10 +42,10 @@ class User(Base):
             plain_password.encode("utf-8"), hashed_password.encode("utf-8")
         )
 
-    @classmethod
-    def get_created_user_event(cls) -> UserCreatedEvent:
-        return UserCreatedEvent(userID=cls.id, email=cls.email, username=cls.username)
+    def get_created_user_event(self) -> UserCreatedEvent:
+        return UserCreatedEvent(
+            userID=str(self.id), email=self.email, username=self.username
+        )
 
-    @classmethod
-    def get_auth_user_event(cls) -> UserAuthEvent:
-        return UserAuthEvent(userID=cls.id, email=cls.email)
+    def get_auth_user_event(self) -> UserAuthEvent:
+        return UserAuthEvent(userID=str(self.id), email=self.email)

@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from dataclasses import asdict
 import aio_pika
 import json
 from typing import Any, Dict, Callable, Awaitable
@@ -17,7 +18,6 @@ class RabbitMQHandler:
         self.channel = None
         self.config = config
 
-    @asynccontextmanager
     async def connect(self):
         if not self.connection or self.connection.is_closed:
             self.connection = await aio_pika.connect_robust(
@@ -26,12 +26,14 @@ class RabbitMQHandler:
                 password=self.config.password,
                 port=self.config.port,
             )
+            self.channel = await self.connection.channel()
 
-        yield self.connection
-        await self.close()
+    async def close(self):
+        if self.connection and not self.connection.is_closed:
+            await self.connection.close()
+            log.info("RabbitMQ connection closed")
 
     async def publish(self, ent: Any):
-        """Use **reflection** to define queue name"""
         if not self.channel:
             log.info("Reconnecting to channel")
             await self.connect()
@@ -41,9 +43,17 @@ class RabbitMQHandler:
         await self.channel.declare_queue(queue_name, durable=True)
         log.info(f"{queue_name} has been declared")
 
+        log.info(f"Attempting to serialize: {ent}")
+
+        try:
+            body = json.dumps(asdict(ent), default=str).encode("utf-8")
+        except TypeError as e:
+            log.error(f"Error serializing object: {e}")
+            return
+
         await self.channel.default_exchange.publish(
             aio_pika.Message(
-                body=json.dumps(ent).encode(),
+                body=body,
                 delivery_mode=aio_pika.DeliveryMode.PERSISTENT,
             ),
             routing_key=queue_name,

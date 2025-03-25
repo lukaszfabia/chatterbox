@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.rest.auth_routes import auth_router
+from app.infrastructure.rest.auth_routes import auth_router
 from dotenv import load_dotenv
 from app.config import APP_NAME
 
