@@ -24,9 +24,10 @@ func New() Repository {
 	db, err := database.Connect()
 
 	if err != nil {
+		log.Println(err.Error())
 		panic("Failed to connect with db")
 	}
-	log.Println("Successfully connected to PostgreSQL and MongoDB database!")
+	log.Println("Successfully connected to MongoDB database!")
 
 	err = db.Sync()
 	if err != nil {

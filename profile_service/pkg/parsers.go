@@ -2,7 +2,10 @@ package pkg
 
 import (
 	"encoding/json"
+	"fmt"
+	"mime/multipart"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gorilla/schema"
 )
@@ -31,4 +34,23 @@ func DecodeMultipartForm[T any](r *http.Request) (*T, error) {
 	}
 
 	return form, nil
+}
+
+func GetFileFromForm(fileHeader *multipart.FileHeader) (FileInfo, error) {
+	fileInfo := FileInfo{}
+
+	file, err := fileHeader.Open()
+	if err != nil {
+		return fileInfo, fmt.Errorf("failed to open file: %w", err)
+	}
+
+	extension := filepath.Ext(fileHeader.Filename)
+	if extension == "" {
+		return fileInfo, fmt.Errorf("file has no extension")
+	}
+
+	fileInfo.File = &file
+	fileInfo.Extension = extension
+
+	return fileInfo, nil
 }

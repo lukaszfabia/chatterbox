@@ -1,13 +1,13 @@
 package queries
 
 import (
-	"profile_service/internal/domain/models/readmodels"
+	"profile_service/internal/domain/models"
 	"profile_service/internal/domain/queries"
 	"profile_service/internal/domain/repositories"
 )
 
 type ProfileQueryService interface {
-	GetProfile(queries.GetProfileQuery) (*readmodels.Profile, error)
+	GetProfile(queries.GetProfileQuery) (*models.Profile, error)
 }
 
 type profileQueryServiceImpl struct {

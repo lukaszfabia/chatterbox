@@ -2,14 +2,11 @@ package repositories
 
 import (
 	"context"
-	"profile_service/internal/domain/models/readmodels"
-	"profile_service/internal/domain/models/writemodels"
+	"profile_service/internal/domain/models"
 	"profile_service/internal/domain/repositories"
 	"profile_service/internal/infrastructure/database"
 
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
-	"gorm.io/gorm"
 )
 
 type key string
@@ -30,10 +27,10 @@ func NewProfileRepository(database *database.Database) repositories.ProfileRepos
 	}
 }
 
-func (repo *profileRepoImpl) getUserByKey(k key, v any) (*readmodels.Profile, error) {
+func (repo *profileRepoImpl) getUserByKey(k key, v any) (*models.Profile, error) {
 	res := repo.database.GetNoSql().FindOne(context.TODO(), bson.M{string(k): v})
 
-	var profile readmodels.Profile
+	var profile models.Profile
 	err := res.Decode(&profile)
 	if err != nil {
 		return nil, err
@@ -42,27 +39,21 @@ func (repo *profileRepoImpl) getUserByKey(k key, v any) (*readmodels.Profile, er
 	return &profile, nil
 }
 
-func (repo *profileRepoImpl) GetUserById(id uuid.UUID) (*readmodels.Profile, error) {
+func (repo *profileRepoImpl) GetUserById(id string) (*models.Profile, error) {
 	return repo.getUserByKey(uid, id)
 }
 
-func (repo *profileRepoImpl) GetUserByUsername(username string) (*readmodels.Profile, error) {
+func (repo *profileRepoImpl) GetUserByUsername(username string) (*models.Profile, error) {
 	return repo.getUserByKey(name, username)
 }
 
-func (repo *profileRepoImpl) SaveUser(profile writemodels.Profile) (*readmodels.Profile, error) {
-	repo.database.GetSql().Transaction(func(tx *gorm.DB) error {
-		err := tx.Create(profile).Error
+func (repo *profileRepoImpl) SaveUser(profile models.Profile) (*models.Profile, error) {
 
-		if err != nil {
-			tx.Rollback()
-		}
+	_, err := repo.database.GetNoSql().InsertOne(context.TODO(), profile)
 
-		tx.Commit()
-		return nil
-	})
+	if err != nil {
+		return nil, FailedToSave(err)
+	}
 
-	p := writemodels.NewReadOnlyProfile(profile)
-
-	return &p, nil
+	return &profile, nil
 }

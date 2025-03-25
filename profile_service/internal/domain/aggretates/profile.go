@@ -1,11 +1,10 @@
 package aggregates
 
 import (
-	"profile_service/internal/domain"
+	"log"
 	"profile_service/internal/domain/commands"
 	"profile_service/internal/domain/events"
-	"profile_service/internal/domain/models/readmodels"
-	"profile_service/internal/domain/models/writemodels"
+	"profile_service/internal/domain/models"
 	"profile_service/internal/domain/repositories"
 )
 
@@ -19,9 +18,10 @@ func NewProfileAggregate(repo repositories.ProfileRepository) *ProfileAggregate 
 	}
 }
 
-func (a *ProfileAggregate) CreateProfile(event events.UserCreatedEvent) (*readmodels.Profile, error) {
+func (a *ProfileAggregate) CreateProfile(event events.UserCreatedEvent) (*models.Profile, error) {
+	log.Println("Creating new profile...")
+	profile, err := models.NewProfile(event.Email, event.Username, event.UserID)
 
-	profile, err := writemodels.NewProfileFromEvent(event)
 	if err != nil {
 		return nil, err
 	}
@@ -31,10 +31,12 @@ func (a *ProfileAggregate) CreateProfile(event events.UserCreatedEvent) (*readmo
 		return nil, err
 	}
 
+	log.Println("Profile has been created!")
+
 	return savedProfile, nil
 }
 
-func (a *ProfileAggregate) UpdateProfile(profile commands.UpdateProfileCommand) (*readmodels.Profile, error) {
+func (a *ProfileAggregate) UpdateProfile(profile commands.UpdateProfileCommand) (*models.Profile, error) {
 
 	toUpdate, err := a.repo.GetUserById(profile.UUID)
 
@@ -42,13 +44,9 @@ func (a *ProfileAggregate) UpdateProfile(profile commands.UpdateProfileCommand) 
 		return nil, err
 	}
 
-	updated, err := domain.Update(toUpdate, profile)
+	toUpdate.UpdateProfile(profile)
 
-	if err != nil {
-		return nil, err
-	}
-
-	savedProfile, err := a.repo.SaveUser(*updated)
+	savedProfile, err := a.repo.SaveUser(*toUpdate)
 
 	if err != nil {
 		return nil, err

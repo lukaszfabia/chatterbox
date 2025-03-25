@@ -7,13 +7,10 @@ import (
 	"profile_service/internal/config"
 
 	"go.mongodb.org/mongo-driver/v2/mongo"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 type Database struct {
-	writeDB *gorm.DB
-	readDB  *mongo.Collection
+	db *mongo.Collection
 }
 
 func Connect() (*Database, error) {
@@ -28,17 +25,7 @@ func Connect() (*Database, error) {
 func (d *Database) Close() error {
 	log.Println("Closing connections...")
 
-	if dbInstance, err := d.writeDB.DB(); err == nil {
-		if closeErr := dbInstance.Close(); closeErr != nil {
-			log.Println("Failed to close PostgreSQL connection:", closeErr)
-			return FailedToCloseConnection(err)
-		}
-		log.Println("PostgreSQL connection closed successfully")
-	} else {
-		log.Println("Error closing PostgreSQL connection:", err)
-	}
-
-	if err := d.readDB.Database().Client().Disconnect(context.TODO()); err != nil {
+	if err := d.db.Database().Client().Disconnect(context.TODO()); err != nil {
 		log.Println("Failed to close MongoDB connection:", err)
 		return FailedToCloseConnection(err)
 	}
@@ -48,38 +35,28 @@ func (d *Database) Close() error {
 }
 
 func (d *Database) Sync() error {
-	if err := d.writeDB.AutoMigrate(config.Tables...); err != nil {
-		return FailedMigration(err)
-	}
-
-	log.Println("Database synced successfully!")
 	return nil
 }
 
 func newDBConnection(dbName, collection string) (*Database, error) {
-	dsn := config.GetSqlUrl(dbName)
-	db, err := gorm.Open(postgres.Open(dsn), config.GetGormConfig())
-	if err != nil {
-		return nil, err
-	}
-
 	client, err := mongo.Connect(config.GetNoSqlConfig())
 	if err != nil {
 		return nil, err
 	}
 
+	if err := client.Ping(context.TODO(), nil); err != nil {
+		return nil, FailedToConnect(err)
+	}
+
+	log.Println("Database pinged successfully!")
+
 	mongoDB := client.Database(dbName).Collection(collection)
 
 	return &Database{
-		writeDB: db,
-		readDB:  mongoDB,
+		db: mongoDB,
 	}, nil
 }
 
 func (d *Database) GetNoSql() *mongo.Collection {
-	return d.readDB
-}
-
-func (d *Database) GetSql() *gorm.DB {
-	return d.writeDB
+	return d.db
 }

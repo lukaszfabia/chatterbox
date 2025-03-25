@@ -19,6 +19,7 @@ func (d *Dispatcher) Register(queueName string, handler EventHandler) {
 }
 
 func (d *Dispatcher) HandleEvent(queueName string, msg []byte) error {
+	log.Printf("Handling event from '%s'\n", queueName)
 
 	handler, exists := d.handlers[queueName]
 	if !exists {

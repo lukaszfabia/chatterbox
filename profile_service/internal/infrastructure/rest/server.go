@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
@@ -20,7 +19,7 @@ type Server struct {
 
 func NewServer(router *mux.Router) *Server {
 	port := os.Getenv("APP_PORT")
-	host := strings.TrimSpace(os.Getenv("APP_ENV"))
+	host := os.Getenv("APP_ENV")
 	if host == "" {
 		host = "localhost"
 	}
@@ -55,8 +54,10 @@ func (apiServer *Server) GracefulShutdown(done chan bool) {
 }
 
 func (apiServer *Server) StartAndListen() {
+	log.Printf("Server is listening on: http://%s%s", os.Getenv("APP_ENV"), apiServer.s.Addr)
 	err := apiServer.s.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		panic(fmt.Sprintf("HTTP server error: %s", err))
 	}
+
 }

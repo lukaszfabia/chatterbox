@@ -22,6 +22,7 @@ func New(url string) (*RabbitMQ, error) {
 		return nil, err
 	}
 
+	log.Println("Successfully connected to RabbitMQ broker!")
 	return &RabbitMQ{Conn: conn, Channel: ch}, nil
 }
 

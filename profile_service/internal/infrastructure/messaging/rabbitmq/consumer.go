@@ -19,6 +19,8 @@ func (r *RabbitMQ) Consume(queueName string, dispatcher *events.Dispatcher) erro
 		return err
 	}
 
+	log.Printf("[x] Starting consuming %s\n", queueName)
+
 	for msg := range msgs {
 		if err := dispatcher.HandleEvent(queueName, msg.Body); err != nil {
 			log.Printf("Error handling event from queue %s: %v", queueName, err)

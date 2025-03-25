@@ -1,15 +1,12 @@
 package repositories
 
 import (
-	"profile_service/internal/domain/models/readmodels"
-	"profile_service/internal/domain/models/writemodels"
-
-	"github.com/google/uuid"
+	"profile_service/internal/domain/models"
 )
 
 type ProfileRepository interface {
-	GetUserById(id uuid.UUID) (*readmodels.Profile, error)
-	GetUserByUsername(username string) (*readmodels.Profile, error)
+	GetUserById(id string) (*models.Profile, error)
+	GetUserByUsername(username string) (*models.Profile, error)
 
-	SaveUser(profile writemodels.Profile) (*readmodels.Profile, error)
+	SaveUser(profile models.Profile) (*models.Profile, error)
 }
