@@ -1,5 +1,5 @@
 package queries
 
 type GetProfileQuery struct {
-	UserID uint `json:"userID"`
+	UserID string `json:"userID"`
 }

@@ -1,25 +1,23 @@
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import APIRouter, Body
 from fastapi import status
 from fastapi import Depends
-import jwt
 from app.application.command_handlers import CreateUserCommandHandler
 from app.application.query_handlers import AuthUserQueryHandler
-from app.config import (
-    DECODE_ALGO,
-    GOOGLE_CLIENT_ID,
-    GOOGLE_TOKEN_URL,
-    HANDLED_PROVIDERS,
-    GOOGLE_CLIENT_SECRET,
-    GOOGLE_REDIRECT_URI,
-    oauth2_scheme,
-)
-from app.dependencies import get_auth_service, get_handler
+
+# from app.config import (
+#     DECODE_ALGO,
+#     GOOGLE_CLIENT_ID,
+#     GOOGLE_TOKEN_URL,
+#     HANDLED_PROVIDERS,
+#     GOOGLE_CLIENT_SECRET,
+#     GOOGLE_REDIRECT_URI,
+#     oauth2_scheme,
+# )
+from app.dependencies import get_handler
 from app.domain.commands import CreateUserCommand
-from app.domain.exceptions import UnsupportedProvider
 from app.domain.queries import AuthUserQuery
 from app.domain.dto.model import TokenDTO
 from fastapi import Depends
-import requests
 
 
 auth_router = APIRouter(tags=["auth endpoints"], prefix="/auth")
@@ -57,7 +55,7 @@ async def register(
     # publish event
     event = user.get_created_user_event()
 
-    await handler.publish_event(event)
+    await handler.rabbit_handler.publish(event)
 
     return token
 

@@ -11,6 +11,5 @@ type ProfileRepository interface {
 	GetUserById(id uuid.UUID) (*readmodels.Profile, error)
 	GetUserByUsername(username string) (*readmodels.Profile, error)
 
-	CreateUser(profile writemodels.Profile) (*readmodels.Profile, error)
-	UpdateUser(profile writemodels.Profile) (*readmodels.Profile, error)
+	SaveUser(profile writemodels.Profile) (*readmodels.Profile, error)
 }

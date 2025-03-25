@@ -7,7 +7,7 @@ from app.domain.dto.model import TokenDTO
 from app.infrastructure.utils.jwt.jwt import JWTSerivce
 
 
-class CreateUserCommandHandler(Handler):
+class CreateUserCommandHandler:
     def __init__(self, rabbit_handler, user_repo):
         self.jwt = JWTSerivce()
         super().__init__(rabbit_handler, user_repo)
@@ -30,6 +30,3 @@ class CreateUserCommandHandler(Handler):
         )
 
         return (new_user, token)
-
-    async def publish_event(self, event: UserCreatedEvent):
-        await self.rabbit_handler.publish(event)

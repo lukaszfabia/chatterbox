@@ -40,7 +40,7 @@ func DecodeJWT(tokenStr string) (uuid.UUID, error) {
 
 	if err != nil {
 		log.Println(err)
-		return uuid.Nil, FailedToParse(err)
+		return uuid.Nil, FailedToParseToken(err)
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {

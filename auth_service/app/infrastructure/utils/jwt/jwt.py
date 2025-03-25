@@ -1,4 +1,5 @@
 from datetime import timedelta, timezone, datetime
+import uuid
 
 from fastapi import Depends
 from pydantic import BaseModel
@@ -41,14 +42,14 @@ class JWTSerivce:
         return encoded_jwt
 
     @staticmethod
-    def create_access_token(sub: str | int):
+    def create_access_token(sub: uuid.UUID):
         """Get new access token"""
         return JWTSerivce.__create_token(
             sub=str(sub), expires_delta=settings.access_token_expiration
         )
 
     @staticmethod
-    def create_refresh_token(sub: str | int):
+    def create_refresh_token(sub: uuid.UUID):
         """Get new refresh token"""
         return JWTSerivce.__create_token(
             sub=str(sub), expires_delta=settings.refresh_token_expiration

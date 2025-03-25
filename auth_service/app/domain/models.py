@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Date
+import uuid
+from sqlalchemy import UUID, Column, Integer, String, Date
 from sqlalchemy.ext.declarative import declarative_base
 import bcrypt
 
@@ -10,7 +11,7 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
 
     deleted_at = Column(Date, default=None)
 

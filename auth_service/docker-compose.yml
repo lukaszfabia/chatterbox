@@ -9,11 +9,11 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
-      RABBIT_HOST: ${RABBIT_HOST}
-      RABBIT_PORT: ${RABBIT_PORT}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
 
     ports:
-      - ${DB_PORT}:${DB_PORT}
+      - "${DB_PORT}:5432"
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "${DB_USERNAME}" ]
       interval: 30s

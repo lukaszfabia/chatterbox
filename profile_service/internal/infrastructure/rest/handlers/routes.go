@@ -16,9 +16,10 @@ func NewRouter(commandService commands.ProfileCommandService, queryService queri
 	router.HandleFunc("/profiles/{id}", profileHandler.GetProfile).Methods(http.MethodGet)
 	router.HandleFunc("/profiles", profileHandler.GetProfile).Methods(http.MethodGet)
 
-	router.HandleFunc("/profiles", profileHandler.CreateProfile).Methods(http.MethodPost)
-	router.HandleFunc("/profiles", profileHandler.UpdateProfile).Methods(http.MethodPut)
-	router.HandleFunc("/profiles", profileHandler.DeleteProfile).Methods(http.MethodDelete)
+	authRouter := router.NewRoute().Subrouter()
+	authRouter.Use(profileHandler.IsAuth)
+
+	authRouter.HandleFunc("/profiles", profileHandler.UpdateProfile).Methods(http.MethodPut)
 
 	return router
 }

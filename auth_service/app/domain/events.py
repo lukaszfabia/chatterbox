@@ -1,15 +1,15 @@
 from dataclasses import dataclass
-from pydantic import BaseModel
+import uuid
 
 
 @dataclass(frozen=True)
 class UserCreatedEvent:
-    userID: int
+    userID: uuid.UUID
     email: str
     username: str
 
 
 @dataclass(frozen=True)
 class UserAuthEvent:
-    userID: int
+    userID: uuid.UUID
     email: str

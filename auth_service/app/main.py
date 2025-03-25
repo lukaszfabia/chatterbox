@@ -1,13 +1,14 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.auth_routes import auth_router
+from app.rest.auth_routes import auth_router
 from dotenv import load_dotenv
 from app.config import APP_NAME
 
 
 def create_app() -> FastAPI:
     load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+    load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
     app = FastAPI(
         title=f"{APP_NAME} - Auth Serivce",
@@ -27,9 +28,4 @@ def create_app() -> FastAPI:
     return app
 
 
-if __name__ == "__main__":
-    import uvicorn
-
-    app = create_app()
-
-    uvicorn.run(app, host="localhost", port=8000)
+app = create_app()

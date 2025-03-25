@@ -7,7 +7,7 @@ from app.domain.dto.model import TokenDTO
 from app.infrastructure.utils.jwt.jwt import JWTSerivce
 
 
-class AuthUserQueryHandler(Handler):
+class AuthUserQueryHandler:
     def __init__(self, rabbit_handler, user_repo):
         super().__init__(rabbit_handler, user_repo)
         self.jwt = JWTSerivce()

@@ -1,35 +1,63 @@
 package main
 
+import (
+	"fmt"
+	"profile_service/internal/application/commands"
+	"profile_service/internal/application/events"
+	"profile_service/internal/application/queries"
+	"profile_service/internal/config"
+	aggregates "profile_service/internal/domain/aggretates"
+	e "profile_service/internal/domain/events"
+	"profile_service/internal/infrastructure/messaging/rabbitmq"
+	"profile_service/internal/infrastructure/repositories"
+	"profile_service/internal/infrastructure/rest"
+	"profile_service/internal/infrastructure/rest/handlers"
+	"profile_service/pkg"
+	"reflect"
+)
+
+func init() {
+	pkg.LoadEnv()
+}
+
 func main() {
 
-	// repo := repository.New()
-	// router := mux.NewRouter()
+	repo := repositories.New()
+	aggregate := aggregates.NewProfileAggregate(repo.ProfileRepository())
 
-	// server := api.NewServer(repo, router)
+	queryService := queries.NewProfileQueryService(repo.ProfileRepository())
+	commandService := commands.NewProfileCommandService(*aggregate)
 
-	// done := make(chan bool, 1)
+	dispatcher := events.NewDispatcher()
 
-	// go func() {
-	// 	server.StartAndListen()
-	// }()
+	event := events.NewUserCreatedHandler(*aggregate)
+	dispatcher.Register(fmt.Sprint(reflect.TypeOf(e.UserCreatedEvent{}).Name()), event)
 
-	// go func() {
-	// 	rabbit, err := rabbitmq.NewRabbitMQConnection()
-	// 	if err != nil {
-	// 		panic("Failed to connect with queue")
-	// 	}
+	// handlers
+	router := handlers.NewRouter(commandService, queryService)
+	server := rest.NewServer(router)
 
-	// 	defer rabbit.Close()
+	done := make(chan bool, 1)
 
-	// 	handler := application.NewEventHandler(rabbit, server.GetProfileRepo())
+	go func() {
+		server.StartAndListen()
+	}()
 
-	// 	handler.StartListen()
+	go func() {
+		rabbit, err := rabbitmq.New(config.GetBrokerUrl())
+		if err != nil {
+			panic("Failed to connect with queue")
+		}
 
-	// }()
+		defer rabbit.Close()
 
-	// go func() {
-	// 	server.GracefulShutdown(done)
-	// }()
+		rabbit.Consume(fmt.Sprint(reflect.TypeOf(e.UserCreatedEvent{}).Name()), dispatcher)
 
-	// <-done
+	}()
+
+	go func() {
+		server.GracefulShutdown(done)
+	}()
+
+	<-done
 }

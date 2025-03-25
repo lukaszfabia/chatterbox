@@ -5,11 +5,16 @@ import (
 	"log"
 	aggregates "profile_service/internal/domain/aggretates"
 	"profile_service/internal/domain/events"
-	"profile_service/internal/domain/models/writemodels"
 )
 
 type UserCreatedHandler struct {
 	aggregate aggregates.ProfileAggregate
+}
+
+func NewUserCreatedHandler(aggregate aggregates.ProfileAggregate) EventHandler {
+	return &UserCreatedHandler{
+		aggregate: aggregate,
+	}
 }
 
 func (h *UserCreatedHandler) Handle(body []byte) error {
@@ -18,13 +23,7 @@ func (h *UserCreatedHandler) Handle(body []byte) error {
 		return err
 	}
 
-	profile, errr := writemodels.NewProfileFromEvent(event)
-
-	if errr != nil {
-		log.Println(errr.Error())
-	}
-
-	_, err := h.aggregate.CreateProfile(*profile)
+	_, err := h.aggregate.CreateProfile(event)
 
 	if err != nil {
 		log.Println(err.Error())

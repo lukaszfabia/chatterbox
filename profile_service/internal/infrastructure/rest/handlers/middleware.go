@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"profile_service/internal/domain/queries"
 	"profile_service/internal/infrastructure/rest"
 	"profile_service/pkg"
 	"strings"
@@ -17,7 +18,7 @@ func (h *ProfileHandler) IsAuth(next http.Handler) http.Handler {
 		// no bearer token
 		if authorization == "" {
 			log.Println("Unauthorized")
-			rest.NewResponse(w, http.StatusUnauthorized, "")
+			rest.Unauthorized(w)
 			return
 		}
 
@@ -25,7 +26,7 @@ func (h *ProfileHandler) IsAuth(next http.Handler) http.Handler {
 
 		if tokenStr == "" {
 			log.Println("Token missing after trimming Bearer prefix")
-			rest.NewResponse(w, http.StatusUnauthorized, "")
+			rest.Unauthorized(w)
 			return
 		}
 
@@ -34,15 +35,17 @@ func (h *ProfileHandler) IsAuth(next http.Handler) http.Handler {
 
 		if err != nil {
 			log.Println("Error during decoding token")
-			rest.NewResponse(w, http.StatusUnauthorized, err.Error())
+			rest.Unauthorized(w)
 			return
 		}
 
-		user, err := h.queryService.GetProfile(id)
+		q := queries.GetProfileQuery{UserID: id.String()}
+
+		user, err := h.queryService.GetProfile(q)
 
 		if err != nil {
 			log.Println("Error retrieving user from database:", err)
-			rest.NewResponse(w, http.StatusUnauthorized, "")
+			rest.Unauthorized(w)
 			return
 		}
 

@@ -23,5 +23,8 @@ async def get_rabbitmq():
 #     return AuthService(user_repository)
 
 
-def get_handler(user_repository: UserRepository = Depends(get_user_repository)):
-    return Handler(user_repo=user_repository, rabbit_handler=get_rabbitmq())
+async def get_handler():
+    user_repo = await get_user_repository()
+    rabbit_handler = await get_rabbitmq()
+
+    return Handler(user_repo=user_repo, rabbit_handler=rabbit_handler)

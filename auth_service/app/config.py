@@ -17,8 +17,8 @@ class RabbitConfig:
 config_for_rabbit = RabbitConfig(
     login=os.getenv("RABBITMQ_DEFAULT_USER"),
     password=os.getenv("RABBITMQ_DEFAULT_PASS"),
-    port=os.getenv("RABBIT_PORT"),
-    host=os.getenv("RABBIT_HOST"),
+    port=os.getenv("RABBITMQ_PORT"),
+    host=os.getenv("RABBITMQ_HOST"),
 )
 
 

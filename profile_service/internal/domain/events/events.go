@@ -5,7 +5,6 @@ type Event interface {
 }
 
 type BaseEvent struct {
-	EventName string
 }
 
 func (b *BaseEvent) Log() {

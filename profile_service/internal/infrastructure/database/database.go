@@ -12,8 +12,8 @@ import (
 )
 
 type Database struct {
-	WriteDB *gorm.DB
-	ReadDB  *mongo.Collection
+	writeDB *gorm.DB
+	readDB  *mongo.Collection
 }
 
 func Connect() (*Database, error) {
@@ -28,7 +28,7 @@ func Connect() (*Database, error) {
 func (d *Database) Close() error {
 	log.Println("Closing connections...")
 
-	if dbInstance, err := d.WriteDB.DB(); err == nil {
+	if dbInstance, err := d.writeDB.DB(); err == nil {
 		if closeErr := dbInstance.Close(); closeErr != nil {
 			log.Println("Failed to close PostgreSQL connection:", closeErr)
 			return FailedToCloseConnection(err)
@@ -38,7 +38,7 @@ func (d *Database) Close() error {
 		log.Println("Error closing PostgreSQL connection:", err)
 	}
 
-	if err := d.ReadDB.Database().Client().Disconnect(context.TODO()); err != nil {
+	if err := d.readDB.Database().Client().Disconnect(context.TODO()); err != nil {
 		log.Println("Failed to close MongoDB connection:", err)
 		return FailedToCloseConnection(err)
 	}
@@ -48,7 +48,7 @@ func (d *Database) Close() error {
 }
 
 func (d *Database) Sync() error {
-	if err := d.WriteDB.AutoMigrate(config.Tables...); err != nil {
+	if err := d.writeDB.AutoMigrate(config.Tables...); err != nil {
 		return FailedMigration(err)
 	}
 
@@ -71,7 +71,15 @@ func newDBConnection(dbName, collection string) (*Database, error) {
 	mongoDB := client.Database(dbName).Collection(collection)
 
 	return &Database{
-		WriteDB: db,
-		ReadDB:  mongoDB,
+		writeDB: db,
+		readDB:  mongoDB,
 	}, nil
+}
+
+func (d *Database) GetNoSql() *mongo.Collection {
+	return d.readDB
+}
+
+func (d *Database) GetSql() *gorm.DB {
+	return d.writeDB
 }

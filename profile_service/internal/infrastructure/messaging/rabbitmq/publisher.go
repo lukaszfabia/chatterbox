@@ -2,11 +2,12 @@ package rabbitmq
 
 import (
 	"encoding/json"
+	"profile_service/internal/domain/events"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-func (r *RabbitMQ) Publish(queueName string, event any) error {
+func (r *RabbitMQ) Publish(queueName string, event events.Event) error {
 	_, err := r.Channel.QueueDeclare(
 		queueName,
 		true,  // durable
