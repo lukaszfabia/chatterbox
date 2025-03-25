@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Body
 from fastapi import status
 from fastapi import Depends
-from app.application.command_handlers import CreateUserCommandHandler
-from app.application.query_handlers import AuthUserQueryHandler
+from app.application.commands.command_handlers import CreateUserCommandService
+from app.application.queries.query_handlers import AuthUserQueryService
 
 # from app.config import (
 #     DECODE_ALGO,
@@ -13,7 +13,10 @@ from app.application.query_handlers import AuthUserQueryHandler
 #     GOOGLE_REDIRECT_URI,
 #     oauth2_scheme,
 # )
-from app.dependencies import get_handler
+from app.dependencies import (
+    get_create_user_command_service,
+    get_auth_user_query_service,
+)
 from app.domain.commands import CreateUserCommand
 from app.domain.queries import AuthUserQuery
 from app.domain.dto.model import TokenDTO
@@ -31,11 +34,9 @@ auth_router = APIRouter(tags=["auth endpoints"], prefix="/auth")
 )
 async def login(
     credentials: AuthUserQuery = Body(..., example=AuthUserQuery.exmaple()),
-    handler: AuthUserQueryHandler = Depends(get_handler),
+    serivce: AuthUserQueryService = Depends(get_create_user_command_service),
 ):
-    user, token = await handler.handle(ent=credentials)
-
-    await handler.publish_event(event=user.get_auth_user_event())
+    token = await serivce.handle(ent=credentials)
 
     return token
 
@@ -44,18 +45,13 @@ async def login(
     "/register",
     description="create an account",
     response_model=TokenDTO,
-    status_code=status.HTTP_202_ACCEPTED,
+    status_code=status.HTTP_201_CREATED,
 )
 async def register(
     credentials: CreateUserCommand = Body(..., example=CreateUserCommand.exmaple()),
-    handler: CreateUserCommandHandler = Depends(get_handler),
+    handler: CreateUserCommandService = Depends(get_auth_user_query_service),
 ):
-    user, token = await handler.handle(ent=credentials)
-
-    # publish event
-    event = user.get_created_user_event()
-
-    await handler.rabbit_handler.publish(event)
+    token = await handler.handle(ent=credentials)
 
     return token
 
