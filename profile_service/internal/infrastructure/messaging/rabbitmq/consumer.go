@@ -2,29 +2,23 @@ package rabbitmq
 
 import (
 	"log"
-	"profile_service/internal/application/events"
 )
 
-func (r *RabbitMQ) Consume(queueName string, dispatcher *events.Dispatcher) error {
-	msgs, err := r.Channel.Consume(
-		queueName,
-		"",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
+func (r *RabbitMQ) Consume(queue string, handler func(body []byte) error) error {
+	msgs, err := r.Channel.Consume(queue, "", true, false, false, false, nil)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("[x] Starting consuming %s\n", queueName)
-
-	for msg := range msgs {
-		if err := dispatcher.HandleEvent(queueName, msg.Body); err != nil {
-			log.Printf("Error handling event from queue %s: %v", queueName, err)
+	go func() {
+		for msg := range msgs {
+			err := handler(msg.Body)
+			if err != nil {
+				log.Printf("Error handling event from queue %s: %v", queue, err)
+			}
 		}
-	}
+	}()
+
+	log.Printf("Consuming from queue: %s", queue)
 	return nil
 }

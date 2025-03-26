@@ -19,7 +19,7 @@ func NewProfileAggregate(repo repositories.ProfileRepository) *ProfileAggregate 
 }
 
 func (a *ProfileAggregate) CreateProfile(event events.UserCreatedEvent) (*models.Profile, error) {
-	log.Println("Creating new profile...")
+	log.Printf("Creating new profile for %s", event.Username)
 	profile, err := models.NewProfile(event.Email, event.Username, event.UserID)
 
 	if err != nil {

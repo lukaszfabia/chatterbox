@@ -29,11 +29,6 @@ func New() Repository {
 	}
 	log.Println("Successfully connected to MongoDB database!")
 
-	err = db.Sync()
-	if err != nil {
-		log.Println(err.Error())
-	}
-
 	profileRepo := NewProfileRepository(db)
 
 	return &repositoryImpl{

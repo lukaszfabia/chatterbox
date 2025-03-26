@@ -39,7 +39,7 @@ func BuildConnectionString() string {
 }
 
 func LoadEnv() {
-	if err := godotenv.Load("../.env"); err != nil {
+	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file provied")
 	}
 }

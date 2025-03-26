@@ -1,6 +1,4 @@
-from dataclasses import asdict, dataclass
-import json
-import uuid
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True)

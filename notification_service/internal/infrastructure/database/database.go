@@ -1,18 +1,20 @@
 package database
 
 import (
+	"context"
 	"log"
 	"notification_serivce/internal/config"
+	"os"
 
-	"github.com/go-redis/redis"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 type Database struct {
-	db *redis.Client
+	db *mongo.Collection
 }
 
 func Connect() (*Database, error) {
-	dbs, err := newDBConnection()
+	dbs, err := newDBConnection(os.Getenv("DB_NAME"), os.Getenv("MONGO_COLLECTION"))
 	if err != nil {
 		return nil, FailedToConnect(err)
 	}
@@ -23,30 +25,38 @@ func Connect() (*Database, error) {
 func (d *Database) Close() error {
 	log.Println("Closing connections...")
 
-	if err := d.db.Close(); err != nil {
-		log.Println("Failed to close connection with Redis")
+	if err := d.db.Database().Client().Disconnect(context.TODO()); err != nil {
+		log.Println("Failed to close MongoDB connection:", err)
+		return FailedToCloseConnection(err)
 	}
 
-	log.Println("Redis connection closed successfully")
+	log.Println("MongoDB connection closed successfully")
 	return nil
 }
 
-func newDBConnection() (*Database, error) {
-	client := config.GetRedisClient()
-	ping := client.Ping()
-	_, err := ping.Result()
+func (d *Database) Sync() error {
+	return nil
+}
 
+func newDBConnection(dbName, collection string) (*Database, error) {
+	client, err := mongo.Connect(config.GetNoSqlConfig())
 	if err != nil {
 		return nil, err
 	}
 
+	if err := client.Ping(context.TODO(), nil); err != nil {
+		return nil, FailedToConnect(err)
+	}
+
 	log.Println("Database pinged successfully!")
 
+	mongoDB := client.Database(dbName).Collection(collection)
+
 	return &Database{
-		db: client,
+		db: mongoDB,
 	}, nil
 }
 
-func (d *Database) GetRedis() *redis.Client {
+func (d *Database) GetNoSql() *mongo.Collection {
 	return d.db
 }

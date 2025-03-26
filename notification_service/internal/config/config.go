@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"os"
 
-	"github.com/go-redis/redis"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 // Please load env vars before you call it!
@@ -26,18 +27,17 @@ func GetBrokerUrl() string {
 	return amqpURL
 }
 
-func GetRedisClient() *redis.Client {
-	host := os.Getenv("REDIS_HOST")
-	port := os.Getenv("REDIS_PORT")
-	pass := os.Getenv("REDIS_PASS")
+func GetNoSqlConfig() *options.ClientOptions {
+	host := os.Getenv("MONGO_HOST")
+	port := os.Getenv("MONGO_PORT")
+	user := os.Getenv("MONGO_USER")
+	pass := os.Getenv("MONGO_PASS")
 
-	addr := fmt.Sprintf("%s:%s", host, port)
+	if host == "" || port == "" || user == "" || pass == "" {
+		log.Fatal("MongoDB credentials are missing. Make sure MONGO_HOST, MONGO_PORT, MONGO_USER, and MONGO_PASS are set.")
+	}
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     addr,
-		Password: pass,
-		DB:       0,
-	})
+	uri := fmt.Sprintf("mongodb://%s:%s@%s:%s", user, pass, host, port)
 
-	return rdb
+	return options.Client().ApplyURI(uri)
 }

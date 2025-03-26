@@ -2,10 +2,12 @@ package events
 
 import (
 	"log"
+	"sync"
 )
 
 type Dispatcher struct {
 	handlers map[string]EventHandler
+	mu       sync.RWMutex
 }
 
 func NewDispatcher() *Dispatcher {
@@ -27,4 +29,11 @@ func (d *Dispatcher) HandleEvent(queueName string, msg []byte) error {
 	}
 
 	return handler.Handle(msg)
+}
+
+func (d *Dispatcher) GetHandler(eventName string) (func([]byte) error, bool) {
+	d.mu.RLock()
+	defer d.mu.RUnlock()
+	handler, exists := d.handlers[eventName]
+	return handler.Handle, exists
 }

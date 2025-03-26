@@ -1,6 +1,9 @@
 package messaging
 
+import "profile_service/internal/domain/events"
+
 type EventBus interface {
-	Publish(queueName string, event any) error
-	Consume(queue string, handler func(body []byte)) error
+	Publish(queueName string, event events.Event) error
+	Consume(queueName string, handler func(body []byte) error) error
+	Close()
 }

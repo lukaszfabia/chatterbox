@@ -2,6 +2,7 @@ package rabbitmq
 
 import (
 	"log"
+	"profile_service/internal/infrastructure/messaging"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -11,7 +12,7 @@ type RabbitMQ struct {
 	Channel *amqp.Channel
 }
 
-func New(url string) (*RabbitMQ, error) {
+func New(url string) (messaging.EventBus, error) {
 	conn, err := amqp.Dial(url)
 	if err != nil {
 		return nil, err

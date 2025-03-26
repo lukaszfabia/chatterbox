@@ -11,12 +11,14 @@ import (
 func NewRouter(commandService commands.ProfileCommandService, queryService queries.ProfileQueryService) *mux.Router {
 	router := mux.NewRouter()
 
+	apiRouter := router.PathPrefix("/api/v1").Subrouter()
+
 	profileHandler := NewProfileHandler(commandService, queryService)
 
-	router.HandleFunc("/profiles/{id}", profileHandler.GetProfile).Methods(http.MethodGet)
-	router.HandleFunc("/profiles", profileHandler.GetProfile).Methods(http.MethodGet)
+	apiRouter.HandleFunc("/profiles/{id}", profileHandler.GetProfile).Methods(http.MethodGet)
+	apiRouter.HandleFunc("/profiles", profileHandler.GetProfile).Methods(http.MethodGet)
 
-	authRouter := router.NewRoute().Subrouter()
+	authRouter := apiRouter.NewRoute().Subrouter()
 	authRouter.Use(profileHandler.IsAuth)
 
 	authRouter.HandleFunc("/profiles", profileHandler.UpdateProfile).Methods(http.MethodPut)

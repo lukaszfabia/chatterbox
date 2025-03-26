@@ -1,5 +1,4 @@
 from app.domain.exceptions import InvalidCredentials
-from app.domain.models import User
 from app.domain.queries import AuthUserQuery
 from app.domain.dto.model import TokenDTO
 from app.infrastructure.rabbitmq import RabbitMQHandler
@@ -20,6 +19,8 @@ class AuthUserQueryService:
 
         if not user.verify_password(ent.password, user.password):
             raise InvalidCredentials()
+
+        await self.rabbit_handler.publish(user.get_auth_user_event())
 
         return TokenDTO(
             access_token=self.jwt.create_access_token(user),
