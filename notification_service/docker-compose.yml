@@ -1,0 +1,19 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: profile_data
+    restart: always
+    environment:
+      GMAIL_MAIL: ${GMAIL_MAIL}
+      GMAIL_PASSWORD: ${GMAIL_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASS: ${REDIS_PASS}
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    networks:
+      - notification_service_net
+
+networks:
+  notification_service_net:
+    driver: bridge

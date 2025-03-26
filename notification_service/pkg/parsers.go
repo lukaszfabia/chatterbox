@@ -2,12 +2,23 @@ package pkg
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"text/template"
 )
+
+func DecodeJSON[T any](r *http.Request) (*T, error) {
+	form := new(T) // new instance of T
+	if err := json.NewDecoder(r.Body).Decode(form); err != nil {
+		return nil, IvnalidJson(err)
+	}
+
+	return form, nil
+}
 
 func ParseHTMLToString(templateName string, data any) (string, error) {
 	pwd, err := os.Getwd()
