@@ -1,5 +1,9 @@
 from fastapi import Depends
-from app.application.commands.command_handlers import CreateUserCommandService
+from app.application.commands.command_handlers import (
+    CreateUserCommandService,
+    UpdateUserCommandService,
+    DeleteUserCommandService,
+)
 from app.application.queries.query_handlers import AuthUserQueryService
 from app.infrastructure.rabbitmq import RabbitMQHandler
 from app.infrastructure.repository.user_repo import UserRepository
@@ -30,3 +34,17 @@ def get_auth_user_query_service(
     rabbit_handler: RabbitMQHandler = Depends(get_rabbitmq),
 ) -> AuthUserQueryService:
     return AuthUserQueryService(user_repo=user_repo, rabbit_handler=rabbit_handler)
+
+
+def get_update_user_command_service(
+    user_repo: UserRepository = Depends(get_user_repository),
+    rabbit_handler: RabbitMQHandler = Depends(get_rabbitmq),
+) -> UpdateUserCommandService:
+    return UpdateUserCommandService(user_repo=user_repo, rabbit_handler=rabbit_handler)
+
+
+def get_delete_user_command_service(
+    user_repo: UserRepository = Depends(get_user_repository),
+    rabbit_handler: RabbitMQHandler = Depends(get_rabbitmq),
+) -> DeleteUserCommandService:
+    return DeleteUserCommandService(user_repo=user_repo, rabbit_handler=rabbit_handler)

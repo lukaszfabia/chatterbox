@@ -1,10 +1,17 @@
 from datetime import datetime
+from typing import Optional
 import uuid
-from sqlalchemy import UUID, Column, DateTime, Integer, String, Date, func
+from pydantic import EmailStr
+from sqlalchemy import UUID, Column, DateTime, String, Date
 from sqlalchemy.ext.declarative import declarative_base
 import bcrypt
 
-from app.domain.events import UserAuthEvent, UserCreatedEvent
+from app.domain.events import (
+    DeleteUserEvent,
+    UserAuthEvent,
+    UserCreatedEvent,
+    UserUpdatedEvent,
+)
 
 Base = declarative_base()
 
@@ -26,6 +33,28 @@ class User(Base):
 
     def __repr__(self):
         return f"<User(id={self.id}, username={self.username}, email={self.email})>"
+
+    def update(
+        self,
+        username: Optional[str],
+        password: Optional[str],
+        email: Optional[str],
+    ):
+        if self.__can_be_set(username, self.username):
+            self.usernamer = username
+
+        if self.__can_be_set(email, self.email):
+            self.email = email
+
+        # add more validation in the future
+        if self.__can_be_set(password, self.password):
+            self.password = self.hash_password(password)
+
+    def mark_as_deleted(self):
+        self.deleted_at = datetime.now
+
+    def __can_be_set(self, s: Optional[str], to_comapre: str) -> bool:
+        return s and s != to_comapre and 3 < len(s) < 124
 
     @staticmethod
     def hash_password(password: str) -> str:
@@ -49,3 +78,11 @@ class User(Base):
 
     def get_auth_user_event(self) -> UserAuthEvent:
         return UserAuthEvent(userID=str(self.id), email=self.email)
+
+    def get_user_updated_event(self) -> UserUpdatedEvent:
+        return UserUpdatedEvent(
+            userID=str(self.id), email=self.email, username=self.username
+        )
+
+    def get_deleted_user_event(self) -> DeleteUserEvent:
+        return DeleteUserEvent(userID=str(self.id))

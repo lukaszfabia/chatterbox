@@ -1,34 +1,55 @@
-from app.domain.commands import CreateUserCommand
-from app.domain.exceptions import FailedToRegister, UserAlreadyExists
+from typing import Optional
+from app.application.serivce import Service, trigger_event
+from app.domain.commands import CreateUserCommand, DeleteUserCommand, UpdateUserCommand
 from app.domain.dto.model import TokenDTO
-from app.infrastructure.rabbitmq import RabbitMQHandler
-from app.infrastructure.repository.user_repo import UserRepository
-from app.infrastructure.utils.jwt.jwt import JWTSerivce
+from app.domain.models import User
 
 
-class CreateUserCommandService:
-    def __init__(self, rabbit_handler: RabbitMQHandler, user_repo: UserRepository):
-        self.jwt = JWTSerivce()
-        self.rabbit_handler = rabbit_handler
-        self.repo = user_repo
+class CreateUserCommandService(Service):
 
-    async def handle(self, ent: CreateUserCommand) -> TokenDTO:
+    def __init__(self, rabbit_handler, user_repo):
+        super().__init__(rabbit_handler, user_repo)
+
+    @trigger_event(("get_created_user_event"))
+    async def handle(self, ent: CreateUserCommand) -> Optional[TokenDTO]:
         if await self.repo.is_user_exists(email=ent.email, username=ent.username):
-            raise UserAlreadyExists()
+            return None
 
-        # create user
-        new_user = await self.repo.create(
+        new_user: User = await self.repo.create(
             email=ent.email, username=ent.username, password=ent.password
         )
 
         if new_user is None:
-            raise FailedToRegister()
+            return None
 
-        await self.rabbit_handler.publish(new_user.get_created_user_event())
+        self.rabbit_handler.publish(new_user.get_created_user_event())
 
-        token = TokenDTO(
+        return TokenDTO(
             access_token=self.jwt.create_access_token(new_user),
             refresh_token=self.jwt.create_refresh_token(new_user),
         )
 
-        return token
+
+class UpdateUserCommandService(Service):
+    def __init__(self, rabbit_handler, user_repo):
+        super().__init__(rabbit_handler, user_repo)
+
+    @trigger_event(("get_user_updated_event"))
+    async def handle(self, ent: UpdateUserCommand):
+
+        user = await self.get_auth_user()
+
+        return await self.repo.update_user(
+            user, username=ent.username, email=ent.email, password=ent.password
+        )
+
+
+class DeleteUserCommandService(Service):
+    def __init__(self, rabbit_handler, user_repo):
+        super().__init__(rabbit_handler, user_repo)
+
+    @trigger_event(("get_deleted_user_event"))
+    async def handle(self, _: DeleteUserCommand):
+        user = await self.get_auth_user()
+
+        return await self.repo.delete_user(user)

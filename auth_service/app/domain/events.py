@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -12,3 +13,15 @@ class UserCreatedEvent:
 class UserAuthEvent:
     userID: str
     email: str
+
+
+@dataclass(frozen=True)
+class UserUpdatedEvent:
+    userID: Optional[str]
+    email: Optional[str]
+    username: Optional[str]
+
+
+@dataclass(frozen=True)
+class DeleteUserEvent:
+    userID: Optional[str]

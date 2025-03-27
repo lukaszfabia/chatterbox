@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Body
 from fastapi import status
 from fastapi import Depends
-from app.application.commands.command_handlers import CreateUserCommandService
+from app.application.commands.command_handlers import (
+    CreateUserCommandService,
+    DeleteUserCommandService,
+    UpdateUserCommandService,
+)
 from app.application.queries.query_handlers import AuthUserQueryService
 
 # from app.config import (
@@ -16,14 +20,46 @@ from app.application.queries.query_handlers import AuthUserQueryService
 from app.dependencies import (
     get_create_user_command_service,
     get_auth_user_query_service,
+    get_update_user_command_service,
+    get_delete_user_command_service,
 )
-from app.domain.commands import CreateUserCommand
+from app.domain.commands import CreateUserCommand, UpdateUserCommand, DeleteUserCommand
 from app.domain.queries import AuthUserQuery
 from app.domain.dto.model import TokenDTO
 from fastapi import Depends
+from app.domain.exceptions import (
+    FailedToRegister,
+    InvalidCredentials,
+    FailedToDelete,
+    FailedToUpdate,
+)
 
 
 auth_router = APIRouter(tags=["auth endpoints"], prefix="/auth")
+
+
+@auth_router.put("/me", description="Update auth data", status_code=status.HTTP_200_OK)
+async def update_user_credintials(
+    credentials: UpdateUserCommand = Body(..., example=UpdateUserCommand.exmaple()),
+    service: UpdateUserCommandService = Depends(get_update_user_command_service),
+):
+    try:
+        await service.handle(ent=credentials)
+    except Exception:
+        raise FailedToUpdate()
+
+
+@auth_router.delete(
+    "/me", description="Soft deletes user", status_code=status.HTTP_200_OK
+)
+async def delete_user(
+    credentials: DeleteUserCommand = Body(..., example=DeleteUserCommand.exmaple()),
+    service: DeleteUserCommandService = Depends(get_delete_user_command_service),
+):
+    try:
+        await service.handle(ent=credentials)
+    except Exception:
+        raise FailedToDelete()
 
 
 @auth_router.post(
@@ -38,6 +74,9 @@ async def login(
 ):
     token = await serivce.handle(ent=credentials)
 
+    if token is None:
+        raise InvalidCredentials()
+
     return token
 
 
@@ -49,9 +88,12 @@ async def login(
 )
 async def register(
     credentials: CreateUserCommand = Body(..., example=CreateUserCommand.exmaple()),
-    handler: CreateUserCommandService = Depends(get_create_user_command_service),
+    service: CreateUserCommandService = Depends(get_create_user_command_service),
 ):
-    token = await handler.handle(ent=credentials)
+    token = await service.handle(ent=credentials)
+
+    if token is None:
+        raise FailedToRegister()
 
     return token
 
