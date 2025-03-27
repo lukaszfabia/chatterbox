@@ -31,4 +31,33 @@ Ustalenie architektury aplikacji, technologii, inicjacja projektu, bez infrastru
 
 Praca nad serwisem uwierzytelniania użytkownika
 
+//
+
+do auth service 
+
+- sso z googlem 
+
+- usuwanie konta -> wyzwolenie eventu z usunieciem do profile_serivce
+
+- update danych email, username, password -> wyzwolenie eventu do profile service aktualizacja danych email, username 
+
+do profile service 
+
+- update danych typu bio, zdj 
+
+- handling eventu z updatem danych 
+
+- opcjonlanie dodanie eventu powiadomiomienia ze dane zmienone
+
+- pobieranie profili 
+
+- handling usuwania konta
+
+do noti service 
+
+- implementacja websocketa do nasluchiwania powiadomien
+
+...
+
+zacząć robic chat i status serivce ...
 

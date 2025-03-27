@@ -3,6 +3,6 @@ import { Button } from "../ui/button";
 
 export default function Login() {
     return (
-        <Link href="/login"><Button variant="outline">Login</Button></Link>
+        <Button variant="outline"><Link href="/login">Login</Link></Button>
     )
 }

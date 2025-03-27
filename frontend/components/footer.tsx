@@ -7,7 +7,7 @@ import { Input } from "./ui/input";
 
 export default function Footer() {
     return (
-        <footer className="md:p-5 p-4 bg-accent mt-auto">
+        <footer className="md:p-5 p-4 mt-auto">
             <div className="md:px-5 px-3 py-5">
                 <div className="flex flex-col md:flex-row justify-between gap-10">
                     <div className="flex-1">

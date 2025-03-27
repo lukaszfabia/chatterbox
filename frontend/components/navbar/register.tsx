@@ -3,6 +3,6 @@ import { Button } from "../ui/button";
 
 export function Register() {
     return (
-        <Link href="/register"><Button>Sign Up</Button></Link>
+        <Button><Link href="/register">Sign Up</Link></Button>
     )
 }

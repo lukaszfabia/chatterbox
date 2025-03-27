@@ -100,7 +100,7 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <header className="p-5 backdrop-blur-2xl min-h-[70px] fixed w-full left-0 top-0">
+        <header className="p-5 backdrop-blur-2xl min-h-[70px] fixed w-full left-0 top-0 z-50">
             <nav className="flex justify-between px-5 items-center bg-transparent">
                 <Brand />
 

@@ -57,7 +57,7 @@ function FirstSection() {
           >
             <Button><Link href="/messages">
               Get Started</Link></Button>
-            <Button variant="outline"><span>Learn More</span> <ArrowRight /></Button>
+            <Button variant="outline"><Link href="/docs">Learn More</Link> <ArrowRight /></Button>
           </motion.div>
         </div>
       </motion.div>

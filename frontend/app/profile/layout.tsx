@@ -5,5 +5,5 @@ export default function ProfileLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="md:px-52 px-40">{children}</div>;
+  return <div>{children}</div>;
 }
