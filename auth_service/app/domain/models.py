@@ -7,7 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 import bcrypt
 
 from app.domain.events import (
-    DeleteUserEvent,
+    UserDeletedEvent,
     UserAuthEvent,
     UserCreatedEvent,
     UserUpdatedEvent,
@@ -41,7 +41,7 @@ class User(Base):
         email: Optional[str],
     ):
         if self.__can_be_set(username, self.username):
-            self.usernamer = username
+            self.username = username
 
         if self.__can_be_set(email, self.email):
             self.email = email
@@ -50,8 +50,10 @@ class User(Base):
         if self.__can_be_set(password, self.password):
             self.password = self.hash_password(password)
 
+        return self
+
     def mark_as_deleted(self):
-        self.deleted_at = datetime.now
+        self.deleted_at = datetime.now()
 
     def __can_be_set(self, s: Optional[str], to_comapre: str) -> bool:
         return s and s != to_comapre and 3 < len(s) < 124
@@ -84,5 +86,5 @@ class User(Base):
             userID=str(self.id), email=self.email, username=self.username
         )
 
-    def get_deleted_user_event(self) -> DeleteUserEvent:
-        return DeleteUserEvent(userID=str(self.id))
+    def get_deleted_user_event(self) -> UserDeletedEvent:
+        return UserDeletedEvent(userID=str(self.id))

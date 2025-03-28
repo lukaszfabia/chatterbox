@@ -6,7 +6,9 @@ import (
 
 type UpdateProfileCommand struct {
 	UUID           string                `json:"id"`
-	Bio            string                `json:"bio"`
-	AvatarFile     *multipart.FileHeader `json:"avatar_file"`
-	BackgroundFile *multipart.FileHeader `json:"background_file"`
+	FirstName      *string               `json:"firstName"`
+	LastName       *string               `json:"lastName"`
+	Bio            *string               `json:"bio"`
+	AvatarFile     *multipart.FileHeader `json:"avatarFile"`
+	BackgroundFile *multipart.FileHeader `json:"backgroundFile"`
 }

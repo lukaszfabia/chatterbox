@@ -13,7 +13,7 @@ import (
 
 var (
 	base = "./media"
-	host = "/api/v1/media"
+	host = "/api/v1/profile/media"
 )
 
 type Background struct{}
@@ -38,16 +38,18 @@ type FileInfo struct {
 }
 
 // Saves image and returns new URL
-func SaveImage[T Saveable](fileHeader *multipart.FileHeader, oldpath string) (url string, err error) {
+func SaveImage[T Saveable](fileHeader *multipart.FileHeader, oldpath *string) (url string, err error) {
 
 	fileinfo, err := GetFileFromForm(fileHeader)
-	fileinfo.OldPath = &oldpath
+	fileinfo.OldPath = oldpath
 
 	if err != nil {
+		log.Println(err.Error())
 		return "", err
 	}
 
 	if fileinfo.File == nil {
+		log.Println("No file")
 		return "", nil
 	}
 

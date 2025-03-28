@@ -9,25 +9,25 @@ import (
 	"reflect"
 )
 
-type UserCreatedHandler struct {
+type UserDeletedHandler struct {
 	aggregate aggregates.ProfileAggregate
 	bus       messaging.EventBus
 }
 
-func NewUserCreatedEventHandler(aggregate aggregates.ProfileAggregate, bus messaging.EventBus) EventHandler {
-	return &UserCreatedHandler{
+func NewUserDeletedEventHandler(aggregate aggregates.ProfileAggregate, bus messaging.EventBus) EventHandler {
+	return &UserDeletedHandler{
 		aggregate: aggregate,
 		bus:       bus,
 	}
 }
 
-func (h *UserCreatedHandler) Handle(body []byte) error {
-	var event events.UserCreatedEvent
+func (h *UserDeletedHandler) Handle(body []byte) error {
+	var event events.UserDeletedEvent
 	if err := json.Unmarshal(body, &event); err != nil {
 		return err
 	}
-
-	_, err := h.aggregate.CreateProfile(event)
+	log.Println(event.UserID)
+	err := h.aggregate.MarkAsADeleted(event.UserID)
 
 	if err != nil {
 		log.Println(err.Error())
@@ -36,7 +36,7 @@ func (h *UserCreatedHandler) Handle(body []byte) error {
 
 	n := events.NewNotifyEvent(event.UserID, event)
 	// publish noti
-	err = h.bus.Publish(reflect.TypeOf(*n).Name(), event)
+	err = h.bus.Publish(reflect.TypeOf(n).Name(), event)
 
 	if err != nil {
 		log.Println(err.Error())

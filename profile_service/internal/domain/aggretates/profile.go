@@ -37,12 +37,15 @@ func (a *ProfileAggregate) CreateProfile(event events.UserCreatedEvent) (*models
 }
 
 func (a *ProfileAggregate) UpdateProfile(profile commands.UpdateProfileCommand) (*models.Profile, error) {
-
+	log.Println("Starting updating profile...")
 	toUpdate, err := a.repo.GetUserById(profile.UUID)
 
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
+
+	log.Printf("Updating info for %s", toUpdate.Username)
 
 	toUpdate.UpdateProfile(profile)
 
@@ -53,4 +56,39 @@ func (a *ProfileAggregate) UpdateProfile(profile commands.UpdateProfileCommand) 
 	}
 
 	return savedProfile, nil
+}
+
+func (a *ProfileAggregate) UpdateProfileAuthInfo(profile events.UserUpdatedEvent) (*models.Profile, error) {
+
+	toUpdate, err := a.repo.GetUserById(profile.UserID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	toUpdate.UpdateAuthInfo(profile)
+
+	savedProfile, err := a.repo.SaveUser(*toUpdate)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return savedProfile, nil
+}
+
+func (a *ProfileAggregate) MarkAsADeleted(userID string) error {
+
+	toDelete, err := a.repo.GetUserById(userID)
+
+	if err != nil {
+		return err
+	}
+
+	toDelete.MarkDelete()
+
+	log.Printf("Deleting user: %s", toDelete.Username)
+
+	_, err = a.repo.SaveUser(*toDelete)
+	return err
 }

@@ -1,4 +1,3 @@
-from contextlib import asynccontextmanager
 from dataclasses import asdict
 import aio_pika
 import json
@@ -6,7 +5,6 @@ from typing import Any, Dict, Callable, Awaitable
 import logging
 
 from app.config import RabbitConfig
-
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("RabbitMQ logger")
@@ -39,9 +37,6 @@ class RabbitMQHandler:
             await self.connect()
 
         queue_name = ent.__class__.__name__
-
-        await self.channel.declare_queue(queue_name, durable=True)
-        log.info(f"{queue_name} has been declared")
 
         log.info(f"Attempting to serialize: {ent}")
 

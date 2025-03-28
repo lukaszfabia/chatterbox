@@ -33,6 +33,7 @@ from app.domain.exceptions import (
     FailedToDelete,
     FailedToUpdate,
 )
+from app.config import oauth2_scheme
 
 
 auth_router = APIRouter(tags=["auth endpoints"], prefix="/auth")
@@ -42,9 +43,11 @@ auth_router = APIRouter(tags=["auth endpoints"], prefix="/auth")
 async def update_user_credintials(
     credentials: UpdateUserCommand = Body(..., example=UpdateUserCommand.exmaple()),
     service: UpdateUserCommandService = Depends(get_update_user_command_service),
+    token=Depends(oauth2_scheme),
 ):
     try:
-        await service.handle(ent=credentials)
+        user = await service.get_auth_user(token)
+        await service.handle(ent=credentials, user=user)
     except Exception:
         raise FailedToUpdate()
 
@@ -55,10 +58,13 @@ async def update_user_credintials(
 async def delete_user(
     credentials: DeleteUserCommand = Body(..., example=DeleteUserCommand.exmaple()),
     service: DeleteUserCommandService = Depends(get_delete_user_command_service),
+    token=Depends(oauth2_scheme),
 ):
     try:
-        await service.handle(ent=credentials)
-    except Exception:
+        user = await service.get_auth_user(token)
+
+        await service.handle(user=user)
+    except Exception as e:
         raise FailedToDelete()
 
 

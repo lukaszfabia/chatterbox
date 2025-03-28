@@ -1,9 +1,6 @@
 from typing import Optional
 from app.domain.queries import AuthUserQuery
 from app.domain.dto.model import TokenDTO
-from app.infrastructure.rabbitmq import RabbitMQHandler
-from app.infrastructure.repository.user_repo import UserRepository
-from app.infrastructure.jwt import JWTSerivce
 from app.application.serivce import Service
 
 
@@ -23,6 +20,6 @@ class AuthUserQueryService(Service):
         await self.rabbit_handler.publish(user.get_auth_user_event())
 
         return TokenDTO(
-            access_token=self.jwt.create_access_token(user),
-            refresh_token=self.jwt.create_refresh_token(user),
+            access_token=self.jwt.create_access_token(user.id),
+            refresh_token=self.jwt.create_refresh_token(user.id),
         )

@@ -7,7 +7,7 @@ import (
 )
 
 type ProfileCommandService interface {
-	UpdateProfile(commands.UpdateProfileCommand) (*models.Profile, error)
+	UpdateProfile(body commands.UpdateProfileCommand) (*models.Profile, error)
 }
 
 type profileCommandServiceImpl struct {

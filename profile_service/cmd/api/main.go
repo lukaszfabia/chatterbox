@@ -26,6 +26,8 @@ func addEvents(aggregate *aggregates.ProfileAggregate, bus messaging.EventBus) (
 	dispatcher := events.NewDispatcher()
 	handlers := map[string]events.EventHandler{
 		fmt.Sprint(reflect.TypeOf(e.UserCreatedEvent{}).Name()): events.NewUserCreatedEventHandler(*aggregate, bus),
+		fmt.Sprint(reflect.TypeOf(e.UserDeletedEvent{}).Name()): events.NewUserDeletedEventHandler(*aggregate, bus),
+		fmt.Sprint(reflect.TypeOf(e.UserUpdatedEvent{}).Name()): events.NewUserUpdatedEventHandler(*aggregate, bus),
 	}
 
 	queueNames := make([]string, 0, len(handlers))

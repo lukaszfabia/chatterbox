@@ -37,7 +37,10 @@ class UserRepository:
     async def get_user_by_email_or_username(self, s: str) -> Optional[User]:
         return (
             await self.db.execute(
-                select(User).filter(or_(User.email == s, User.username == s))
+                select(User).filter(
+                    or_(User.email == s, User.username == s),
+                    User.deleted_at.is_(None),
+                )
             )
         ).scalar_one_or_none()
 
@@ -45,11 +48,15 @@ class UserRepository:
         uid = uuid.UUID(id)
 
         return (
-            await self.db.execute(select(User).filter(User.id == uid))
+            await self.db.execute(
+                select(User).filter(User.id == uid, User.deleted_at.is_(None))
+            )
         ).scalar_one_or_none()
 
     async def is_user_exists(self, username: str, email: str) -> bool:
-        stmt = select(User).filter(and_(User.email == email, User.username == username))
+        stmt = select(User).filter(
+            and_(User.email == email, User.username == username),
+        )
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none() is not None
 
@@ -69,8 +76,7 @@ class UserRepository:
         self, user: User, username: str, email: EmailStr, password: str
     ) -> Optional[User]:
 
-        user.update(username=username, email=email, password=password)
-        return user
+        return user.update(username=username, email=email, password=password)
 
     @handle_tx
     async def delete_user(self, user: User):

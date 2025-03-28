@@ -77,7 +77,7 @@ class JWTSerivce:
             return payload
         except jwt.ExpiredSignatureError:
             raise TokenExpired()
-        except jwt.JWTError:
+        except:
             raise InvalidToken()
 
     @staticmethod

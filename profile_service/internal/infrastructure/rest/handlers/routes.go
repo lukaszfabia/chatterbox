@@ -9,19 +9,22 @@ import (
 )
 
 func NewRouter(commandService commands.ProfileCommandService, queryService queries.ProfileQueryService) *mux.Router {
+	profileHandler := NewProfileHandler(commandService, queryService)
 	router := mux.NewRouter()
 
-	apiRouter := router.PathPrefix("/api/v1").Subrouter()
+	fileServer := http.FileServer(http.Dir("./media"))
+	router.PathPrefix("/api/v1/media/").Handler(http.StripPrefix("/api/v1/media/", fileServer))
 
-	profileHandler := NewProfileHandler(commandService, queryService)
+	apiRouter := router.PathPrefix("/api/v1/profile").Subrouter()
 
-	apiRouter.HandleFunc("/profiles/{id}", profileHandler.GetProfile).Methods(http.MethodGet)
-	apiRouter.HandleFunc("/profiles", profileHandler.GetProfile).Methods(http.MethodGet)
+	apiRouter.HandleFunc("", profileHandler.GetProfile).Methods(http.MethodGet)
+	apiRouter.HandleFunc("/many", profileHandler.GetProfiles).Methods(http.MethodGet)
 
-	authRouter := apiRouter.NewRoute().Subrouter()
+	authRouter := apiRouter.PathPrefix("/auth").Subrouter()
 	authRouter.Use(profileHandler.IsAuth)
 
-	authRouter.HandleFunc("/profiles", profileHandler.UpdateProfile).Methods(http.MethodPut)
+	authRouter.HandleFunc("/me", profileHandler.UpdateProfile).Methods(http.MethodPut)
+	authRouter.HandleFunc("/me", profileHandler.GetAuthUserProfile).Methods(http.MethodGet)
 
 	return router
 }

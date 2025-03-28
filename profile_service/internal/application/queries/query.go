@@ -8,6 +8,7 @@ import (
 
 type ProfileQueryService interface {
 	GetProfile(queries.GetProfileQuery) (*models.Profile, error)
+	GetProfiles(queries.GetProfilesQuery) ([]*models.Profile, error)
 }
 
 type profileQueryServiceImpl struct {

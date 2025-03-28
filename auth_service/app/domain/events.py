@@ -23,5 +23,5 @@ class UserUpdatedEvent:
 
 
 @dataclass(frozen=True)
-class DeleteUserEvent:
+class UserDeletedEvent:
     userID: Optional[str]

@@ -5,6 +5,12 @@ import (
 )
 
 func (r *RabbitMQ) Consume(queue string, handler func(body []byte) error) error {
+	_, err := r.Channel.QueueDeclare(queue, true, false, false, false, nil)
+	if err != nil {
+		log.Printf("Failed to declare queue %s: %v", queue, err)
+		return err
+	}
+
 	msgs, err := r.Channel.Consume(queue, "", true, false, false, false, nil)
 	if err != nil {
 		return err

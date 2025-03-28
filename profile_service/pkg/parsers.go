@@ -21,19 +21,20 @@ func DecodeJSON[T any](r *http.Request) (*T, error) {
 	return form, nil
 }
 
-func DecodeMultipartForm[T any](r *http.Request) (*T, error) {
+func DecodeMultipartForm[T any](r *http.Request) (*T, map[string][]*multipart.FileHeader, error) {
 	if err := r.ParseMultipartForm(10 << 20); err != nil { // 10 MB limit
-		return nil, FailedToParseForm(err)
+		return nil, nil, FailedToParseForm(err)
 	}
 
 	form := new(T)
 
-	// map values
 	if err := decoder.Decode(form, r.PostForm); err != nil {
-		return nil, IvnalidFormData(err)
+		return nil, nil, IvnalidFormData(err)
 	}
 
-	return form, nil
+	files := r.MultipartForm.File
+
+	return form, files, nil
 }
 
 func GetFileFromForm(fileHeader *multipart.FileHeader) (FileInfo, error) {

@@ -37,5 +37,9 @@ func (r *RabbitMQ) Publish(queueName string, event events.Event) error {
 		},
 	)
 
-	return FailedToPulblish(err)
+	if err != nil {
+		FailedToPulblish(err)
+	}
+
+	return nil
 }
