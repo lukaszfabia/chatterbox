@@ -10,6 +10,6 @@ export class UserLoggedOutEventHandler implements EventHandler<UserLoggedOutEven
     ) { }
 
     async handle(event: UserLoggedOutEvent): Promise<void> {
-        await this.repo.setUserStatus(new UserStatus(event.userID, false))
+        await this.repo.setUserStatus(new UserStatus(event.userID, false));
     }
 }
