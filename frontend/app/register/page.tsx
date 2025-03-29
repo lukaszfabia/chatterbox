@@ -29,17 +29,24 @@ export default function Register() {
 
                         <form className="mt-5 space-y-4">
                             <div>
-                                <Label htmlFor="register" className="text-muted-foreground">
-                                    Username or Email
+                                <Label htmlFor="username" className="text-muted-foreground">
+                                    Username
                                 </Label>
-                                <Input type="text" id="register" placeholder="joe.doe@example.com" className="mt-1" />
+                                <Input type="text" id="username" name="username" placeholder="joe_doe" className="mt-1" />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="email" className="text-muted-foreground">
+                                    Email
+                                </Label>
+                                <Input type="text" id="email" name="email" placeholder="joe.doe@example.com" className="mt-1" />
                             </div>
 
                             <div>
                                 <Label htmlFor="password" className="text-muted-foreground">
                                     Password
                                 </Label>
-                                <Input type="password" id="password" placeholder="••••••••" className="mt-1" />
+                                <Input type="password" id="password" name="password" placeholder="••••••••" className="mt-1" />
                             </div>
 
                             <motion.div
@@ -59,11 +66,8 @@ export default function Register() {
                             <div className="flex-1 h-px bg-muted-foreground"></div>
                         </div>
 
-                        <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            <Button variant="outline" className="w-full flex items-center justify-center gap-2">
+                        <motion.div>
+                            <Button disabled variant="outline" className="w-full flex items-center justify-center gap-2">
                                 <Image src="/icons/google.svg" alt="Google Logo" width={20} height={20} />
                                 Continue with Google
                             </Button>

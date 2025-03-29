@@ -6,6 +6,12 @@ import (
 )
 
 func (r *RabbitMQ) Consume(queueName string, dispatcher *events.Dispatcher) error {
+	_, err := r.Channel.QueueDeclare(queueName, true, false, false, false, nil)
+	if err != nil {
+		log.Printf("Failed to declare queue %s: %v", queueName, err)
+		return err
+	}
+
 	msgs, err := r.Channel.Consume(
 		queueName,
 		"",

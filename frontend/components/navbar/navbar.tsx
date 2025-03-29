@@ -1,6 +1,6 @@
 "use client";
 
-import { appDetails } from "@/lib/config";
+import { appDetails } from "@/config/config";
 import { ModeToggle } from "../toggle";
 import Link from "next/link";
 import IsLogged from "./isLogged";

@@ -53,7 +53,7 @@ func NewUserNotification(event events.Event) Notification {
 		info := "Start chatting now!"
 		return newNoti(sub, info, userid, message)
 
-	case events.UserCreatedEvent:
+	case events.NotifyEvent:
 		userid := e.UserID
 		sub := fmt.Sprintf("Welcome %s!", e.Username)
 		info := "Your account has been created successfully, you can login by your email or username."

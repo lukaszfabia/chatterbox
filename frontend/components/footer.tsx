@@ -1,4 +1,4 @@
-import { appDetails } from "@/lib/config";
+import { appDetails } from "@/config/config";
 import { Separator } from "@radix-ui/react-separator";
 import Link from "next/link";
 import { Button } from "./ui/button";

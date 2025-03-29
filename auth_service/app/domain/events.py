@@ -10,9 +10,13 @@ class UserCreatedEvent:
 
 
 @dataclass(frozen=True)
-class UserAuthEvent:
+class UserLoggedInEvent:
     userID: str
-    email: str
+
+
+@dataclass(frozen=True)
+class UserLoggedOutEvent:
+    userID: str
 
 
 @dataclass(frozen=True)

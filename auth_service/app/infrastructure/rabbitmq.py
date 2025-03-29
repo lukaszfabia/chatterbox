@@ -4,6 +4,8 @@ import json
 from typing import Any, Dict, Callable, Awaitable
 import logging
 
+from pydantic import BaseModel
+
 from app.config import RabbitConfig
 
 logging.basicConfig(level=logging.INFO)
@@ -37,6 +39,7 @@ class RabbitMQHandler:
             await self.connect()
 
         queue_name = ent.__class__.__name__
+        await self.channel.declare_queue(queue_name, durable=True)
 
         log.info(f"Attempting to serialize: {ent}")
 

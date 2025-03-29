@@ -17,7 +17,7 @@ class AuthUserQueryService(Service):
         if not user.verify_password(ent.password, user.password):
             return None
 
-        await self.rabbit_handler.publish(user.get_auth_user_event())
+        await self.rabbit_handler.publish(user.get_logged_in_user_event())
 
         return TokenDTO(
             access_token=self.jwt.create_access_token(user.id),

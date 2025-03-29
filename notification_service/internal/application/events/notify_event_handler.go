@@ -7,17 +7,17 @@ import (
 	"notification_serivce/internal/domain/events"
 )
 
-type UserCreatedEventHandler struct {
+type NotifyEventHandler struct {
 	aggregate aggregates.NotificationAggregate
 }
 
-func NewUserCreatedEventHandler(aggregate aggregates.NotificationAggregate) EventHandler {
+func NewNotifyEventHandler(aggregate aggregates.NotificationAggregate) EventHandler {
 	return &GotNewMessageEventHandler{
 		aggregate: aggregate,
 	}
 }
 
-func (g *UserCreatedEventHandler) Handle(body []byte) error {
+func (g *NotifyEventHandler) Handle(body []byte) error {
 	var event events.UserCreatedEvent
 	if err := json.Unmarshal(body, &event); err != nil {
 		return err

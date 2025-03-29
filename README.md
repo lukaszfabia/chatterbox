@@ -37,22 +37,6 @@ do auth service
 
 - sso z googlem 
 
-- usuwanie konta -> wyzwolenie eventu z usunieciem do profile_serivce
-
-- update danych email, username, password -> wyzwolenie eventu do profile service aktualizacja danych email, username 
-
-do profile service 
-
-- update danych typu bio, zdj 
-
-- handling eventu z updatem danych 
-
-- opcjonlanie dodanie eventu powiadomiomienia ze dane zmienone
-
-- pobieranie profili 
-
-- handling usuwania konta
-
 do noti service 
 
 - implementacja websocketa do nasluchiwania powiadomien
@@ -60,4 +44,21 @@ do noti service
 ...
 
 zacząć robic chat i status serivce ...
+
+
+CQRS, event driven 
+status serivce - odpowiedzialnosc
+
+reagowanie na zalogowanie sie i wylogowanie ze strony, czyli obsluga eventu logged in/out 
+
+// czyli to nam generuje dane 
+wykorzystanie websocketa aby pograc w ping ponga - czyli frontend bedzie pingowac gdy 
+user jest na stronie np. co 30s.
+zmiana statusy moze odbywac sie tak, ze nasluchujemy na zmiany, jesli stan sie zmieni do mozna wyemitowac odpowieni event user-status-updated i teraz serwis nasluchuje na tej kolejce i konsumuje wydarzenie - zmienia stan w bazie bo inna czesc systemu poprosila o zmiane i to moze byc zapis do bazy 
+
+// potrzeba resta zeby pobrac aktualny stan, zeby obcy mogl zobaczyc czy ktos jest online
+get-user-status {
+    // lista userid do sprawdzenia np. kiedy listujemy chat 
+    userID : string[]
+}
 

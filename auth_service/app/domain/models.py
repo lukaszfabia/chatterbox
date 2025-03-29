@@ -1,14 +1,14 @@
 from datetime import datetime
 from typing import Optional
 import uuid
-from pydantic import EmailStr
 from sqlalchemy import UUID, Column, DateTime, String, Date
 from sqlalchemy.ext.declarative import declarative_base
 import bcrypt
 
 from app.domain.events import (
     UserDeletedEvent,
-    UserAuthEvent,
+    UserLoggedInEvent,
+    UserLoggedOutEvent,
     UserCreatedEvent,
     UserUpdatedEvent,
 )
@@ -78,8 +78,11 @@ class User(Base):
             userID=str(self.id), email=self.email, username=self.username
         )
 
-    def get_auth_user_event(self) -> UserAuthEvent:
-        return UserAuthEvent(userID=str(self.id), email=self.email)
+    def get_logged_in_user_event(self) -> UserLoggedInEvent:
+        return UserLoggedInEvent(userID=str(self.id))
+
+    def get_logged_out_user_event(self) -> UserLoggedOutEvent:
+        return UserLoggedInEvent(userID=str(self.id))
 
     def get_user_updated_event(self) -> UserUpdatedEvent:
         return UserUpdatedEvent(

@@ -23,9 +23,9 @@ func init() {
 
 func addEvents(aggregate *aggregates.NotificationAggregate, dispatcher *events.Dispatcher) []string {
 	handlers := map[string]events.EventHandler{
-		// fmt.Sprint(reflect.TypeOf(e.GotNewMessageEvent{}).Name()): events.NewGotNewMessageEventHandler(*aggregate),
-		fmt.Sprint(reflect.TypeOf(e.UserCreatedEvent{}).Name()): events.NewUserCreatedEventHandler(*aggregate),
-		fmt.Sprint(reflect.TypeOf(e.UserAuthEvent{}).Name()):    events.NewUserAuthEventHandler(*aggregate),
+		fmt.Sprint(reflect.TypeOf(e.GotNewMessageEvent{}).Name()): events.NewGotNewMessageEventHandler(*aggregate),
+		fmt.Sprint(reflect.TypeOf(e.UserCreatedEvent{}).Name()):   events.NewNotifyEventHandler(*aggregate),
+		fmt.Sprint(reflect.TypeOf(e.UserAuthEvent{}).Name()):      events.NewUserAuthEventHandler(*aggregate),
 	}
 
 	queueNames := make([]string, 0, len(handlers))
