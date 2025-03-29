@@ -4,6 +4,7 @@ from fastapi import Depends
 from app.application.commands.command_handlers import (
     CreateUserCommandService,
     DeleteUserCommandService,
+    LogoutUserCommandService,
     UpdateUserCommandService,
 )
 from app.application.queries.query_handlers import AuthUserQueryService
@@ -22,8 +23,14 @@ from app.dependencies import (
     get_auth_user_query_service,
     get_update_user_command_service,
     get_delete_user_command_service,
+    get_logout_user_command_service,
 )
-from app.domain.commands import CreateUserCommand, UpdateUserCommand, DeleteUserCommand
+from app.domain.commands import (
+    CreateUserCommand,
+    LogoutUserCommand,
+    UpdateUserCommand,
+    DeleteUserCommand,
+)
 from app.domain.queries import AuthUserQuery
 from app.domain.dto.model import TokenDTO
 from fastapi import Depends
@@ -37,6 +44,21 @@ from app.config import oauth2_scheme
 
 
 auth_router = APIRouter(tags=["auth endpoints"], prefix="/auth")
+
+
+@auth_router.get(
+    "/logout", description="Update logs out the user", status_code=status.HTTP_200_OK
+)
+async def logout(
+    service: LogoutUserCommandService = Depends(get_logout_user_command_service),
+    token=Depends(oauth2_scheme),
+):
+    try:
+        user = await service.get_auth_user(token)
+
+        await service.handle(user)
+    except Exception:
+        raise FailedToUpdate()
 
 
 @auth_router.put("/me", description="Update auth data", status_code=status.HTTP_200_OK)

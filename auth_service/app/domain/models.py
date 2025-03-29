@@ -82,7 +82,7 @@ class User(Base):
         return UserLoggedInEvent(userID=str(self.id))
 
     def get_logged_out_user_event(self) -> UserLoggedOutEvent:
-        return UserLoggedInEvent(userID=str(self.id))
+        return UserLoggedOutEvent(userID=str(self.id))
 
     def get_user_updated_event(self) -> UserUpdatedEvent:
         return UserUpdatedEvent(

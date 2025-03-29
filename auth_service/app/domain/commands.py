@@ -28,3 +28,6 @@ class UpdateUserCommand(BaseModel):
     @staticmethod
     def exmaple():
         return {"email": "joe.doe@example.com", "username": "joe"}
+
+
+class LogoutUserCommand(BaseModel): ...

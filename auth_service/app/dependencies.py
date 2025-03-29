@@ -1,6 +1,7 @@
 from fastapi import Depends
 from app.application.commands.command_handlers import (
     CreateUserCommandService,
+    LogoutUserCommandService,
     UpdateUserCommandService,
     DeleteUserCommandService,
 )
@@ -48,3 +49,10 @@ def get_delete_user_command_service(
     rabbit_handler: RabbitMQHandler = Depends(get_rabbitmq),
 ) -> DeleteUserCommandService:
     return DeleteUserCommandService(user_repo=user_repo, rabbit_handler=rabbit_handler)
+
+
+def get_logout_user_command_service(
+    user_repo: UserRepository = Depends(get_user_repository),
+    rabbit_handler: RabbitMQHandler = Depends(get_rabbitmq),
+) -> LogoutUserCommandService:
+    return LogoutUserCommandService(user_repo=user_repo, rabbit_handler=rabbit_handler)

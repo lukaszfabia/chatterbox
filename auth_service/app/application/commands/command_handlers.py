@@ -58,3 +58,11 @@ class DeleteUserCommandService(Service):
             await self.rabbit_handler.publish(user.get_deleted_user_event())
         except Exception as e:
             raise e
+
+
+class LogoutUserCommandService(Service):
+    def __init__(self, rabbit_handler, user_repo):
+        super().__init__(rabbit_handler, user_repo)
+
+    async def handle(self, user: User):
+        await self.rabbit_handler.publish(user.get_logged_out_user_event())

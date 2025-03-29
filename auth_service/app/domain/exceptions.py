@@ -13,6 +13,16 @@ class FailedToUpdate(HTTPException):
         super().__init__(status_code, detail, headers)
 
 
+class FailedToLoggedOut(HTTPException):
+    def __init__(
+        self,
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Failed to logout user",
+        headers=None,
+    ):
+        super().__init__(status_code, detail, headers)
+
+
 class FailedToDelete(HTTPException):
     def __init__(
         self,
