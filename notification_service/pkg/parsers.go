@@ -26,7 +26,6 @@ func ParseHTMLToString(templateName string, data any) (string, error) {
 		log.Printf("Error getting working directory: %v", err)
 		return "", errors.New("failed to get working directory")
 	}
-	log.Println(pwd)
 
 	templatePath := filepath.Join(pwd, "internal", "infrastructure", "email", "templates", templateName)
 	tmpl, err := template.ParseFiles(templatePath)

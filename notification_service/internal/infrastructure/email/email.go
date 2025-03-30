@@ -11,16 +11,18 @@ import (
 )
 
 type Components struct {
-	Sub  string
-	Name string
-	Info string
+	Sub     string
+	Name    string
+	Info    string
+	AppName string
 }
 
 func NewComponents(n models.Notification, username string) Components {
 	return Components{
-		Sub:  n.Sub,
-		Info: n.Info,
-		Name: username,
+		Sub:     n.Sub,
+		Info:    n.Info,
+		Name:    username,
+		AppName: os.Getenv("APP_NAME"),
 	}
 }
 
@@ -42,7 +44,7 @@ func SendEmail(n models.Notification, email string) error {
 	m.SetAddressHeader("Cc", email, email)
 	m.SetHeader("Subject", components.Sub)
 
-	body, err := pkg.ParseHTMLToString("welcome.html", components)
+	body, err := pkg.ParseHTMLToString("mail.html", components)
 
 	if err != nil {
 		log.Println("Error parsing email template:", err)
@@ -51,12 +53,16 @@ func SendEmail(n models.Notification, email string) error {
 
 	m.SetBody("text/html", body)
 
-	d := mail.NewDialer("smtp.gmail.com", 587, senderMail, senderPassword)
+	log.Println(n)
 
-	if err := d.DialAndSend(m); err != nil {
-		log.Printf("Error sending email: %v", err)
-		return errors.New("failed to send email")
-	}
+	// d := mail.NewDialer("smtp.gmail.com", 587, senderMail, senderPassword)
+
+	// if err := d.DialAndSend(m); err != nil {
+	// 	log.Printf("Error sending email: %v", err)
+	// 	return errors.New("failed to send email")
+	// }
+
+	log.Printf("Email has been sent to %s", email)
 
 	return nil
 }

@@ -1,5 +1,5 @@
 package queries
 
-type GetProfileQuery struct {
+type GetNotificationsQuery struct {
 	UserID string `json:"userID"`
 }

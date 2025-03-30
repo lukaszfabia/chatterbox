@@ -1,17 +1,19 @@
 package events
 
-type NotiType string
-
 const (
-	CREATED NotiType = "CREATED"
-	UPDATED NotiType = "UPDATED"
-	DELETED NotiType = "DELETED"
+	CREATED string = "CREATED"
+	DELETED string = "DELETED"
 )
 
-type NotifyEvent struct {
-	UserID string   `json:"userID"`
-	Type   NotiType `json:"type"`
+type EmailEvent interface {
+	GetEmail() string
 }
 
-func (e NotifyEvent) Log() {
+type EmailNotificationEvent struct {
+	UserID string `json:"userID"`
+	Email  string `json:"email"`
+	Type   string `json:"type"`
+}
+
+func (e EmailNotificationEvent) Log() {
 }

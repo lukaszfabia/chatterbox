@@ -34,9 +34,9 @@ func (h *UserCreatedHandler) Handle(body []byte) error {
 		return err
 	}
 
-	n := events.NewNotifyEvent(event.UserID, event)
-	// publish noti
-	err = h.bus.Publish(reflect.TypeOf(*n).Name(), event)
+	n := events.NewNotifyCreatedEvent(event)
+
+	err = h.bus.Publish(reflect.TypeOf(n).Name(), n)
 
 	if err != nil {
 		log.Println(err.Error())

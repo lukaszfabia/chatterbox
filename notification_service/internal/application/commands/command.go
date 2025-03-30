@@ -11,6 +11,6 @@ type notificationCommandServiceImpl struct {
 	aggregate aggregates.NotificationAggregate
 }
 
-func NewProfileCommandService(aggregate aggregates.NotificationAggregate) NotificationCommandService {
+func NewNotificationCommandService(aggregate aggregates.NotificationAggregate) NotificationCommandService {
 	return &notificationCommandServiceImpl{aggregate: aggregate}
 }

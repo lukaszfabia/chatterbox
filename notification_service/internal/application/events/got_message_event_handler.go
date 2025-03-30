@@ -23,7 +23,7 @@ func (g *GotNewMessageEventHandler) Handle(body []byte) error {
 		return err
 	}
 
-	err := g.aggregate.Send(event)
+	err := g.aggregate.SendPush(event)
 
 	if err != nil {
 		log.Println(err.Error())

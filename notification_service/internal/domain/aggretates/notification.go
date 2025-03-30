@@ -7,21 +7,24 @@ import (
 	"notification_serivce/internal/domain/models"
 	"notification_serivce/internal/domain/repositories"
 	"notification_serivce/internal/infrastructure/email"
+	"notification_serivce/internal/infrastructure/ws"
 	"reflect"
 )
 
 type NotificationAggregate struct {
-	repo repositories.NotificationRepository
+	repo     repositories.NotificationRepository
+	wsServer *ws.WebSocketServer
 }
 
-func NewNotificationAggregate(repo repositories.NotificationRepository) *NotificationAggregate {
+func NewNotificationAggregate(repo repositories.NotificationRepository, wsServer *ws.WebSocketServer) *NotificationAggregate {
 	return &NotificationAggregate{
-		repo: repo,
+		repo:     repo,
+		wsServer: wsServer,
 	}
 }
 
-func (n *NotificationAggregate) Send(event events.Event) error {
-	noti := models.NewUserNotification(event)
+func (n *NotificationAggregate) Send(event events.EmailNotificationEvent) error {
+	noti := models.NewEmailNotification(event)
 
 	eventType := reflect.TypeOf(event).Name()
 	log.Printf("Processing event of type: %s", eventType)
@@ -31,15 +34,22 @@ func (n *NotificationAggregate) Send(event events.Event) error {
 		return fmt.Errorf("failed to add notification: %w", err)
 	}
 
-	switch e := event.(type) {
-	case events.UserAuthEvent:
-		email.SendEmail(noti, e.Email)
-	case events.UserCreatedEvent:
-		email.SendEmail(noti, e.Email)
+	log.Printf("Created notification: %v", noti)
 
-	default:
-		log.Printf("No specific handler for event type %s", eventType)
+	email.SendEmail(noti, event.Email)
+
+	return nil
+}
+
+func (n *NotificationAggregate) SendPush(event events.GotNewMessageEvent) error {
+	notification := models.NewUserNotification(event)
+
+	if _, err := n.repo.AddNotification(notification); err != nil {
+		log.Println("Failed to create notification")
+		return err
 	}
+
+	n.wsServer.SendNotification(notification)
 
 	return nil
 }

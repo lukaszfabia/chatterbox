@@ -34,7 +34,8 @@ func (h *UserDeletedHandler) Handle(body []byte) error {
 		return err
 	}
 
-	n := events.NewNotifyEvent(event.UserID, event)
+	n := events.NewNotifyDeletedEvent(event)
+
 	// publish noti
 	err = h.bus.Publish(reflect.TypeOf(n).Name(), event)
 

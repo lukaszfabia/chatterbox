@@ -13,7 +13,7 @@ import (
 )
 
 type NotificationRepository interface {
-	GetAllNotifications(userID string) ([]models.Notification, error)
+	GetAllNotifications(userID string) ([]*models.Notification, error)
 	DeleteNotification(id string) error
 	AddNotification(noti models.Notification) (*models.Notification, error)
 }
@@ -62,12 +62,14 @@ func (n *notificationRepoImpl) DeleteNotification(id string) error {
 	return nil
 }
 
-func (n *notificationRepoImpl) GetAllNotifications(userID string) ([]models.Notification, error) {
+func (n *notificationRepoImpl) GetAllNotifications(userID string) ([]*models.Notification, error) {
+	limit := 20
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	filter := bson.M{"userID": userID}
-	opts := options.Find().SetSort(bson.D{{Key: "sentAt", Value: -1}})
+	opts := options.Find().SetSort(bson.D{{Key: "sentAt", Value: -1}}).SetLimit(int64(limit))
 
 	cursor, err := n.database.GetNoSql().Find(ctx, filter, opts)
 	if err != nil {
@@ -75,8 +77,8 @@ func (n *notificationRepoImpl) GetAllNotifications(userID string) ([]models.Noti
 	}
 	defer cursor.Close(ctx)
 
-	var notifications []models.Notification
-	if err = cursor.All(ctx, &notifications); err != nil {
+	var notifications []*models.Notification
+	if err = cursor.All(ctx, notifications); err != nil {
 		return nil, fmt.Errorf("failed to decode notifications: %w", err)
 	}
 

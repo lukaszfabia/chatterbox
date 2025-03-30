@@ -90,4 +90,4 @@ class User(Base):
         )
 
     def get_deleted_user_event(self) -> UserDeletedEvent:
-        return UserDeletedEvent(userID=str(self.id))
+        return UserDeletedEvent(userID=str(self.id), email=self.email)

@@ -1,35 +1,32 @@
 package events
 
-type NotiType string
-
 const (
-	CREATED NotiType = "CREATED"
-	UPDATED NotiType = "UPDATED"
-	DELETED NotiType = "DELETED"
+	CREATED string = "CREATED"
+	DELETED string = "DELETED"
 )
 
-type NotifyEvent struct {
-	UserID string   `json:"userID"`
-	Email  string   `json:"email"`
-	Type   NotiType `json:"type"`
+type EmailNotificationEvent struct {
+	UserID string `json:"userID"`
+	Email  string `json:"email"`
+	Type   string `json:"type"`
 }
 
-func (u NotifyEvent) Log() {
+func (u EmailNotificationEvent) Log() {
 
 }
 
-var eventTypeMap = map[Event]NotiType{
-	UserDeletedEvent{}: DELETED,
-	UserCreatedEvent{}: CREATED,
-	UserUpdatedEvent{}: UPDATED,
-}
-
-func NewNotifyEvent(uid string, event Event) *NotifyEvent {
-	if eventType, ok := eventTypeMap[event]; ok {
-		return &NotifyEvent{
-			UserID: uid,
-			Type:   eventType,
-		}
+func NewNotifyCreatedEvent(created UserCreatedEvent) EmailNotificationEvent {
+	return EmailNotificationEvent{
+		UserID: created.UserID,
+		Email:  created.Email,
+		Type:   CREATED,
 	}
-	return nil
+}
+
+func NewNotifyDeletedEvent(deleted UserDeletedEvent) EmailNotificationEvent {
+	return EmailNotificationEvent{
+		UserID: deleted.UserID,
+		Email:  deleted.Email,
+		Type:   DELETED,
+	}
 }

@@ -13,6 +13,7 @@ import (
 	"notification_serivce/internal/infrastructure/repositories"
 	"notification_serivce/internal/infrastructure/rest"
 	"notification_serivce/internal/infrastructure/rest/handlers"
+	"notification_serivce/internal/infrastructure/ws"
 	"notification_serivce/pkg"
 	"reflect"
 )
@@ -23,9 +24,8 @@ func init() {
 
 func addEvents(aggregate *aggregates.NotificationAggregate, dispatcher *events.Dispatcher) []string {
 	handlers := map[string]events.EventHandler{
-		fmt.Sprint(reflect.TypeOf(e.GotNewMessageEvent{}).Name()): events.NewGotNewMessageEventHandler(*aggregate),
-		fmt.Sprint(reflect.TypeOf(e.UserCreatedEvent{}).Name()):   events.NewNotifyEventHandler(*aggregate),
-		fmt.Sprint(reflect.TypeOf(e.UserAuthEvent{}).Name()):      events.NewUserAuthEventHandler(*aggregate),
+		fmt.Sprint(reflect.TypeOf(e.GotNewMessageEvent{}).Name()):     events.NewGotNewMessageEventHandler(*aggregate),
+		fmt.Sprint(reflect.TypeOf(e.EmailNotificationEvent{}).Name()): events.NewEmailNotificationEventHandler(*aggregate),
 	}
 
 	queueNames := make([]string, 0, len(handlers))
@@ -40,10 +40,12 @@ func addEvents(aggregate *aggregates.NotificationAggregate, dispatcher *events.D
 func main() {
 
 	repo := repositories.New()
-	aggregate := aggregates.NewNotificationAggregate(repo.NotificationRepository())
+	ws := ws.NewWebSocketServer()
 
-	queryService := queries.NewProfileQueryService(repo.NotificationRepository())
-	commandService := commands.NewProfileCommandService(*aggregate)
+	aggregate := aggregates.NewNotificationAggregate(repo.NotificationRepository(), ws)
+
+	queryService := queries.NewNotiQueryService(repo.NotificationRepository())
+	commandService := commands.NewNotificationCommandService(*aggregate)
 
 	dispatcher := events.NewDispatcher()
 

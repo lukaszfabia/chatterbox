@@ -87,12 +87,12 @@ export class RedisService implements IStatusRepository {
         }
     }
 
-    async getUserStatus(userID: string): Promise<UserStatus | null> {
+    async getUserStatus(userID: string): Promise<UserStatus> {
         this.checkConnection();
 
         try {
             const userStatus = await this.redisClient.get(`user:${userID}:status`);
-            return userStatus ? JSON.parse(userStatus) : null;
+            return userStatus ? JSON.parse(userStatus) : new UserStatus(userID, false);
         } catch (error) {
             throw error;
         }
@@ -100,22 +100,6 @@ export class RedisService implements IStatusRepository {
 
     async getOnlineUsers(): Promise<UserStatus[]> {
         return [];
-        // this.checkConnection();
-
-        // try {
-        //     const keys = await this.redisClient.keys('user:*:status');
-        //     const pipeline = this.redisClient.pipeline();
-
-        //     keys.forEach(key => pipeline.get(key));
-        //     const results = await pipeline.exec();
-
-        //     return results
-        //         .filter(([err, res]) => !err && res)
-        //         .map(([_, res]) => JSON.parse(res as string));
-        // } catch (error) {
-        //     this.logger.error('Error getting online users', error.stack);
-        //     throw error;
-        // }
     }
 
     async onModuleDestroy() {

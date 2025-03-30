@@ -18,7 +18,6 @@ func NewRouter(commandService commands.NotificationCommandService, queryService 
 	authRouter := apiRouter.NewRoute().Subrouter()
 	authRouter.Use(profileHandler.IsAuth)
 
-	authRouter.HandleFunc("/notification", profileHandler.DeleteNotification).Methods(http.MethodDelete)
 	authRouter.HandleFunc("/notifications", profileHandler.GetNotifications).Methods(http.MethodGet)
 
 	return router
