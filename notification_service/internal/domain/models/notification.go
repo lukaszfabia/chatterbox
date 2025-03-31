@@ -19,11 +19,12 @@ func trimMessage(msg string) string {
 }
 
 type Notification struct {
-	ID     uuid.UUID `json:"id"`
-	UserID string    `json:"userID"`
-	Sub    string    `json:"sub"`
-	Info   string    `json:"info"`
-	SentAt time.Time `json:"sentAt"`
+	ID          uuid.UUID `json:"id"`
+	UserID      string    `json:"userID"`
+	Sub         string    `json:"sub"`
+	Info        string    `json:"info"`
+	SentAt      time.Time `json:"sentAt"`
+	IsDelivered bool      `json:"isDelivered"`
 }
 
 func NewUserNotification(event events.GotNewMessageEvent) Notification {
@@ -47,11 +48,12 @@ func ExmapleNotification() Notification {
 func newGotMessageNotification(event events.GotNewMessageEvent) Notification {
 
 	return Notification{
-		ID:     uuid.New(),
-		UserID: event.UserID,
-		SentAt: time.Now(),
-		Sub:    fmt.Sprintf("Got new message from %s", event.Sender),
-		Info:   trimMessage(event.Message),
+		ID:          uuid.New(),
+		UserID:      event.UserID,
+		SentAt:      time.Now(),
+		Sub:         fmt.Sprintf("Got new message from %s", event.Sender),
+		Info:        trimMessage(event.Message),
+		IsDelivered: false,
 	}
 }
 

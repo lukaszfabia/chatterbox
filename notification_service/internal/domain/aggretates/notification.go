@@ -28,6 +28,9 @@ func (n *NotificationAggregate) Send(event events.EmailNotificationEvent) error 
 
 	eventType := reflect.TypeOf(event).Name()
 	log.Printf("Processing event of type: %s", eventType)
+	err := email.SendEmail(noti, event.Email)
+
+	noti.IsDelivered = err == nil
 
 	if _, err := n.repo.AddNotification(noti); err != nil {
 		log.Printf("Failed to add notification for event %s: %v", eventType, err)
@@ -36,20 +39,20 @@ func (n *NotificationAggregate) Send(event events.EmailNotificationEvent) error 
 
 	log.Printf("Created notification: %v", noti)
 
-	email.SendEmail(noti, event.Email)
-
 	return nil
 }
 
 func (n *NotificationAggregate) SendPush(event events.GotNewMessageEvent) error {
 	notification := models.NewUserNotification(event)
 
+	err := n.wsServer.SendNotification(notification)
+
+	notification.IsDelivered = err == nil
+
 	if _, err := n.repo.AddNotification(notification); err != nil {
 		log.Println("Failed to create notification")
 		return err
 	}
-
-	n.wsServer.SendNotification(notification)
 
 	return nil
 }

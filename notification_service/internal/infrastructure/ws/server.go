@@ -59,18 +59,20 @@ func (ws *WebSocketServer) HandleConnection(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (ws *WebSocketServer) SendNotification(n models.Notification) {
+func (ws *WebSocketServer) SendNotification(n models.Notification) error {
 	ws.mu.Lock()
 	conn, exists := ws.clients[n.UserID]
 	ws.mu.Unlock()
 
 	if !exists {
-		log.Printf("User %s is offline, skipping notification", n.UserID)
-		return
+		return SendLater()
 	}
 
 	err := conn.WriteJSON(n)
 	if err != nil {
 		log.Printf("Failed to send WebSocket message: %v", err)
+		return SendLater()
 	}
+
+	return nil
 }

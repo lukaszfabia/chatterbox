@@ -1,7 +1,18 @@
 import { motion } from "framer-motion"
 import { Skeleton } from "../ui/skeleton"
-import { Pencil, MessageCircle } from "lucide-react"
+import { Pencil } from "lucide-react"
 import { Button } from "../ui/button"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 export default function ActionButtons({ isMe, isLoading }: { isMe: boolean, isLoading?: boolean }) {
     if (isLoading) {
@@ -28,10 +39,26 @@ export default function ActionButtons({ isMe, isLoading }: { isMe: boolean, isLo
                     Edit Profile
                 </Button>
             ) : (
-                <Button className="w-full" variant="outline">
-                    <MessageCircle className="h-4 w-4" />
-                    Send Message
-                </Button>
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button className="w-full" variant="outline">
+                            <Pencil className="h-4 w-4" />
+                            Send
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Do you want to create new chat?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                It looks like you haven't with "username"?
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction>Continue</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             )}
         </motion.div>
     )

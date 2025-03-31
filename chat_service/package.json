@@ -1,0 +1,22 @@
+{
+  "name": "chat_service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@types/amqp": "^0.2.8",
+    "amqplib": "^0.10.7",
+    "express": "^4.21.2",
+    "jwt-decode": "^4.0.0",
+    "mongodb": "^6.15.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
+  }
+}
