@@ -1,16 +1,23 @@
-import { IConversation } from "../models/conversation.model"
-import { IMessage } from "../models/message.model"
+import { ConversationDTO } from "../dto/conversation.dto";
+import { MessageDTO } from "../dto/message.dto";
+import { User } from "../models/conversation.model"
 
 export interface IChatRepository {
-    createConversation(chat: IConversation): Promise<IConversation | null>;
+    createConversation(members: User[]): Promise<ConversationDTO | null>;
 
-    updateConversation(chatID: string, updateData: Partial<IConversation>): Promise<IConversation | null>;
+    updateConversation(chatID: string, updateData: Partial<ConversationDTO>): Promise<ConversationDTO | null>;
 
-    appendMessage(chatID: string, message: IMessage): Promise<void>;
+    appendMessage(receiverID: string,
+        senderID: string,
+        content: string,
+        chatID: string,
+        sentAt: number): Promise<ConversationDTO | null>;
 
-    getConversationForMember(memberID: string, page?: number, limit?: number): Promise<IConversation[]>;
+    getConversationForMember(memberID: string, page?: number, limit?: number): Promise<ConversationDTO[]>;
 
-    getConversationById(chatID: string): Promise<IConversation | null>;
+    getMessages(chatID: string, limit: number): Promise<MessageDTO[]>;
 
-    deleteConversation(chatID: string): Promise<void>;
+    getConversationById(chatID: string): Promise<ConversationDTO | null>;
+
+    deleteConversation(chatID: string): Promise<ConversationDTO | null>;
 }

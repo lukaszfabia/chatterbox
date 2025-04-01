@@ -1,4 +1,6 @@
-import { IConversation } from "../../domain/models/conversation.model";
+import { ConversationDTO } from "../../domain/dto/conversation.dto";
+import { MessageDTO } from "../../domain/dto/message.dto";
+import { IConversation, User } from "../../domain/models/conversation.model";
 import { IMessage } from "../../domain/models/message.model";
 import { IChatRepository } from "../../domain/repository/chat.repository";
 import { Collection, MongoClient } from "mongodb";
@@ -11,8 +13,10 @@ export class MongoService implements IChatRepository {
     private conversations: Collection<IConversation>;
 
 
-    constructor(private readonly uri: string = process.env.MONGO_URI || "") {
-        if (!uri) throw new Error("MongoDB URI is required");
+    constructor(
+        private readonly uri: string = `mongodb://${encodeURIComponent(process.env.MONGO_USER || '')}:${encodeURIComponent(process.env.MONGO_PASS || '')}@${process.env.MONGO_HOST || 'localhost'}:${process.env.MONGO_PORT || '27017'}/${process.env.DB_NAME || 'test'}?authSource=admin`
+    ) {
+        if (!this.uri) throw new Error("MongoDB URI is required");
     }
 
     async connect(): Promise<void> {
@@ -54,28 +58,78 @@ export class MongoService implements IChatRepository {
         }
     }
 
-    async createConversation(chat: IConversation): Promise<IConversation | null> {
-        const result = await this.conversations.insertOne(chat)
-        if (result.acknowledged) {
-            return null;
-        }
-        // TODO: fix it
-        return chat;
-    }
-    updateConversation(chatID: string, updateData: Partial<IConversation>): Promise<IConversation | null> {
-        throw new Error("Method not implemented.");
-    }
-    appendMessage(chatID: string, message: IMessage): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-    getConversationForMember(memberID: string, page?: number, limit?: number): Promise<IConversation[]> {
-        throw new Error("Method not implemented.");
-    }
-    getConversationById(chatID: string): Promise<IConversation | null> {
-        throw new Error("Method not implemented.");
-    }
-    deleteConversation(chatID: string): Promise<void> {
-        throw new Error("Method not implemented.");
+
+    async getConversationById(chatID: string): Promise<ConversationDTO | null> {
+        const chat = await this.conversations.findOne({ _id: chatID });
+        return chat ? ConversationDTO.fromMongoDocument(chat) : null;
     }
 
+    async getConversationForMember(memberID: string, page = 1, limit = 10): Promise<ConversationDTO[]> {
+        const chats = await this.conversations
+            .find({ "members.userID": memberID })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .toArray();
+
+        return chats.map(ConversationDTO.fromMongoDocument);
+    }
+
+    async appendMessage(receiverID: string, senderID: string, content: string, chatID: string, sentAt: number): Promise<ConversationDTO | null> {
+        const filter = { _id: chatID };
+
+        const message: IMessage = {
+            senderID: senderID,
+            content: content,
+            sentAt: sentAt,
+            chatID: chatID,
+            status: "sent",
+            receiverID: receiverID
+        }
+
+        const added = await this.messages.insertOne(message)
+
+        if (!added.insertedId) {
+            console.log('Failed to append message')
+            return null;
+        }
+
+        const updatedConversation = await this.conversations.findOneAndUpdate(
+            filter,
+            {
+                $set: {
+                    lastMessage: {
+                        ...message,
+                        _id: added.insertedId
+                    },
+                    updatedAt: new Date()
+                }
+            },
+            { returnDocument: 'after' }
+        );
+
+        if (!updatedConversation?.lastMessage) {
+            return null;
+        }
+
+        return ConversationDTO.fromMongoDocument(updatedConversation);
+    }
+
+    async getMessages(chatID: string, limit: number): Promise<MessageDTO[]> {
+        const chat = await this.messages.findOne({ _id: chatID });
+        if (!chat || !chat.messages) return [];
+
+        return chat.messages.slice(-limit).map(MessageDTO.fromMongoDocument);
+    }
+
+    async deleteConversation(chatID: string): Promise<ConversationDTO | null> {
+        const deleted = await this.conversations.findOneAndDelete({ _id: chatID });
+        return deleted ? ConversationDTO.fromMongoDocument(deleted) : null;
+    }
+
+    createConversation(members: User[]): Promise<ConversationDTO | null> {
+        throw new Error("Method not implemented.");
+    }
+    updateConversation(chatID: string, updateData: Partial<ConversationDTO>): Promise<ConversationDTO | null> {
+        throw new Error("Method not implemented.");
+    }
 }

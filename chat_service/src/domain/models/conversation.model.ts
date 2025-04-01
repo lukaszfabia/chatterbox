@@ -6,6 +6,8 @@ export class User {
 }
 
 export interface IConversation extends Document {
+    _id?: string;
     members: User[];
-    lastMessage: IMessage;
+    lastMessage?: IMessage;
+    updatedAt: Date;
 }

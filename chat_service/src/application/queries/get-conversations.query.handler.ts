@@ -6,7 +6,7 @@ export class GetConversationsQueryHandler implements QueryHandler<GetConversatio
 
     constructor(private repo: IChatRepository) { }
 
-    execute(q: GetConversationsQuery): Promise<void> {
+    execute(_: GetConversationsQuery): Promise<void> {
         throw new Error("Method not implemented.");
     }
 }

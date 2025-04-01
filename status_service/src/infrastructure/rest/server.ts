@@ -11,6 +11,8 @@ import { Router } from './routes';
 import http from 'http';
 import { Server } from 'socket.io';
 import { WebSocketService } from '../ws/websocket';
+import { MessageSentEventHandler } from '../../application/events/message-sent.handler';
+import { MessageSentEvent } from '../../domain/events/message-send.event';
 
 
 
@@ -26,6 +28,7 @@ export default async function startServer() {
     rabbitMQService.registerHandler(UserStatusUpdatedEvent.name, new UserStatusUpdatedEventHandler(repo));
     rabbitMQService.registerHandler(UserLoggedInEvent.name, new UserLoggedInEventHandler(repo));
     rabbitMQService.registerHandler(UserLoggedOutEvent.name, new UserLoggedOutEventHandler(repo));
+    rabbitMQService.registerHandler(MessageSentEvent.name, new MessageSentEventHandler(repo, rabbitMQService));
 
     await Promise.all([
         rabbitMQService.consume<UserStatusUpdatedEvent>(UserStatusUpdatedEvent.name),

@@ -1,6 +1,6 @@
 import { EventHandler } from "../../application/events/event.handler";
-import { Event } from "../../domain/models/model";
 import { EventBus } from "./bus";
+import { Event } from "../../domain/events/event";
 import client, { Connection, Channel, ConsumeMessage } from "amqplib";
 
 export class RabbitMQService implements EventBus {

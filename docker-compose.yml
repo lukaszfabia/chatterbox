@@ -8,15 +8,84 @@ services:
     ports:
       - "${RABBITMQ_PORT}:${RABBITMQ_PORT}"
       - "${RABBITMQ_UI_PORT}:${RABBITMQ_UI_PORT}"
-    # optionally check is working fine
     healthcheck:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - profile_service_net
 
-networks:
-  profile_service_net:
-    driver: bridge
+  chat_service_db:
+    image: mongo:latest
+    container_name: chat_data
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${CHAT_MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${CHAT_MONGO_PASS}
+    ports:
+      - "${CHAT_MONGO_PORT}:27017"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  profile_service_db:
+    image: mongo:latest
+    container_name: profile_data
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${PROFILE_MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${PROFILE_MONGO_PASS}
+    ports:
+      - "${PROFILE_MONGO_PORT}:27017"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  notification_service_db:
+    image: mongo:latest
+    container_name: notifications_data
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${NOTIFICATION_MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${NOTIFICATION_MONGO_PASS}
+    ports:
+      - "${NOTIFICATION_MONGO_PORT}:27017"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth_service_db:
+    image: postgres:latest
+    container_name: auth_data
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${AUTH_POSTGRES_DB}
+      POSTGRES_USER: ${AUTH_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${AUTH_POSTGRES_PASSWORD}
+    ports:
+      - "${AUTH_POSTGRES_PORT}:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${AUTH_POSTGRES_USER} -d ${AUTH_POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  status_service_db:
+    image: redis:latest
+    container_name: status_data
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${STATUS_REDIS_PASSWORD}
+    ports:
+      - "${STATUS_REDIS_PORT}:6379"
+    command: redis-server --requirepass ${STATUS_REDIS_PASSWORD}
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5

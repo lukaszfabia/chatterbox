@@ -1,0 +1,1 @@
+export const InvalidBody = { error: "Invalid body" }

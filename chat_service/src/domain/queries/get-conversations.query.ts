@@ -1,3 +1,5 @@
 import { Query } from "./query";
 
-export class GetConversationsQuery implements Query { }
+export class GetConversationsQuery implements Query {
+
+}

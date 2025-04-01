@@ -1,4 +1,4 @@
-import { GetUserStatusQueryHandler } from "../application/queries/get-user-status-query.handler";
+import { GetUserStatusQueryHandler } from "../application/queries/get-user-status.query.handler";
 import { GetUserStatusQuery } from "../domain/queries/get-user-status.query";
 import { Request, Response } from "express";
 

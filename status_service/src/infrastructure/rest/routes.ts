@@ -1,12 +1,10 @@
 import express from 'express';
 import { GetUserStatusController } from '../../interfaces/get-user-status.controller';
-import { GetUserStatusQueryHandler } from '../../application/queries/get-user-status-query.handler';
 import { IStatusRepository } from '../../domain/repository/status.repository';
+import { GetUserStatusQueryHandler } from '../../application/queries/get-user-status.query.handler'
 
 export class Router {
-    private repo: IStatusRepository
-    constructor(repo: IStatusRepository) {
-        this.repo = repo
+    constructor(private repo: IStatusRepository) {
     }
 
     config() {
