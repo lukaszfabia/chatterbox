@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 from fastapi.security import OAuth2PasswordBearer
 import logging
 
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+
 
 @dataclass(frozen=True)
 class RabbitConfig:
@@ -17,12 +20,10 @@ class RabbitConfig:
 config_for_rabbit = RabbitConfig(
     login=os.getenv("RABBITMQ_DEFAULT_USER"),
     password=os.getenv("RABBITMQ_DEFAULT_PASS"),
-    port=int(os.getenv("RABBITMQ_PORT")),
-    host=os.getenv("RABBITMQ_HOST"),
+    port=int(os.getenv("RABBITMQ_PORT")) or 5672,
+    host=os.getenv("RABBITMQ_HOST") or "localhost",
 )
 
-
-load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 logger = logging.getLogger()
 logging.basicConfig(level=logging.INFO)
@@ -45,3 +46,5 @@ DECODE_ALGO = "HS256"
 JWT_SECRET = os.getenv("JWT_SECRET")
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+print(DATABASE_URL)

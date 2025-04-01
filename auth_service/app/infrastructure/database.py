@@ -2,9 +2,24 @@ from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.config import DATABASE_URL
+import os
+from dotenv import load_dotenv
 
-engine = create_async_engine(DATABASE_URL, echo=True)
+
+def get_db_url():
+    load_dotenv()
+
+    url = (
+        f"postgresql+asyncpg://{os.getenv('DB_USERNAME')}:{os.getenv('DB_PASSWORD')}"
+        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+    )
+
+    print(url)
+
+    return url
+
+
+engine = create_async_engine(get_db_url(), echo=True)
 
 SessionLocal = sessionmaker(
     bind=engine,

@@ -21,6 +21,7 @@ func (r *repositoryImpl) ProfileRepository() repositories.ProfileRepository {
 }
 
 func New() Repository {
+	log.Println("Trying to connect with db...")
 	db, err := database.Connect()
 
 	if err != nil {

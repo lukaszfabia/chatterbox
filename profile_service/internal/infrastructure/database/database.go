@@ -41,10 +41,12 @@ func (d *Database) Sync() error {
 func newDBConnection(dbName, collection string) (*Database, error) {
 	client, err := mongo.Connect(config.GetNoSqlConfig())
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
 
-	if err := client.Ping(context.TODO(), nil); err != nil {
+	if err := client.Ping(context.Background(), nil); err != nil {
+		log.Println(err.Error())
 		return nil, FailedToConnect(err)
 	}
 

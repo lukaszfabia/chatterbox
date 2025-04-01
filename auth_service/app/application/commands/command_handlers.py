@@ -1,6 +1,6 @@
 from typing import Optional
 from app.application.serivce import Service
-from app.domain.commands import CreateUserCommand, DeleteUserCommand, UpdateUserCommand
+from app.domain.commands import CreateUserCommand, UpdateUserCommand
 from app.domain.dto.model import TokenDTO
 from app.domain.models import User
 
