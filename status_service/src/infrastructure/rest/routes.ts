@@ -11,7 +11,7 @@ export class Router {
         const router = express.Router();
         const handler = new GetUserStatusQueryHandler(this.repo)
         const userStatusController = new GetUserStatusController(handler)
-        router.get("/status", userStatusController.getStatus.bind(userStatusController))
+        router.get("/check", userStatusController.getStatus.bind(userStatusController))
 
 
         return router

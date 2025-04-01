@@ -40,7 +40,7 @@ export default async function startServer() {
 
     app.use(express.json());
 
-    app.use('/api/v1', jwtMiddleware);
+    app.use('/api/v1/chat', jwtMiddleware);
 
     app.use('/new/message', router.createMessage())
     app.use('/new/chat', router.createChat())

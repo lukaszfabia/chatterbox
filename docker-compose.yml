@@ -1,4 +1,22 @@
 services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # config files
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs
+    depends_on:
+      - chat_service
+      - profile_service
+      - notification_service
+      - auth_service
+      - status_service_db
+
   rabbitmq:
     image: rabbitmq:management
     container_name: rabbitmq

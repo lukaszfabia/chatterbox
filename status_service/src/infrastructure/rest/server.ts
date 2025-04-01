@@ -52,11 +52,7 @@ export default async function startServer() {
 
     app.use(express.json());
 
-    app.use('/api/v1', router.config());
-
-    app.get('/', (_, res) => {
-        res.json({ status: 'ok' });
-    });
+    app.use('/api/v1/status', router.config());
 
     server.listen(port, () => {
         console.log(`Server running on port :${port}`);
