@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	_ "profile_service/docs"
 	"profile_service/internal/application/commands"
 	"profile_service/internal/application/events"
 	"profile_service/internal/application/queries"
@@ -39,6 +40,14 @@ func addEvents(aggregate *aggregates.ProfileAggregate, bus messaging.EventBus) (
 	return dispatcher, queueNames
 }
 
+// @title Profile Service API
+// @version 1.0
+// @description Profile management service
+// @host localhost:8002
+// @BasePath /api/v1
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 
 	rabbit, err := rabbitmq.New(config.GetBrokerUrl())

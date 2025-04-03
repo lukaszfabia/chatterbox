@@ -1,0 +1,151 @@
+basePath: /api/v1
+definitions:
+  models.Profile:
+    properties:
+      avatarURL:
+        type: string
+      backgroundURL:
+        type: string
+      bio:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: string
+      lastName:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: Profile management microservice
+  title: Profile Service API
+  version: "1.0"
+paths:
+  /api/v1/auth/me:
+    get:
+      consumes:
+      - application/json
+      description: Returns the profile of the currently logged-in user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Authenticated user profile
+          schema:
+            $ref: '#/definitions/models.Profile'
+        "401":
+          description: Unauthorized
+      summary: Get authenticated user profile
+      tags:
+      - Auth
+    put:
+      consumes:
+      - multipart/form-data
+      description: Updates the profile of the logged-in user
+      parameters:
+      - description: First name
+        in: formData
+        name: firstName
+        type: string
+      - description: Last name
+        in: formData
+        name: lastName
+        type: string
+      - description: Biography
+        in: formData
+        name: bio
+        type: string
+      - description: Avatar image
+        in: formData
+        name: avatarFile
+        type: file
+      - description: Background image
+        in: formData
+        name: backgroundFile
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Profile'
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+      security:
+      - ApiKeyAuth: []
+      summary: Update user profile
+      tags:
+      - profile
+  /api/v1/profiles:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of user profiles with pagination
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of profiles per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of profiles
+          schema:
+            items:
+              $ref: '#/definitions/models.Profile'
+            type: array
+        "400":
+          description: Invalid request
+      summary: Get list of profiles
+      tags:
+      - Profile
+  /api/v1/profiles/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Returns user profile details based on the provided user ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile details
+          schema:
+            $ref: '#/definitions/models.Profile'
+        "400":
+          description: Invalid request
+      summary: Get user profile
+      tags:
+      - Profile
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

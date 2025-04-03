@@ -5,7 +5,10 @@ import (
 	"profile_service/internal/application/commands"
 	"profile_service/internal/application/queries"
 
+	_ "profile_service/docs"
+
 	"github.com/gorilla/mux"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func NewRouter(commandService commands.ProfileCommandService, queryService queries.ProfileQueryService) *mux.Router {
@@ -15,16 +18,20 @@ func NewRouter(commandService commands.ProfileCommandService, queryService queri
 	fileServer := http.FileServer(http.Dir("./media"))
 	router.PathPrefix("/api/v1/media/").Handler(http.StripPrefix("/api/v1/media/", fileServer))
 
-	apiRouter := router.PathPrefix("/api/v1/profile").Subrouter()
+	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
-	apiRouter.HandleFunc("", profileHandler.GetProfile).Methods(http.MethodGet)
-	apiRouter.HandleFunc("/many", profileHandler.GetProfiles).Methods(http.MethodGet)
+	profileRouter := router.PathPrefix("/api/v1/profiles").Subrouter()
 
-	authRouter := apiRouter.PathPrefix("/auth").Subrouter()
+	profileRouter.HandleFunc("/{id}", profileHandler.GetProfile).Methods(http.MethodGet)
+
+	profileRouter.HandleFunc("", profileHandler.GetProfiles).Methods(http.MethodGet)
+
+	authRouter := router.PathPrefix("/api/v1/auth").Subrouter()
 	authRouter.Use(profileHandler.IsAuth)
 
-	authRouter.HandleFunc("/me", profileHandler.UpdateProfile).Methods(http.MethodPut)
 	authRouter.HandleFunc("/me", profileHandler.GetAuthUserProfile).Methods(http.MethodGet)
+
+	authRouter.HandleFunc("/me", profileHandler.UpdateProfile).Methods(http.MethodPut)
 
 	return router
 }

@@ -22,7 +22,7 @@ type profileRepoImpl struct {
 	database *database.Database
 }
 
-func (repo *profileRepoImpl) GetUsers(limit int) ([]*models.Profile, error) {
+func (repo *profileRepoImpl) GetUsers(limit, page int) ([]*models.Profile, error) {
 	ctx := context.TODO()
 	collection := repo.database.GetNoSql()
 
@@ -31,6 +31,7 @@ func (repo *profileRepoImpl) GetUsers(limit int) ([]*models.Profile, error) {
 	}
 
 	opts := options.Find().
+		SetSkip(int64((page - 1) * limit)).
 		SetLimit(int64(limit)).
 		SetSort(bson.M{string(name): 1})
 

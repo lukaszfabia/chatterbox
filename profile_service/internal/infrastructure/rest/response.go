@@ -17,7 +17,7 @@ func NewResponse(w http.ResponseWriter, httpCode int, data any) {
 	if err != nil {
 		log.Printf("Error encoding response: %v", err)
 		if httpCode == http.StatusOK {
-			http.Error(w, "Error encoding response", http.StatusInternalServerError)
+			http.Error(w, "Error encoding response", http.StatusBadRequest)
 		}
 	}
 }
