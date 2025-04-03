@@ -32,6 +32,7 @@ export class RabbitMQService implements EventBus {
       const host = process.env.RABBITMQ_HOST || "localhost";
 
       const rabbitmqURL = `amqp://${user}:${pass}@${host}:${port}`;
+      console.log('rabbitmqURL', rabbitmqURL)
 
       const connection = await client.connect(rabbitmqURL);
 
@@ -72,8 +73,7 @@ export class RabbitMQService implements EventBus {
     const delay = this.retryAttempts * this.retryDelay;
 
     console.log(
-      `Retrying connection in ${delay / 1000} seconds (attempt ${
-        this.retryAttempts
+      `Retrying connection in ${delay / 1000} seconds (attempt ${this.retryAttempts
       }/${this.maxRetryAttempts})`
     );
 

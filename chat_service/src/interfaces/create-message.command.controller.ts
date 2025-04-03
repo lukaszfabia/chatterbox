@@ -5,13 +5,9 @@ import asyncHandler from "express-async-handler";
 import { InvalidBody } from "./errors";
 
 export class CreateMessageController {
-    private readonly router: Router;
-
     constructor(
         private readonly handler: CreateMessageCommandHandler
     ) {
-        this.router = Router();
-        this.initializeRoutes();
     }
 
     createMessage = asyncHandler(async (req: Request, res: Response) => {
@@ -23,15 +19,12 @@ export class CreateMessageController {
         }
 
         const result = await this.handler.execute(command);
-        res.status(201).json({ result });
-        return;
+        if (!result) {
+            res.status(400).json(InvalidBody);
+            return;
+        }
+
+        res.status(201).json(result);
     });
 
-    private initializeRoutes() {
-        this.router.post("/message", this.createMessage);
-    }
-
-    getRoutes() {
-        return this.router;
-    }
 }

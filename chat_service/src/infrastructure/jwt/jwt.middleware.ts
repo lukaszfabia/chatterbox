@@ -1,13 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-const SECRET_KEY = process.env.JWT_SECRET;
 
 export interface AuthRequest extends Request {
     userID?: string;
 }
 
 export const jwtMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
+    console.log('Validating token...')
+    const SECRET_KEY = process.env.JWT_SECRET;
+
     const token = req.headers.authorization?.split(" ")[1];
 
     if (!SECRET_KEY) {
@@ -21,8 +23,16 @@ export const jwtMiddleware = (req: AuthRequest, res: Response, next: NextFunctio
     }
 
     try {
-        const decoded = jwt.verify(token, SECRET_KEY) as { userID: string };
-        req.userID = decoded.userID;
+        const decoded = jwt.verify(token, SECRET_KEY) as { sub: string, exp: number };
+        const now = new Date().getTime()
+
+
+        if (now < decoded.exp) {
+            res.status(401).json({ message: "Token has been expired" });
+            return;
+        }
+
+        req.userID = decoded.sub;
         next();
     } catch (error) {
         res.status(403).json({ message: "Invalid token" });

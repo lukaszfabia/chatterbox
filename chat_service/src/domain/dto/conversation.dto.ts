@@ -1,5 +1,5 @@
 import { MessageDTO } from "./message.dto";
-import { User } from "../../domain/models/conversation.model";
+import { IConversation, User } from "../../domain/models/conversation.model";
 
 export class ConversationDTO {
     constructor(
@@ -9,10 +9,10 @@ export class ConversationDTO {
         public readonly updatedAt?: Date,
     ) { }
 
-    static fromMongoDocument(doc: any): ConversationDTO {
+    static fromMongoDocument(doc: IConversation): ConversationDTO {
         return new ConversationDTO(
             doc._id?.toString() || "",
-            doc.members,
+            doc.members.map((member: any) => new User(member.userID, member.username, member.avatarURL)),
             doc.lastMessage ? MessageDTO.fromMongoDocument(doc.lastMessage) : undefined,
             doc.updatedAt
         );

@@ -1,4 +1,3 @@
-import { IMessage } from "../models/message.model";
 import { Command } from "./command";
 
 export class CreateMessageCommand implements Command {

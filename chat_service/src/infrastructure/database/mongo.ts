@@ -3,7 +3,7 @@ import { MessageDTO } from "../../domain/dto/message.dto";
 import { IConversation, User } from "../../domain/models/conversation.model";
 import { IMessage } from "../../domain/models/message.model";
 import { IChatRepository } from "../../domain/repository/chat.repository";
-import { Collection, MongoClient } from "mongodb";
+import { Collection, MongoClient, ObjectId } from "mongodb";
 
 export class MongoService implements IChatRepository {
   private readonly MESSAGE_COLLECTION = "messages";
@@ -15,9 +15,8 @@ export class MongoService implements IChatRepository {
   constructor(
     private readonly uri: string = `mongodb://${encodeURIComponent(
       process.env.MONGO_USER || ""
-    )}:${encodeURIComponent(process.env.MONGO_PASS || "")}@${
-      process.env.MONGO_HOST || "localhost"
-    }:${process.env.MONGO_PORT || "27017"}`
+    )}:${encodeURIComponent(process.env.MONGO_PASS || "")}@${process.env.MONGO_HOST || "localhost"
+      }:${process.env.MONGO_PORT || "27017"}`
   ) {
     if (!this.uri) throw new Error("MongoDB URI is required");
   }
@@ -63,7 +62,7 @@ export class MongoService implements IChatRepository {
   }
 
   async getConversationById(chatID: string): Promise<ConversationDTO | null> {
-    const chat = await this.conversations.findOne({ _id: chatID });
+    const chat = await this.conversations.findOne({ _id: new ObjectId(chatID) });
     return chat ? ConversationDTO.fromMongoDocument(chat) : null;
   }
 
@@ -78,6 +77,8 @@ export class MongoService implements IChatRepository {
       .limit(limit)
       .toArray();
 
+    console.log('chats', chats)
+
     return chats.map(ConversationDTO.fromMongoDocument);
   }
 
@@ -88,8 +89,6 @@ export class MongoService implements IChatRepository {
     chatID: string,
     sentAt: number
   ): Promise<ConversationDTO | null> {
-    const filter = { _id: chatID };
-
     const message: IMessage = {
       senderID: senderID,
       content: content,
@@ -106,6 +105,8 @@ export class MongoService implements IChatRepository {
       return null;
     }
 
+    const filter = { _id: new ObjectId(chatID) };
+
     const updatedConversation = await this.conversations.findOneAndUpdate(
       filter,
       {
@@ -120,7 +121,10 @@ export class MongoService implements IChatRepository {
       { returnDocument: "after" }
     );
 
-    if (!updatedConversation?.lastMessage) {
+    console.log('updatedConversation', updatedConversation)
+
+    if (!updatedConversation) {
+      console.log('No last message')
       return null;
     }
 
@@ -128,20 +132,42 @@ export class MongoService implements IChatRepository {
   }
 
   async getMessages(chatID: string, limit: number): Promise<MessageDTO[]> {
-    const chat = await this.messages.findOne({ _id: chatID });
+    const chat = await this.messages.findOne({ _id: new ObjectId(chatID) });
     if (!chat || !chat.messages) return [];
 
     return chat.messages.slice(-limit).map(MessageDTO.fromMongoDocument);
   }
 
   async deleteConversation(chatID: string): Promise<ConversationDTO | null> {
-    const deleted = await this.conversations.findOneAndDelete({ _id: chatID });
+    const deleted = await this.conversations.findOneAndDelete({ _id: new ObjectId(chatID) });
     return deleted ? ConversationDTO.fromMongoDocument(deleted) : null;
   }
 
-  createConversation(members: User[]): Promise<ConversationDTO | null> {
-    throw new Error("Method not implemented.");
+  async createConversation(members: User[]): Promise<ConversationDTO | null> {
+    const existingConversation = await this.conversations.findOne({
+      members: members
+    });
+
+    if (existingConversation) {
+      console.log('Conversation already exists')
+      return ConversationDTO.fromMongoDocument(existingConversation);
+    }
+
+    const newConversation: IConversation = {
+      updatedAt: new Date(),
+      members: members,
+    };
+
+    const added = await this.conversations.insertOne(newConversation);
+
+    if (added.insertedId) {
+      newConversation._id = added.insertedId;
+      return ConversationDTO.fromMongoDocument(newConversation);
+    }
+
+    return null;
   }
+
   updateConversation(
     chatID: string,
     updateData: Partial<ConversationDTO>

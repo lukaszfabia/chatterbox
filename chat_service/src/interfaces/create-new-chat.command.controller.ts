@@ -5,11 +5,8 @@ import { CreateNewChatCommand } from "../domain/command/create-new-chat.command"
 import { InvalidBody } from "./errors";
 
 export class CreateChatController {
-    private readonly router: Router;
 
     constructor(private readonly handler: CreateNewChatCommandHandler) {
-        this.router = Router();
-        this.initializeRoutes();
     }
 
     createChat = asyncHandler(async (req: Request, res: Response) => {
@@ -21,14 +18,6 @@ export class CreateChatController {
         }
 
         const result = await this.handler.execute(command);
-        res.status(201).json({ result });
+        res.status(201).json(result);
     });
-
-    private initializeRoutes() {
-        this.router.post("/chat", this.createChat);
-    }
-
-    getRoutes() {
-        return this.router;
-    }
 }

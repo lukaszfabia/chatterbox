@@ -25,9 +25,15 @@ export class RabbitMQService implements EventBus {
 
         try {
             console.log(`Connecting to RabbitMQ Server...`);
-            const connection = await client.connect(
-                process.env.RABBITMQ_URL || 'amqp://lukasz:lukasz@localhost:5672'
-            );
+
+            const port = process.env.RABBITMQ_PORT || 5672;
+            const pass = process.env.RABBITMQ_DEFAULT_PASS || "";
+            const user = process.env.RABBITMQ_DEFAULT_USER || "";
+            const host = process.env.RABBITMQ_HOST || "localhost";
+
+            const rabbitmqURL = `amqp://${user}:${pass}@${host}:${port}`;
+
+            const connection = await client.connect(rabbitmqURL);
 
             this.connection = connection.connection;
             this.channel = await connection.createChannel();

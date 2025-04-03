@@ -1,4 +1,4 @@
-import { Document } from "mongodb";
+import { Document, ObjectId } from "mongodb";
 import { IMessage } from "./message.model";
 
 export class User {
@@ -6,7 +6,7 @@ export class User {
 }
 
 export interface IConversation extends Document {
-    _id?: string;
+    _id?: ObjectId;
     members: User[];
     lastMessage?: IMessage;
     updatedAt: Date;

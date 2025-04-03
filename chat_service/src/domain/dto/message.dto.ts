@@ -1,3 +1,5 @@
+import { IMessage } from "../models/message.model";
+
 export class MessageDTO {
     constructor(
         public readonly id: string,
@@ -9,15 +11,15 @@ export class MessageDTO {
         public readonly status: string
     ) { }
 
-    static fromMongoDocument(doc: any): MessageDTO {
+    static fromMongoDocument(doc: IMessage): MessageDTO {
         return new MessageDTO(
-            doc._id.toString(),
+            doc._id?.toString() || "",
             doc.senderID,
+            doc.receiverID,
             doc.content,
             doc.sentAt,
             doc.chatID,
             doc.status,
-            doc.receiverID,
         );
     }
 }
