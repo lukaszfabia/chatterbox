@@ -2,17 +2,17 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { GetDummyUsers, User } from "@/lib/models/user";
 import { Search } from "lucide-react";
 import UserRow from "@/components/explore/row";
 import { useState } from "react";
 import { UserRowSkeleton } from "@/components/explore/row-skeleton";
+import { User } from "@/lib/models/user";
 
 
 
 export default function Explore() {
     const [phrase, setPhrase] = useState<string>("");
-    const [users, _] = useState<User[]>(GetDummyUsers());
+    const [users, _] = useState<User[]>([]);
 
     const filteredUsers = users.filter((user: User) => {
         const p = phrase.toLowerCase()
@@ -53,7 +53,7 @@ export default function Explore() {
             ) : (
                 filteredUsers.length > 0 ? (
                     filteredUsers.map((user) => (
-                        <UserRow user={user} key={`${user.ID}-${user.email}`} />
+                        <UserRow user={user} key={`${user.id}-${user.email}`} />
                     ))
                 ) : (
                     <div className="mt-8 text-center text-muted-foreground">

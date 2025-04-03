@@ -5,6 +5,8 @@ import { appDetails } from "@/config/config";
 import { ThemeProvider } from "next-themes";
 import Navbar from "@/components/navbar/navbar";
 import Footer from "@/components/footer";
+import { AuthProvider } from "@/context/auth-context";
+import Provider from "@/providers/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,13 +40,15 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Navbar />
-            <div className="min-h-screen flex flex-col">
-              <main className="flex-grow">
-                {children}
-              </main>
-            </div>
-            <Footer />
+            <Provider>
+              <Navbar />
+              <div className="min-h-screen flex flex-col">
+                <main className="flex-grow">
+                  {children}
+                </main>
+              </div>
+              <Footer />
+            </Provider>
           </ThemeProvider>
         </body>
       </html>

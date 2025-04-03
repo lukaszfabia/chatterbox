@@ -7,8 +7,36 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useAuth } from "@/context/auth-context";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Profile from "../profile/[ID]/page";
 
 export default function Register() {
+    const { authenticate, isLoading, error, isAuth, userID } = useAuth();
+    const router = useRouter();
+
+    if (isAuth) {
+        return <Profile />
+    }
+    useEffect(() => {
+        if (isAuth && userID) {
+            router.push(`/profile/${userID}`);
+        }
+    }, [isAuth, userID, router]);
+
+    const [formData, setFormData] = useState({ email: "", password: "", username: "" });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.id]: e.target.value });
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        authenticate(formData, "login");
+    };
+
+
     return (
         <section className="flex min-h-screen items-center justify-center px-5 md:px-20">
             <motion.div
@@ -27,33 +55,37 @@ export default function Register() {
                         <h2 className="text-3xl font-bold text-center">Sign Up</h2>
                         <p className="text-muted-foreground text-center">Create your account today!</p>
 
-                        <form className="mt-5 space-y-4">
+                        <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
                             <div>
                                 <Label htmlFor="username" className="text-muted-foreground">
                                     Username
                                 </Label>
-                                <Input type="text" id="username" name="username" placeholder="joe_doe" className="mt-1" />
+                                <Input onChange={handleChange} value={formData.username} type="text" id="username" name="username" placeholder="joe_doe" className="mt-1" />
                             </div>
 
                             <div>
                                 <Label htmlFor="email" className="text-muted-foreground">
                                     Email
                                 </Label>
-                                <Input type="text" id="email" name="email" placeholder="joe.doe@example.com" className="mt-1" />
+                                <Input onChange={handleChange} value={formData.email} type="text" id="email" name="email" placeholder="joe.doe@example.com" className="mt-1" />
                             </div>
 
                             <div>
                                 <Label htmlFor="password" className="text-muted-foreground">
                                     Password
                                 </Label>
-                                <Input type="password" id="password" name="password" placeholder="••••••••" className="mt-1" />
+                                <Input onChange={handleChange} value={formData.password} type="password" id="password" name="password" placeholder="••••••••" className="mt-1" />
                             </div>
+
+                            {error && (
+                                <p className="text-red-500 text-center text-sm">{error}</p>
+                            )}
 
                             <motion.div
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                             >
-                                <Button className="w-full mt-4 flex items-center justify-center gap-2">
+                                <Button disabled={isLoading} className="w-full mt-4 flex items-center justify-center gap-2">
                                     <span>Sign Up</span>
                                     <ArrowRight />
                                 </Button>

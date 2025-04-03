@@ -65,7 +65,7 @@ export default function UserRow({ user }: { user: User }) {
             whileTap={{ scale: 0.98 }}
             className="my-3"
         >
-            <Link href={`/profile/${user.ID}`} className="block">
+            <Link href={`/profile/${user.id}`} className="block">
                 <div className="bg-slate-100 dark:bg-slate-900 w-full rounded-xl shadow-sm p-4 hover:shadow-md transition-all">
                     <div className="flex items-center justify-between">
                         <div className="flex space-x-4 items-center">

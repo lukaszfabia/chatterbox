@@ -7,8 +7,10 @@ const MAX_YEARS = 100 * MAX_MONTHS;
 import "date-fns"
 import { format, formatDistanceToNow, parseISO } from "date-fns";
 
-export function transformTime(time: Date): string {
-    return `${formatDistanceToNow(time)} ago`;
+export function transformTime(time: string): string {
+    const t = new Date(time);
+
+    return `${formatDistanceToNow(t)} ago`;
 }
 
 export function convertTime(t?: string | null | Date): string {

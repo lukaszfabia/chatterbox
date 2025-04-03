@@ -1,15 +1,27 @@
 "use client";
 
+import { useProfile } from "@/context/profile-context";
 import Login from "./login"
-import Profile from "./profile"
+import AvatarWithSkeleton from "./profile"
 import { Register } from "./register"
+import { Skeleton } from "../ui/skeleton";
+import { useEffect, useState } from "react";
 
 export default function IsLogged() {
-    // use hook to check is logged 
-    const isLogged = false
+    const { currUserProfile, isLoading } = useProfile();
+    const [isMounted, setIsMounted] = useState(false);
 
-    if (isLogged) {
-        return <Profile />
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, [])
+
+    if (isLoading || !isMounted) {
+        return <Skeleton className="rounded-full shadow-xl w-8 h-8" />
+    }
+
+    if (currUserProfile) {
+        return <AvatarWithSkeleton user={currUserProfile} />
     }
 
 

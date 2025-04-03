@@ -50,7 +50,7 @@ export default function ActionButtons({ isMe, isLoading }: { isMe: boolean, isLo
                         <AlertDialogHeader>
                             <AlertDialogTitle>Do you want to create new chat?</AlertDialogTitle>
                             <AlertDialogDescription>
-                                It looks like you haven't with "username"?
+                                It looks like you haven't chat with "username" yet?
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

@@ -1,6 +1,6 @@
 "use client";
 
-import { GetDummyUser, User } from "@/lib/models/user";
+import { User } from "@/lib/models/user";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import BioSection from "@/components/profile/bio";
@@ -8,21 +8,40 @@ import ActionButtons from "@/components/profile/buttons";
 import WhoAmI from "@/components/profile/whoami";
 import UserAvatar from "../../../components/profile/avatar";
 import Cover from "../../../components/profile/cover";
+import { useProfile } from "@/context/profile-context";
+import NotFound404 from "@/app/not-found";
+import { useParams } from "next/navigation";
 
 export default function Profile() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
+  const { ID } = useParams();
+  const { isLoading, error, fetchByID, currUserProfile } = useProfile();
   const isOnline = true;
-  const isMe = false;
+  const [isMe, setIsMe] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setUser(GetDummyUser());
-      setIsLoading(false);
-    }, 300);
+    // case when auth and handle when he goes on his profile and other profile
+    if (ID && currUserProfile) {
+      setIsMe(ID === currUserProfile.id);
+      if (ID === currUserProfile.id) {
+        setUser(currUserProfile);
+      } else {
+        fetchByID(ID.toString()).then((user) => {
+          setUser(user);
+        });
+      }
+    }
+    // case when anon goes on the site and search with url bar 
+    if (ID && !currUserProfile) {
+      fetchByID(ID.toString()).then((user) => {
+        setUser(user);
+      });
+    }
+  }, [ID, currUserProfile, fetchByID]);
 
-    return () => clearTimeout(timer);
-  }, []);
+  if (error) {
+    return <NotFound404 />;
+  }
 
   return (
     <motion.div
@@ -32,8 +51,8 @@ export default function Profile() {
       transition={{ duration: 0.3 }}
     >
       <div className="relative">
-        <Cover url={user?.backgroundURL} isLoading={isLoading} />
-        <UserAvatar user={user} isOnline={isOnline} isLoading={isLoading} />
+        <Cover url={user?.backgroundURL} isLoading={isLoading || !user} />
+        <UserAvatar user={user} isOnline={isOnline} isLoading={isLoading || !user} />
       </div>
 
       <div className="px-4 pt-16 pb-8">
@@ -41,16 +60,16 @@ export default function Profile() {
           firstName={user?.firstName}
           lastName={user?.lastName}
           username={user?.username || ''}
-          isLoading={isLoading}
+          isLoading={isLoading || !user}
         />
 
         <BioSection
           createdAt={user?.createdAt}
           bio={user?.bio}
-          isLoading={isLoading}
+          isLoading={isLoading || !user}
         />
 
-        <ActionButtons isMe={isMe} isLoading={isLoading} />
+        <ActionButtons isMe={isMe} isLoading={isLoading || !user} />
       </div>
     </motion.div>
   );

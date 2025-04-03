@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Calendar } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 
-export default function BioSection({ bio, createdAt, isLoading }: { bio?: string | null, createdAt?: Date, isLoading?: boolean }) {
+export default function BioSection({ bio, createdAt, isLoading }: { bio?: string | null, createdAt?: string, isLoading?: boolean }) {
     const variants = {
         hidden: { opacity: 0, y: 10 },
         visible: { opacity: 1, y: 0 }

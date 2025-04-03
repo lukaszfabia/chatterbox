@@ -37,7 +37,7 @@ export default function Cover({ url, isLoading }: { url?: string | null; isLoadi
                         key="gradient"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="bg-gradient-to-r from-blue-50 to-purple-50 h-full w-full"
+                        className="bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 h-full w-full"
                     />
                 )}
             </AnimatePresence>

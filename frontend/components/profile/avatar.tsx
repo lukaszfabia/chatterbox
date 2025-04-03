@@ -36,9 +36,9 @@ function UserAvatar({ user, isOnline, isLoading = false }: { user?: User | null;
                                 key="fallback"
                                 initial={{ scale: 0.8, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
-                                className="rounded-full w-32 h-32 border-4 border-background bg-gray-200 flex items-center justify-center"
+                                className="rounded-full w-32 h-32 border-4 border-background bg-gray-200 dark:bg-gray-800 flex items-center justify-center"
                             >
-                                <AvatarFallback className="text-2xl font-semibold">
+                                <AvatarFallback className="md:text-4xl text-3xl font-semibold">
                                     {initials(user.username, user.firstName, user.lastName)}
                                 </AvatarFallback>
                             </motion.div>

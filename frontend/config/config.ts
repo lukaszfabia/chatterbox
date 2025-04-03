@@ -9,14 +9,12 @@ export const appDetails = {
 
 export type allowedMethods = "PUT" | "POST" | "DELETE" | "GET"
 
-export type apiVersion = "v1" | "v2"
-
 export type Microservice = Record<"auth" | "profile" | "notification" | "chat" | "status", string>;
 
 export const microservices: Microservice = {
-    auth: process.env.AUTH_SERVICE_HOST!,
-    profile: process.env.PROFILE_SERVICE_HOST!,
-    notification: process.env.NOTIFICATION_SERVICE_HOST!,
-    chat: process.env.CHAT_SERVICE_HOST!,
-    status: process.env.STATUS_SERVICE_HOST!,
+    auth: process.env.NEXT_PUBLIC_AUTH_SERVICE_HOST!,
+    profile: process.env.NEXT_PUBLIC_PROFILE_SERVICE_HOST!,
+    notification: process.env.NEXT_PUBLIC_NOTIFICATION_SERVICE_HOST!,
+    chat: process.env.NEXT_PUBLIC_CHAT_SERVICE_HOST!,
+    status: process.env.NEXT_PUBLIC_STATUS_SERVICE_HOST!,
 };

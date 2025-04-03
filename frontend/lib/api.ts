@@ -1,57 +1,57 @@
-import { allowedMethods, apiVersion as apiV, Microservice, microservices } from "@/config/config";
-import { Model } from "./dto/model";
+import { allowedMethods, Microservice, microservices } from "@/config/config";
 import getToken, { ACCESS } from "./token";
 
-export interface Response<T> {
-    data?: T;
-    error?: string | undefined;
-}
+export type CONTENT_TYPE = "application/json;charset=UTF-8" | "multipart/form-data";
 
 export interface Fetchable {
     method: allowedMethods;
-    apiVersion: apiV;
+    apiVersion: "api/v1" | "api/v2";
     service: keyof Microservice;
-    body?: Record<string, any> | null;
+    body?: Record<string, any> | FormData | null;
     token?: string | null;
     endpoint?: string | null;
     headers?: Record<string, string>;
 }
 
-// export const api = async <T extends Model>({
-//     body,
-//     service = microservices.chat,
-//     method = "GET",
-//     apiVersion = "v1",
-//     endpoint,
-//     token = getToken(ACCESS),
-//     headers = {
-//         "content-type": "application/json;charset=UTF-8",
-//         ...(token && { Authorization: `Bearer ${token}` }),
-//     },
-// }: Fetchable): Promise<Response<T>> => {
-//     try {
-//         const url = `http://${microservices[service]}${apiVersion}${endpoint}`;
+export const api = async <T>({
+    body,
+    service,
+    method = "GET",
+    endpoint,
+    apiVersion = "api/v1",
+    token = getToken(ACCESS),
+    headers,
+}: Fetchable): Promise<T | null> => {
+    try {
+        const url = `http://${microservices[service]}/${apiVersion}/${service}${endpoint}`;
 
-//         const response = await fetch(url, {
-//             method,
-//             headers,
-//             body: body ? JSON.stringify(body) : undefined,
-//         });
+        console.log('url', url)
 
-//         if (response.ok) {
-//             const data: T = await response.json();
-//             return { data };
-//         }
+        const isFormData = body instanceof FormData;
 
-//         const errorData: FailedRequest = await response.json();
-//         return {
-//             detail: errorData.detail || "Something went wrong!",
-//         };
+        const defaultHeaders: Record<string, string> = {
+            ...(token && { Authorization: `Bearer ${token}` }),
+        };
 
-//     } catch (err) {
-//         console.error("API error: ", err);
-//         return {
-//             detail: "Something went wrong!",
-//         };
-//     }
-// };
+        if (!isFormData) {
+            defaultHeaders["Content-Type"] = "application/json;charset=UTF-8";
+        }
+
+        const response = await fetch(url, {
+            method,
+            headers: { ...defaultHeaders, ...headers },
+            body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
+        });
+
+        if (response.ok) {
+            const data: T = await response.json();
+            return data;
+        }
+
+        console.log('Something went wrong!');
+        return null;
+    } catch (err) {
+        console.error("API error: ", err);
+        return null;
+    }
+};
