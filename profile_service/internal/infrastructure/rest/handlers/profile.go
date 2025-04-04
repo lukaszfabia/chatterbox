@@ -106,6 +106,8 @@ func (h *ProfileHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println(id)
+
 	body.UserID = id
 
 	res, err := h.queryService.GetProfile(*body)

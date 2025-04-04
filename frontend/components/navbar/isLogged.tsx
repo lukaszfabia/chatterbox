@@ -6,9 +6,11 @@ import AvatarWithSkeleton from "./profile"
 import { Register } from "./register"
 import { Skeleton } from "../ui/skeleton";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/context/auth-context";
 
 export default function IsLogged() {
     const { currUserProfile, isLoading } = useProfile();
+    const { logout } = useAuth();
     const [isMounted, setIsMounted] = useState(false);
 
 
@@ -21,7 +23,7 @@ export default function IsLogged() {
     }
 
     if (currUserProfile) {
-        return <AvatarWithSkeleton user={currUserProfile} />
+        return <AvatarWithSkeleton logout={logout} user={currUserProfile} />
     }
 
 

@@ -4,15 +4,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import UserRow from "@/components/explore/row";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UserRowSkeleton } from "@/components/explore/row-skeleton";
 import { User } from "@/lib/models/user";
+import { useProfile } from "@/context/profile-context";
+import { useAuth } from "@/context/auth-context";
 
 
 
 export default function Explore() {
     const [phrase, setPhrase] = useState<string>("");
-    const [users, _] = useState<User[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
+    const { fetchProfiles, currUserProfile } = useProfile();
+
+    useEffect(() => {
+        fetchProfiles().then((users) => {
+            setUsers(users);
+        });
+    }, [])
+
 
     const filteredUsers = users.filter((user: User) => {
         const p = phrase.toLowerCase()

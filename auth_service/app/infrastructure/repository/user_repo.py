@@ -2,7 +2,6 @@ from collections.abc import Callable
 import functools
 from typing import Any, Optional
 import uuid
-from fastapi import logger
 from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -22,7 +21,6 @@ def handle_tx(func: Callable) -> Callable:
                 await self.db.refresh(result)
             return result
         except Exception as e:
-            logger.error(f"Database transaction failed in {func.__name__}: {e}")
             await self.db.rollback()
 
             return None

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"log"
 	"profile_service/internal/domain/models"
 	"profile_service/internal/domain/repositories"
 	"profile_service/internal/infrastructure/database"
@@ -55,7 +56,8 @@ func NewProfileRepository(database *database.Database) repositories.ProfileRepos
 	}
 }
 
-func (repo *profileRepoImpl) getUserByKey(k key, v any) (*models.Profile, error) {
+func (repo *profileRepoImpl) getUserByKey(k key, v string) (*models.Profile, error) {
+	log.Println(k, v)
 	res := repo.database.GetNoSql().FindOne(context.TODO(), bson.M{string(k): v, "deletedAt": bson.M{"$exists": false}})
 
 	var profile models.Profile

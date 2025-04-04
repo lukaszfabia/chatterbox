@@ -1,13 +1,9 @@
 "use client";
-
 import { api } from "@/lib/api";
 import { User } from "@/lib/models/user";
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useCallback, useContext } from "react";
 import { useAuth } from "./auth-context";
-
-export interface ProfileProps {
-
-}
+import useSWR from "swr";
 
 type ProfileCtxProps = {
     currUserProfile: User | null;
@@ -15,8 +11,8 @@ type ProfileCtxProps = {
     error?: string | null;
 
     fetchByID: (id: string) => Promise<User | null>;
-    fetchProfiles: (limit: number) => Promise<User[]>;
-}
+    fetchProfiles: () => Promise<User[]>;
+};
 
 const ProfileCtx = createContext<ProfileCtxProps>({
     currUserProfile: null,
@@ -24,73 +20,81 @@ const ProfileCtx = createContext<ProfileCtxProps>({
     error: null,
     fetchByID: async () => null,
     fetchProfiles: async () => [],
-})
+});
 
+const fetchCurrentProfile = async (): Promise<User | null> => {
+    return await api<User>({
+        service: "profile",
+        apiVersion: "api/v1",
+        endpoint: "/auth/me",
+        method: "GET",
+    });
+};
 
 export function ProfileProvider({ children }: { children: ReactNode }) {
-    const [currUserProfile, setCurrUserProfile] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
-    const { isAuth } = useAuth();
+    const { userID, isAuth } = useAuth();
 
+    const {
+        data: currUserProfile,
+        error,
+        isLoading,
+    } = useSWR(isAuth && userID ? "profile/me" : null, fetchCurrentProfile);
 
-    useEffect(() => {
-        const fetch = async () => {
-            console.log('Fetching user...')
-            setIsLoading(true);
+    const fetchByID = useCallback(async (id: string): Promise<User | null> => {
+        try {
             const user = await api<User>({
                 service: "profile",
-                endpoint: "/auth/me",
                 apiVersion: "api/v1",
+                endpoint: `/profiles/${id}`,
                 method: "GET",
             });
 
-            if (user) {
-                console.log(user);
-                setCurrUserProfile(user);
-            }
+            if (!user) throw new Error("User not found");
 
-            setIsLoading(false);
+            return user;
+        } catch (err) {
+            console.error("Failed to fetch user by ID:", err);
+            return null;
         }
-
-        if (!currUserProfile) {
-            fetch();
-        }
-    }, [isAuth]);
-
-    const fetchByID = useCallback(async (id: string): Promise<User | null> => {
-        return null;
-    }, [])
+    }, []);
 
     const fetchProfiles = useCallback(async (): Promise<User[]> => {
-        setIsLoading(true);
-        const users = await api<User[]>({
-            service: "profile",
-            endpoint: "/many",
-            apiVersion: "api/v1",
-            method: "GET",
-        })
+        try {
+            const users = await api<User[]>({
+                service: "profile",
+                apiVersion: "api/v1",
+                endpoint: "/profiles",
+                method: "GET",
+            });
 
+            if (!users) return [];
 
-        if (!users) {
-            setError('Failed to fetch users');
+            return users.filter((v) => v.id !== userID) ?? [];
+        } catch (err) {
+            console.error("Error fetching profiles:", err);
+            return [];
         }
-        setIsLoading(false);
-        return users ?? [];
-    }, [])
+    }, [userID]);
 
     return (
-        <ProfileCtx.Provider value={{ currUserProfile, isLoading, error, fetchByID, fetchProfiles }}>
+        <ProfileCtx.Provider
+            value={{
+                currUserProfile: currUserProfile ?? null,
+                isLoading,
+                error: error?.message ?? null,
+                fetchByID,
+                fetchProfiles,
+            }}
+        >
             {children}
         </ProfileCtx.Provider>
-    )
+    );
 }
-
 
 export const useProfile = () => {
     const context = useContext(ProfileCtx);
     if (!context) {
-        throw new Error("useAuth must be used within an ProfileProvider");
+        throw new Error("useProfile must be used within a ProfileProvider");
     }
     return context;
 };

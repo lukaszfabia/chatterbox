@@ -20,9 +20,16 @@ export default function Profile() {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    if (currUserProfile) {
+      setIsMe(ID === currUserProfile.id);
+    } else {
+      setIsMe(false);
+    }
+  }, [currUserProfile])
+
+  useEffect(() => {
     // case when auth and handle when he goes on his profile and other profile
     if (ID && currUserProfile) {
-      setIsMe(ID === currUserProfile.id);
       if (ID === currUserProfile.id) {
         setUser(currUserProfile);
       } else {

@@ -1,15 +1,41 @@
-export type User = {
-    id: string,
-    createdAt: string,
-    updatedAt: string,
-    deletedAt: string,
-    firstName: string | undefined | null,
-    lastName: string | undefined | null,
-    username: string,
-    email: string,
-    bio: string | undefined | null,
-    avatarURL: string | undefined | null,
-    backgroundURL: string | undefined | null,
+export class User {
+    constructor(
+        public id: string,
+        public createdAt: string,
+        public updatedAt: string,
+        public deletedAt: string,
+        public username: string,
+        public email: string,
+        public firstName?: string | null,
+        public lastName?: string | null,
+        public bio?: string | null,
+        public avatarURL?: string | null,
+        public backgroundURL?: string | null,
+    ) { }
+
+    get fullName(): string {
+        return `${this.firstName ?? ""} ${this.lastName ?? ""}`.trim();
+    }
+
+    isDeleted(): boolean {
+        return !!this.deletedAt;
+    }
+
+    get profile() {
+        return {
+            firstName: this.firstName ?? "",
+            lastName: this.lastName ?? "",
+            bio: this.bio ?? "",
+        }
+    }
+
+    get auth() {
+        return {
+            username: this.username,
+            email: this.email,
+            password: "",
+        }
+    }
 }
 
 

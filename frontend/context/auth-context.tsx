@@ -4,6 +4,7 @@ import { api } from "@/lib/api";
 import { LoginDTO } from "@/lib/dto/login";
 import { RegisterDTO } from "@/lib/dto/register";
 import { TokenDTO } from "@/lib/dto/tokens";
+import { UpdateUserDTO } from "@/lib/dto/update";
 import getUserID from "@/lib/jwt";
 import getToken, { ACCESS, REFRESH } from "@/lib/token";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
@@ -25,6 +26,8 @@ type AuthCtxProps = {
     /* Methods */
     logout: () => void;
     authenticate: (data: LoginDTO | RegisterDTO, type: "login" | "register") => void;
+    deleteAcc: () => void;
+    updateAcc: (data: UpdateUserDTO) => void;
 }
 
 const AuthCtx = createContext<AuthCtxProps>({
@@ -32,33 +35,86 @@ const AuthCtx = createContext<AuthCtxProps>({
     isLoading: false,
     error: null,
     userID: null,
-    logout: () => { },
+    logout: async () => { },
     authenticate: async () => { },
+    deleteAcc: async () => { },
+    updateAcc: async () => { },
 })
 
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [isAuth, setIsAuth] = useState<boolean>(!!getToken(ACCESS))
+    const [userID, setUserID] = useState<string | null>(() => getUserID());
+    const [isAuth, setIsAuth] = useState<boolean>(() => !!getToken(ACCESS));
+
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [userID, setUserID] = useState<string | null>(null);
 
-    const logout = useCallback(() => {
-        clearStorage();
-        setUserID(null);
-        setIsAuth(false);
+    const updateAcc = useCallback(async (data: UpdateUserDTO) => {
+        if (userID) {
+            try {
+                await logout()
+                await api<string>({
+                    body: data,
+                    service: "auth",
+                    method: "PUT",
+                    apiVersion: "api/v1",
+                    endpoint: `/auth/me/`,
+                })
+
+            } catch (error) {
+                console.log('errror', error)
+            }
+        }
+    }, [])
+
+
+    const deleteAcc = useCallback(async () => {
+        if (userID) {
+            try {
+                await logout()
+                await api<string>({
+                    body: { "userID": userID },
+                    service: "auth",
+                    method: "DELETE",
+                    apiVersion: "api/v1",
+                    endpoint: `/auth/me/`,
+                })
+
+            } catch (error) {
+                console.log('errror', error)
+            }
+        }
+    }, [])
+
+    const logout = useCallback(async () => {
+        try {
+            await api<any>({
+                service: "auth",
+                method: "GET",
+                apiVersion: "api/v1",
+                endpoint: `/auth/logout/`,
+            })
+
+            clearStorage();
+            setUserID(null);
+            setIsAuth(false);
+        } catch (error) {
+            console.log('error', error)
+        }
     }, []);
 
     const authenticate = useCallback(async (data: LoginDTO | RegisterDTO, type: "login" | "register") => {
         setIsLoading(true);
+        console.log('Authing')
+
         setError(null);
         try {
             const tokens = await api<TokenDTO>({
                 body: data,
                 service: "auth",
                 method: "POST",
-                endpoint: `/${type}/`,
                 apiVersion: "api/v1",
+                endpoint: `/auth/${type}/`,
             });
 
             if (tokens) {
@@ -76,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
     return (
-        <AuthCtx.Provider value={{ isAuth, isLoading, error, userID, authenticate, logout }}>
+        <AuthCtx.Provider value={{ isAuth, isLoading, error, userID, updateAcc, authenticate, logout, deleteAcc }}>
             {children}
         </AuthCtx.Provider>
     );

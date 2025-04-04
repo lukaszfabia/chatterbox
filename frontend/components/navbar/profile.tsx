@@ -14,7 +14,6 @@ import {
 import trim from '@/lib/trim';
 import { LogOutIcon, Pencil } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '../ui/button';
 
 const AvatarWithSkeleton = ({ user }: { user: User }) => {
     return user && (
@@ -37,7 +36,7 @@ const AvatarWithSkeleton = ({ user }: { user: User }) => {
     );
 };
 
-const AvatarWithActions = ({ user }: { user: User }) => {
+const AvatarWithActions = ({ user, logout }: { user: User, logout: () => void }) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger><AvatarWithSkeleton user={user} /></DropdownMenuTrigger>
@@ -45,8 +44,8 @@ const AvatarWithActions = ({ user }: { user: User }) => {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem><Link href={`/profile/${user.id}`}>{trim(user.username)}</Link></DropdownMenuItem>
-                <DropdownMenuItem><Pencil /><Link href="#">Edit</Link></DropdownMenuItem>
-                <DropdownMenuItem><LogOutIcon /> <button>Log out</button></DropdownMenuItem>
+                <DropdownMenuItem><Pencil /><Link href={`/profile/${user.id}/edit`}>Edit</Link></DropdownMenuItem>
+                <DropdownMenuItem><LogOutIcon /> <button onClick={logout}>Log out</button></DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
 

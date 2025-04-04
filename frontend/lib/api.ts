@@ -23,7 +23,7 @@ export const api = async <T>({
     headers,
 }: Fetchable): Promise<T | null> => {
     try {
-        const url = `http://${microservices[service]}/${apiVersion}/${service}${endpoint}`;
+        const url = `http://${microservices[service]}/${apiVersion}${endpoint}`;
 
         console.log('url', url)
 
