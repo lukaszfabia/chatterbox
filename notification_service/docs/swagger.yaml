@@ -1,0 +1,60 @@
+basePath: /api/v1
+definitions:
+  models.Notification:
+    properties:
+      id:
+        type: string
+      info:
+        type: string
+      isDelivered:
+        type: boolean
+      sentAt:
+        type: string
+      sub:
+        type: string
+      userID:
+        type: string
+    type: object
+host: localhost:8003
+info:
+  contact: {}
+  description: Notification management service
+  title: Notification Service API
+  version: "1.0"
+paths:
+  /notifications:
+    get:
+      consumes:
+      - application/json
+      description: Returns a paginated list of notifications for a given user ID
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of notifications per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of notifications
+          schema:
+            items:
+              $ref: '#/definitions/models.Notification'
+            type: array
+        "400":
+          description: Invalid request
+      summary: Get user notifications with pagination
+      tags:
+      - notifications
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

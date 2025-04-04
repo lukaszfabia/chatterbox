@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 	"notification_serivce/internal/domain/models"
+	"notification_serivce/pkg"
+	"strings"
 	"sync"
 
 	"github.com/gorilla/websocket"
@@ -25,11 +27,20 @@ func NewWebSocketServer() *WebSocketServer {
 }
 
 func (ws *WebSocketServer) HandleConnection(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("user_id")
-	if userID == "" {
-		http.Error(w, "user_id is required", http.StatusBadRequest)
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+		http.Error(w, "Authorization token required", http.StatusUnauthorized)
 		return
 	}
+
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	id, err := pkg.DecodeJWT(token)
+	if err != nil {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	userID := id.String()
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {

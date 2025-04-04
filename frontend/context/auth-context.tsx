@@ -7,6 +7,7 @@ import { TokenDTO } from "@/lib/dto/tokens";
 import { UpdateUserDTO } from "@/lib/dto/update";
 import getUserID from "@/lib/jwt";
 import getToken, { ACCESS, REFRESH } from "@/lib/token";
+import { useRouter } from "next/navigation";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 
 function clearStorage() {
@@ -27,7 +28,7 @@ type AuthCtxProps = {
     logout: () => void;
     authenticate: (data: LoginDTO | RegisterDTO, type: "login" | "register") => void;
     deleteAcc: () => void;
-    updateAcc: (data: UpdateUserDTO) => void;
+    updateAcc: (data: UpdateUserDTO) => Promise<string | null>;
 }
 
 const AuthCtx = createContext<AuthCtxProps>({
@@ -38,7 +39,7 @@ const AuthCtx = createContext<AuthCtxProps>({
     logout: async () => { },
     authenticate: async () => { },
     deleteAcc: async () => { },
-    updateAcc: async () => { },
+    updateAcc: async (data: UpdateUserDTO) => "",
 })
 
 
@@ -52,7 +53,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const updateAcc = useCallback(async (data: UpdateUserDTO) => {
         if (userID) {
             try {
-                await logout()
                 await api<string>({
                     body: data,
                     service: "auth",
@@ -61,10 +61,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     endpoint: `/auth/me/`,
                 })
 
+                return "Success, account has been updated."
             } catch (error) {
-                console.log('errror', error)
+                setError("Failed to Update Account");
+                return null;
             }
         }
+
+        return null;
     }, [])
 
 
@@ -132,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
     return (
-        <AuthCtx.Provider value={{ isAuth, isLoading, error, userID, updateAcc, authenticate, logout, deleteAcc }}>
+        <AuthCtx.Provider value={{ isAuth, isLoading, error, userID, authenticate, logout, deleteAcc, updateAcc }}>
             {children}
         </AuthCtx.Provider>
     );

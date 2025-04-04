@@ -1,6 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import { host } from "../images";
 
 export default function Cover({ url, isLoading }: { url?: string | null; isLoading?: boolean }) {
     return (
@@ -24,7 +25,7 @@ export default function Cover({ url, isLoading }: { url?: string | null; isLoadi
                         transition={{ duration: 0.5 }}
                     >
                         <Image
-                            src={url}
+                            src={`http://${host}/${url}`}
                             alt="background"
                             fill
                             className="object-cover shadow-xl"

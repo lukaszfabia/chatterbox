@@ -1,6 +1,6 @@
 package queries
 
 type GetProfilesQuery struct {
-	Limit int `json:"limit"`
-	Page  int `json:"page"`
+	Page  int `json:"page" validate:"gte=1"`
+	Limit int `json:"limit" validate:"gte=1,lte=100"`
 }

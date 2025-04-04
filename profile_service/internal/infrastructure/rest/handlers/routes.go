@@ -16,7 +16,7 @@ func NewRouter(commandService commands.ProfileCommandService, queryService queri
 	router := mux.NewRouter()
 
 	fileServer := http.FileServer(http.Dir("./media"))
-	router.PathPrefix("/api/v1/media/").Handler(http.StripPrefix("/api/v1/media/", fileServer))
+	router.PathPrefix("/api/v1/profile/media/").Handler(http.StripPrefix("/api/v1/profile/media/", fileServer))
 
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 

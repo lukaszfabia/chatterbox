@@ -1,12 +1,16 @@
-export type UpdateUserDTO = {
+import { DTO } from "./model";
+
+export interface UpdateUserDTO extends DTO {
     email: string,
     password: string,
     username: string,
 }
 
 
-export type UpdateProfileDTO = {
-    firstName: string,
-    lastName: string,
-
+export interface UpdateProfileDTO extends DTO {
+    firstName?: string | null;
+    lastName?: string | null;
+    bio?: string | null;
+    avatarFile?: File | null;
+    backgroundFile?: File | null;
 }

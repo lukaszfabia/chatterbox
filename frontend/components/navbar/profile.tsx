@@ -14,6 +14,7 @@ import {
 import trim from '@/lib/trim';
 import { LogOutIcon, Pencil } from 'lucide-react';
 import Link from 'next/link';
+import { MyUserAvatar } from '../images';
 
 const AvatarWithSkeleton = ({ user }: { user: User }) => {
     return user && (
@@ -21,11 +22,7 @@ const AvatarWithSkeleton = ({ user }: { user: User }) => {
             <Avatar>
                 <AnimatePresence mode="wait">
                     {user.avatarURL ?
-                        <AvatarImage
-                            src={user.avatarURL}
-                            alt={`${user.username}'s avatar`}
-                            className="rounded-full w-8 h-8 border-4 border-background object-cover"
-                        /> :
+                        <MyUserAvatar src={user.avatarURL} className="w-8 h-8" /> :
                         <AvatarFallback className="text-xs font-semibold">
                             {initials(user.username, user.firstName, user.lastName)}
                         </AvatarFallback>

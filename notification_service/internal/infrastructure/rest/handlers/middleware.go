@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"notification_serivce/internal/infrastructure/rest"
@@ -29,13 +30,16 @@ func (h *NotificationHandler) IsAuth(next http.Handler) http.Handler {
 		}
 
 		// decode token
-		_, err := pkg.DecodeJWT(tokenStr)
+		id, err := pkg.DecodeJWT(tokenStr)
 
 		if err != nil {
 			log.Println("Error during decoding token")
 			rest.Unauthorized(w)
 			return
 		}
+
+		ctx := context.WithValue(r.Context(), "userID", id)
+		r = r.WithContext(ctx)
 
 		next.ServeHTTP(w, r)
 	})

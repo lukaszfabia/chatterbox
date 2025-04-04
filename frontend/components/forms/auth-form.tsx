@@ -23,21 +23,12 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { LoginDTO } from "@/lib/dto/login";
 import { RegisterDTO } from "@/lib/dto/register";
+import { getUnionSchema, loginSchema, registerSchema } from "./schemas";
+import { TextInputField } from "./form-components";
 
-const loginSchema = z.object({
-    mode: z.literal("login"),
-    email_or_username: z.string().min(1, "Required"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-});
 
-const registerSchema = z.object({
-    mode: z.literal("register"),
-    username: z.string().min(1, "Username is required"),
-    email: z.string().email("Invalid email"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-});
 
-const formSchema = z.discriminatedUnion("mode", [loginSchema, registerSchema]);
+const formSchema = getUnionSchema(loginSchema, registerSchema)
 
 
 function AuthImageSection({ type }: { type: "login" | "register" }) {
@@ -97,41 +88,16 @@ function AuthFormFields({ type, onSubmit }: { type: "login" | "register", onSubm
                     <form className="mt-5 space-y-4" onSubmit={form.handleSubmit(onSubmit)} action="post">
                         {type === "register" && (
                             <>
-                                <FormField name="username" control={form.control} render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-lg">Username</FormLabel>
-                                        <FormControl><Input placeholder="Joe2003" {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
-
-                                <FormField name="email" control={form.control} render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Email</FormLabel>
-                                        <FormControl><Input placeholder="joe.doe@example.com" {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
+                                <TextInputField name="username" control={form.control} label="Username" placeholder="Joey" />
+                                <TextInputField name="email" control={form.control} label="Email" placeholder="joe.doe@example.com" />
                             </>
                         )}
 
                         {type === "login" && (
-                            <FormField name="email_or_username" control={form.control} render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Email or Username</FormLabel>
-                                    <FormControl><Input placeholder="joe.doe@example.com or Joe2003" {...field} /></FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
+                            <TextInputField name="email_or_username" control={form.control} label="Email or Username" placeholder="joe.doe@example.com or Joe2003" />
                         )}
 
-                        <FormField name="password" control={form.control} render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Password</FormLabel>
-                                <FormControl><Input type="password" placeholder="*******" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
+                        <TextInputField name="password" control={form.control} label="Password" placeholder="*******" type="password" />
 
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                             <Button type="submit" className="w-full mt-4 flex items-center justify-center gap-2">

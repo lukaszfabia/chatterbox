@@ -18,6 +18,7 @@ func trimMessage(msg string) string {
 	return fmt.Sprintf("%s...", msg[:MAX])
 }
 
+// Notification represents a notification
 type Notification struct {
 	ID          uuid.UUID `json:"id"`
 	UserID      string    `json:"userID"`

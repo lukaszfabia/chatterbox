@@ -56,7 +56,7 @@ class User(Base):
         self.deleted_at = datetime.now()
 
     def __can_be_set(self, s: Optional[str], to_comapre: str) -> bool:
-        return s and s != to_comapre and 3 < len(s) < 124
+        return s and s != to_comapre and 1 < len(s) < 124
 
     @staticmethod
     def hash_password(password: str) -> str:

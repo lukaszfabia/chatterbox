@@ -76,7 +76,7 @@ export default function Profile() {
           isLoading={isLoading || !user}
         />
 
-        <ActionButtons isMe={isMe} isLoading={isLoading || !user} />
+        <ActionButtons userID={user?.id} isMe={isMe} isLoading={isLoading || !user} />
       </div>
     </motion.div>
   );

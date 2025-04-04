@@ -3,7 +3,8 @@ import { api } from "@/lib/api";
 import { User } from "@/lib/models/user";
 import { createContext, ReactNode, useCallback, useContext } from "react";
 import { useAuth } from "./auth-context";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
+import { UpdateProfileDTO } from "@/lib/dto/update";
 
 type ProfileCtxProps = {
     currUserProfile: User | null;
@@ -12,6 +13,7 @@ type ProfileCtxProps = {
 
     fetchByID: (id: string) => Promise<User | null>;
     fetchProfiles: () => Promise<User[]>;
+    updateProfile: (data: FormData) => Promise<User | null>;
 };
 
 const ProfileCtx = createContext<ProfileCtxProps>({
@@ -20,6 +22,7 @@ const ProfileCtx = createContext<ProfileCtxProps>({
     error: null,
     fetchByID: async () => null,
     fetchProfiles: async () => [],
+    updateProfile: async () => null,
 });
 
 const fetchCurrentProfile = async (): Promise<User | null> => {
@@ -39,6 +42,25 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         error,
         isLoading,
     } = useSWR(isAuth && userID ? "profile/me" : null, fetchCurrentProfile);
+
+    const updateProfile = useCallback(async (data: FormData): Promise<User | null> => {
+        try {
+            const user = await api<User>({
+                body: data,
+                service: "profile",
+                apiVersion: "api/v1",
+                endpoint: `/auth/me`,
+                method: "PUT",
+            });
+
+            if (!user) throw new Error("User not found");
+            mutate("profile/me");
+            return user;
+        } catch (err) {
+            console.error("Failed to fetch user by ID:", err);
+            return null;
+        }
+    }, []);
 
     const fetchByID = useCallback(async (id: string): Promise<User | null> => {
         try {
@@ -84,6 +106,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
                 error: error?.message ?? null,
                 fetchByID,
                 fetchProfiles,
+                updateProfile,
             }}
         >
             {children}

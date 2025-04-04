@@ -1,6 +1,7 @@
 import { motion } from "framer-motion"
 import { Skeleton } from "../ui/skeleton"
 import { Pencil } from "lucide-react"
+import Link from "next/link"
 import { Button } from "../ui/button"
 import {
     AlertDialog,
@@ -13,9 +14,13 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useRouter } from "next/navigation";
 
-export default function ActionButtons({ isMe, isLoading }: { isMe: boolean, isLoading?: boolean }) {
-    if (isLoading) {
+export default function ActionButtons({ isMe, isLoading, userID }: { isMe: boolean, userID?: string, isLoading?: boolean }) {
+    const router = useRouter();
+
+
+    if (isLoading || !userID) {
         return (
             <motion.div
                 initial={{ opacity: 0 }}
@@ -34,7 +39,7 @@ export default function ActionButtons({ isMe, isLoading }: { isMe: boolean, isLo
             transition={{ delay: 0.5 }}
         >
             {isMe ? (
-                <Button className="w-full" variant="outline">
+                <Button className="w-full cursor-pointer" variant="outline" onClick={() => { router.push(`/profile/${userID}/edit`) }}>
                     <Pencil className="h-4 w-4" />
                     Edit Profile
                 </Button>

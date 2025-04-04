@@ -21,13 +21,13 @@ class DeleteUserCommand(BaseModel):
 
 
 class UpdateUserCommand(BaseModel):
-    email: Optional[EmailStr]
-    username: Optional[str]
-    password: Optional[str]
+    email: Optional[EmailStr] = None
+    username: Optional[str] = None
+    password: Optional[str] = None
 
     @staticmethod
     def exmaple():
-        return {"email": "joe.doe@example.com", "username": "joe"}
+        return {"email": "joe.doe@example.com", "username": "joe", "password": "******"}
 
 
 class LogoutUserCommand(BaseModel): ...

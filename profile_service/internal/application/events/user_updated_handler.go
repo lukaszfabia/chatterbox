@@ -12,7 +12,7 @@ type UserUpdatedHandler struct {
 }
 
 func NewUserUpdatedEventHandler(aggregate aggregates.ProfileAggregate) EventHandler {
-	return &UserCreatedHandler{
+	return &UserUpdatedHandler{
 		aggregate: aggregate,
 	}
 }
