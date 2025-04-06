@@ -1,4 +1,4 @@
-FROM golang:1.24.1-bookworm AS builder
+FROM golang:1.24-bookworm AS builder 
 
 WORKDIR /build
 
@@ -7,15 +7,20 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o profile_serivce ./cmd/main
+RUN CGO_ENABLED=0 GOOS=linux go build -o /go/bin/profile_service ./cmd/api/main.go
 
-FROM alpine:latest AS run
+FROM alpine:latest AS runner
 
 RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
-COPY --from=builder /build/profile_serivce .
 
-RUN chmod +x ./profile_serivce
+COPY --from=builder /go/bin/profile_service .
 
-CMD ["./profile_serivce"]
+COPY media /app/media
+
+RUN chmod +x ./profile_service
+
+EXPOSE 8002 
+
+CMD ["./profile_service"]

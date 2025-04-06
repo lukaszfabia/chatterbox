@@ -19,6 +19,7 @@ func NewRouter(commandService commands.ProfileCommandService, queryService queri
 	router.PathPrefix("/api/v1/profile/media/").Handler(http.StripPrefix("/api/v1/profile/media/", fileServer))
 
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
+	router.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler)
 
 	profileRouter := router.PathPrefix("/api/v1/profiles").Subrouter()
 
