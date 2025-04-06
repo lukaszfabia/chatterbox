@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@/lib/models/user";
+import { User } from "@/lib/dto/user";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import BioSection from "@/components/profile/bio";
@@ -10,14 +10,48 @@ import UserAvatar from "../../../components/profile/avatar";
 import Cover from "../../../components/profile/cover";
 import { useProfile } from "@/context/profile-context";
 import NotFound404 from "@/app/not-found";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useStatus } from "@/context/status-context";
+import { ParamValue } from "next/dist/server/request/params";
+import { useChat } from "@/context/chat-context";
+
 
 export default function Profile() {
   const { ID } = useParams();
-  const { isLoading, error, fetchByID, currUserProfile } = useProfile();
-  const isOnline = true;
+  const router = useRouter();
+  const { isLoading, fetchByID, currUserProfile } = useProfile();
+  const { fetchStatus, isConnected } = useStatus();
   const [isMe, setIsMe] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
+  const [status, setStatus] = useState<boolean>(false);
+  const [isError, setIsError] = useState<boolean>(false);
+  const { initConversation } = useChat();
+
+  const fetchData = (ID: ParamValue) => {
+    if (!ID) {
+      setIsError(true);
+      return;
+    }
+
+    fetchByID(ID.toString()).then((user) => {
+      if (user) {
+        setUser(user);
+        if (user?.id) {
+          fetchStatus(user.id).then((v) => {
+            console.log("[status] fetched for user:", user.id, v?.isOnline);
+            setStatus(v?.isOnline ?? false);
+          }).catch((e) => {
+            console.error("Status fetch error:", e);
+            setStatus(false);
+          });
+        }
+      } else {
+        setIsError(true);
+      }
+    });
+  };
+
+
 
   useEffect(() => {
     if (currUserProfile) {
@@ -39,16 +73,22 @@ export default function Profile() {
       }
     }
     // case when anon goes on the site and search with url bar 
-    if (ID && !currUserProfile) {
-      fetchByID(ID.toString()).then((user) => {
-        setUser(user);
-      });
+    if (!currUserProfile) {
+      fetchData(ID);
     }
   }, [ID, currUserProfile, fetchByID]);
 
-  if (error) {
-    return <NotFound404 />;
+  if (isError) {
+    return <NotFound404 />
   }
+
+  const handleNewConv = () => {
+    if (user && currUserProfile) {
+      initConversation(currUserProfile, user);
+      router.push(`/messages`)
+    }
+  }
+
 
   return (
     <motion.div
@@ -59,7 +99,7 @@ export default function Profile() {
     >
       <div className="relative">
         <Cover url={user?.backgroundURL} isLoading={isLoading || !user} />
-        <UserAvatar user={user} isOnline={isOnline} isLoading={isLoading || !user} />
+        <UserAvatar user={user} isOnline={isMe ? isConnected : status} isLoading={isLoading || !user} />
       </div>
 
       <div className="px-4 pt-16 pb-8">
@@ -76,7 +116,7 @@ export default function Profile() {
           isLoading={isLoading || !user}
         />
 
-        <ActionButtons userID={user?.id} isMe={isMe} isLoading={isLoading || !user} />
+        <ActionButtons user={user} isMe={isMe} isLoading={isLoading || !user} handleNewConversation={handleNewConv} />
       </div>
     </motion.div>
   );

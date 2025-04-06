@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { initials, User } from "@/lib/models/user";
+import { initials, User } from "@/lib/dto/user";
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import { AnimatePresence, motion } from "framer-motion";
 import { host, MyUserAvatar } from "../images";

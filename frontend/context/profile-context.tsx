@@ -1,10 +1,9 @@
 "use client";
 import { api } from "@/lib/api";
-import { User } from "@/lib/models/user";
+import { User } from "@/lib/dto/user";
 import { createContext, ReactNode, useCallback, useContext } from "react";
 import { useAuth } from "./auth-context";
 import useSWR, { mutate } from "swr";
-import { UpdateProfileDTO } from "@/lib/dto/update";
 
 type ProfileCtxProps = {
     currUserProfile: User | null;
@@ -44,58 +43,41 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     } = useSWR(isAuth && userID ? "profile/me" : null, fetchCurrentProfile);
 
     const updateProfile = useCallback(async (data: FormData): Promise<User | null> => {
-        try {
-            const user = await api<User>({
-                body: data,
-                service: "profile",
-                apiVersion: "api/v1",
-                endpoint: `/auth/me`,
-                method: "PUT",
-            });
+        const user = await api<User>({
+            body: data,
+            service: "profile",
+            apiVersion: "api/v1",
+            endpoint: `/auth/me`,
+            method: "PUT",
+        });
 
-            if (!user) throw new Error("User not found");
-            mutate("profile/me");
-            return user;
-        } catch (err) {
-            console.error("Failed to fetch user by ID:", err);
-            return null;
-        }
+        if (!user) return null;
+        mutate("profile/me");
+        return user;
     }, []);
 
     const fetchByID = useCallback(async (id: string): Promise<User | null> => {
-        try {
-            const user = await api<User>({
-                service: "profile",
-                apiVersion: "api/v1",
-                endpoint: `/profiles/${id}`,
-                method: "GET",
-            });
+        const user = await api<User>({
+            service: "profile",
+            apiVersion: "api/v1",
+            endpoint: `/profiles/${id}`,
+            method: "GET",
+        });
 
-            if (!user) throw new Error("User not found");
-
-            return user;
-        } catch (err) {
-            console.error("Failed to fetch user by ID:", err);
-            return null;
-        }
+        return user;
     }, []);
 
     const fetchProfiles = useCallback(async (): Promise<User[]> => {
-        try {
-            const users = await api<User[]>({
-                service: "profile",
-                apiVersion: "api/v1",
-                endpoint: "/profiles",
-                method: "GET",
-            });
+        const users = await api<User[]>({
+            service: "profile",
+            apiVersion: "api/v1",
+            endpoint: "/profiles",
+            method: "GET",
+        });
 
-            if (!users) return [];
+        if (!users) return [];
 
-            return users.filter((v) => v.id !== userID) ?? [];
-        } catch (err) {
-            console.error("Error fetching profiles:", err);
-            return [];
-        }
+        return users.filter((v) => v.id !== userID) ?? [];
     }, [userID]);
 
     return (

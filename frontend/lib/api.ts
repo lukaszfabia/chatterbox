@@ -45,6 +45,7 @@ export const api = async <T>({
 
         if (response.ok) {
             const data: T = await response.json();
+            console.log(data)
             return data;
         }
 

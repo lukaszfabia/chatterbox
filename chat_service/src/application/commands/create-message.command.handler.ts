@@ -1,17 +1,15 @@
 import { CreateMessageCommand } from "../../domain/command/create-message.command";
 import { MessageDTO } from "../../domain/dto/message.dto";
-import { GotNewMessageEvent } from "../../domain/events/got-new-message.event";
+import { MessageCreatedEvent } from "../../domain/events/message-sent.event";
 import { IChatRepository } from "../../domain/repository/chat.repository";
-import { RabbitMQService } from "../../infrastructure/rabbitmq/rabbitmq";
-import { IWebSocketService } from "../../infrastructure/ws/websocket.interface";
+import { EventBus } from "../../infrastructure/rabbitmq/bus";
 import { CommandHanlder } from "./command.handler";
 
 export class CreateMessageCommandHandler implements CommandHanlder<CreateMessageCommand> {
 
     constructor(
         private readonly repo: IChatRepository,
-        private readonly rabbitmq: RabbitMQService,
-        private readonly ws: IWebSocketService
+        private readonly rabbitmq: EventBus,
     ) { }
 
 
@@ -25,20 +23,16 @@ export class CreateMessageCommandHandler implements CommandHanlder<CreateMessage
         )
 
         if (!chat) {
+            console.log('Chat not found')
             return null
         }
 
-        if (await this.ws.isonline(c.receiverID)) {
-            await this.ws.send(chat.lastMessage!)
-        } else {
-            const username = chat.members.find((e) => e.userID === c.receiverID)?.username || 'anon';
-
-
-            const nofi = new GotNewMessageEvent(c.receiverID, username, c.content)
-
-            await this.rabbitmq.publish(GotNewMessageEvent.name, nofi)
+        if (!chat.members.some(m => m.userID === c.senderID)) {
+            console.log('Unauthorized')
+            return null;
         }
 
+        await this.rabbitmq.publish(MessageCreatedEvent.name, new MessageCreatedEvent(chat))
 
         return chat.lastMessage!
     }

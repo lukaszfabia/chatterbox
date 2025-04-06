@@ -7,7 +7,6 @@ export interface AuthRequest extends Request {
 }
 
 export const jwtMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
-    console.log('Validating token...')
     const SECRET_KEY = process.env.JWT_SECRET;
 
     const token = req.headers.authorization?.split(" ")[1];

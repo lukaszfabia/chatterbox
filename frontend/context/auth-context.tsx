@@ -7,8 +7,7 @@ import { TokenDTO } from "@/lib/dto/tokens";
 import { UpdateUserDTO } from "@/lib/dto/update";
 import getUserID from "@/lib/jwt";
 import getToken, { ACCESS, REFRESH } from "@/lib/token";
-import { useRouter } from "next/navigation";
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useCallback, useContext, useState } from "react";
 
 function clearStorage() {
     localStorage.removeItem(ACCESS);
@@ -112,26 +111,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('Authing')
 
         setError(null);
-        try {
-            const tokens = await api<TokenDTO>({
-                body: data,
-                service: "auth",
-                method: "POST",
-                apiVersion: "api/v1",
-                endpoint: `/auth/${type}/`,
-            });
+        const tokens = await api<TokenDTO>({
+            body: data,
+            service: "auth",
+            method: "POST",
+            apiVersion: "api/v1",
+            endpoint: `/auth/${type}/`,
+        });
 
-            if (tokens) {
-                localStorage.setItem(ACCESS, tokens.access_token);
-                localStorage.setItem(REFRESH, tokens.refresh_token);
-                setIsAuth(true);
-                setUserID(getUserID());
-            }
-        } catch (error) {
-            setError("Something went wrong");
-        } finally {
-            setIsLoading(false);
+        if (tokens) {
+            localStorage.setItem(ACCESS, tokens.access_token);
+            localStorage.setItem(REFRESH, tokens.refresh_token);
+            setIsAuth(true);
+            setUserID(getUserID());
+        } else {
+            setError("Username or Email is invalid or password is incorrect.");
         }
+
+        setIsLoading(false);
+
     }, []);
 
 

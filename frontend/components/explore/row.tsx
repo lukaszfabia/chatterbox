@@ -1,6 +1,6 @@
 "use client";
 
-import { initials, User } from "@/lib/models/user";
+import { initials, User } from "@/lib/dto/user";
 import trim from "@/lib/trim";
 import { transformTime } from "@/lib/time";
 import { Separator } from "@radix-ui/react-separator";

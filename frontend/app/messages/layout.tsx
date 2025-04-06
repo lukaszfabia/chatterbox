@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 
 export default function MessagesLayout({ children }: { children: ReactNode }) {
     return (
-        <div>
+        <div className="w-full">
             {children}
         </div>
     )

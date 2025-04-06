@@ -5,8 +5,6 @@ import { User } from "../models/conversation.model"
 export interface IChatRepository {
     createConversation(members: User[]): Promise<ConversationDTO | null>;
 
-    updateConversation(chatID: string, updateData: Partial<ConversationDTO>): Promise<ConversationDTO | null>;
-
     appendMessage(receiverID: string,
         senderID: string,
         content: string,
@@ -20,4 +18,6 @@ export interface IChatRepository {
     getConversationById(chatID: string): Promise<ConversationDTO | null>;
 
     deleteConversation(chatID: string): Promise<ConversationDTO | null>;
+
+    updateMember(userID: string, avatarURL?: string | null, username?: string | null): Promise<number>;
 }

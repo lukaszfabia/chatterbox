@@ -1,4 +1,4 @@
-import { Server, Socket } from 'socket.io';
+import { Socket } from 'socket.io';
 import { MessageDTO } from "../../domain/dto/message.dto";
 
 export interface IWebSocketService {

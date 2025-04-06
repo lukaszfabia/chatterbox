@@ -27,6 +27,8 @@ export class MongoService implements IChatRepository {
 
       await this.client.connect();
 
+      console.log('Connected to MongoDB')
+
       const dbName = process.env.MONGO_DB_NAME;
 
       if (!dbName) {
@@ -132,11 +134,17 @@ export class MongoService implements IChatRepository {
   }
 
   async getMessages(chatID: string, limit: number): Promise<MessageDTO[]> {
-    const chat = await this.messages.findOne({ _id: new ObjectId(chatID) });
-    if (!chat || !chat.messages) return [];
+    const messages = await this.messages.find({ chatID: chatID }).sort({ sentAt: 1 }).limit(limit).toArray();
 
-    return chat.messages.slice(-limit).map(MessageDTO.fromMongoDocument);
+    if (!messages || messages.length === 0) return [];
+
+    const res = messages.map((message) => MessageDTO.fromMongoDocument(message))
+
+    console.log(res)
+
+    return res
   }
+
 
   async deleteConversation(chatID: string): Promise<ConversationDTO | null> {
     const deleted = await this.conversations.findOneAndDelete({ _id: new ObjectId(chatID) });
@@ -168,10 +176,28 @@ export class MongoService implements IChatRepository {
     return null;
   }
 
-  updateConversation(
-    chatID: string,
-    updateData: Partial<ConversationDTO>
-  ): Promise<ConversationDTO | null> {
-    throw new Error("Method not implemented.");
+  async updateMember(
+    userID: string,
+    avatarURL?: string | null,
+    username?: string | null
+  ): Promise<number> {
+    const filter = { "members.userID": userID };
+    const update = {};
+
+    if (avatarURL !== undefined || avatarURL !== null) {
+      update["members.$[elem].avatarURL"] = avatarURL;
+    }
+
+    if (username !== undefined || username !== null) {
+      update["members.$[elem].username"] = username;
+    }
+
+    const result = await this.conversations.updateMany(
+      filter,
+      { $set: update },
+      { arrayFilters: [{ "elem.userID": userID }] }
+    );
+
+    return result.modifiedCount
   }
 }

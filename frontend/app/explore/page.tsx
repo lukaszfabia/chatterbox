@@ -6,16 +6,15 @@ import { Search } from "lucide-react";
 import UserRow from "@/components/explore/row";
 import { useEffect, useState } from "react";
 import { UserRowSkeleton } from "@/components/explore/row-skeleton";
-import { User } from "@/lib/models/user";
+import { User } from "@/lib/dto/user";
 import { useProfile } from "@/context/profile-context";
-import { useAuth } from "@/context/auth-context";
 
 
 
 export default function Explore() {
     const [phrase, setPhrase] = useState<string>("");
     const [users, setUsers] = useState<User[]>([]);
-    const { fetchProfiles, currUserProfile } = useProfile();
+    const { fetchProfiles } = useProfile();
 
     useEffect(() => {
         fetchProfiles().then((users) => {
@@ -56,6 +55,7 @@ export default function Explore() {
 
             {isLoading ? (
                 <>
+                    <UserRowSkeleton />
                     <UserRowSkeleton />
                     <UserRowSkeleton />
                     <UserRowSkeleton />

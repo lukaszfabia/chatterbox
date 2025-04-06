@@ -8,7 +8,7 @@ import {
 import { useForm } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Separator } from "../ui/separator";
-import { User } from "@/lib/models/user";
+import { User } from "@/lib/dto/user";
 import { Button } from "../ui/button";
 import { Pencil, Trash } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";

@@ -120,6 +120,60 @@ services:
     networks:
       - chatterbox_net
 
+  status_service:
+    container_name: status_service_app
+    build:
+      context: ./status_service
+      dockerfile: ./Dockerfile
+    env_file:
+      - ./status_service/.env
+    ports:
+      - "8004:8004" # change it later
+    networks:
+      - chatterbox_net
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      status_service_db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  auth_service:
+    container_name: auth_service_app
+    build:
+      context: ./auth_service
+      dockerfile: ./Dockerfile
+    env_file:
+      - ./auth_service/.env
+    ports:
+      - "8001:8001"
+    networks:
+      - chatterbox_net
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      auth_service_db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  profile_service:
+    container_name: profile_service_app
+    build:
+      context: ./profile_service
+      dockerfile: ./Dockerfile
+    env_file:
+      - ./profile_service/.env
+    ports:
+      - "8002:8002"
+    networks:
+      - chatterbox_net
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      profile_service_db:
+        condition: service_healthy
+    restart: unless-stopped
+
 networks:
   chatterbox_net:
     driver: bridge

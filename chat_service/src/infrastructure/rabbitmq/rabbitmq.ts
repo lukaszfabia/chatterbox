@@ -2,6 +2,7 @@ import { EventHandler } from "../../application/events/event.handler";
 import { EventBus } from "./bus";
 import { Event } from "../../domain/events/event";
 import client, { Connection, Channel, ConsumeMessage } from "amqplib";
+import { EventDispatcher } from "../../application/events/dispatcher";
 
 export class RabbitMQService implements EventBus {
     private connection!: Connection;
@@ -10,14 +11,15 @@ export class RabbitMQService implements EventBus {
     private retryAttempts: number = 0;
     private maxRetryAttempts: number = 5;
     private retryDelay: number = 5000; // 5 seconds
-    private eventHandlers: Map<string, EventHandler<Event>> = new Map();
+    private dispatcher: EventDispatcher;
 
     constructor() {
-        this.connect().catch(console.error);
+        this.dispatcher = new EventDispatcher();
     }
 
-    registerHandler(eventName: string, handler: EventHandler<Event>) {
-        this.eventHandlers.set(eventName, handler);
+    public registerHandler<T extends Event>(event: string, handler: EventHandler<T>): void {
+        console.log('Registering ', event)
+        this.dispatcher.register(event, handler);
     }
 
     async connect(): Promise<void> {
@@ -139,14 +141,8 @@ export class RabbitMQService implements EventBus {
                     const event = JSON.parse(msg.content.toString()) as T;
                     console.log(`[x] Received event from ${queueName}:`, event);
 
-                    const handler = this.eventHandlers.get(queueName);
-                    if (handler) {
-                        await handler.handle(event);
-                        this.channel.ack(msg);
-                    } else {
-                        console.warn(`No handler found for event: ${queueName}`);
-                        this.channel.nack(msg, false, false);
-                    }
+                    await this.dispatcher.dispatch(event, queueName);
+                    this.channel.ack(msg);
                 } catch (error) {
                     console.error(`Error processing message from ${queueName}:`, error);
                     this.channel.nack(msg, false, false);

@@ -3,14 +3,14 @@ import { Event } from "../../domain/events/event";
 export class EventDispatcher {
     private handlers: Record<string, EventHandler<Event>> = {};
 
-    register(event: Event, handler: EventHandler<Event>) {
-        this.handlers[event.constructor.name] = handler;
+    register(event: string, handler: EventHandler<Event>) {
+        this.handlers[event] = handler;
     }
 
-    async dispatch(event: Event, message: Buffer) {
-        const handler = this.handlers[event.constructor.name];
+    async dispatch<T extends Event>(event: T, q: string) {
+        const handler = this.handlers[q];
         if (handler) {
-            await handler.handle(message);
+            await handler.handle(event);
         }
     }
 }

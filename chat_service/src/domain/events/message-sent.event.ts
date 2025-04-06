@@ -1,5 +1,6 @@
 import { Event } from "./event";
+import { ConversationDTO } from "../dto/conversation.dto";
 
-export class MessageSentEvent implements Event {
-    constructor(public readonly messageID: string, public readonly userID: string) { }
+export class MessageCreatedEvent implements Event {
+    constructor(public readonly message: ConversationDTO) { }
 }

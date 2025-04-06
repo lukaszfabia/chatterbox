@@ -22,18 +22,23 @@ interface FileFieldProps {
 }
 
 export function TextInputField({ name, control, label, placeholder, description, type = "text" }: FormFieldProps) {
+    const {
+        field,
+        fieldState: { error },
+    } = useController({ name, control });
+
     return (
         <FormField
             name={name}
             control={control}
-            render={({ field }) => (
+            render={() => (
                 <FormItem>
                     <FormLabel>{label}</FormLabel>
                     <FormControl>
                         <Input type={type} placeholder={placeholder} {...field} />
                     </FormControl>
                     {description && <FormDescription>{description}</FormDescription>}
-                    <FormMessage />
+                    <FormMessage>{error?.message}</FormMessage> {/* Displaying the error message */}
                 </FormItem>
             )}
         />
@@ -41,24 +46,28 @@ export function TextInputField({ name, control, label, placeholder, description,
 }
 
 export function TextAreaField({ name, control, label, placeholder, description }: FormFieldProps) {
+    const {
+        field,
+        fieldState: { error },
+    } = useController({ name, control });
+
     return (
         <FormField
             name={name}
             control={control}
-            render={({ field }) => (
+            render={() => (
                 <FormItem>
                     <FormLabel>{label}</FormLabel>
                     <FormControl>
                         <Textarea placeholder={placeholder} {...field} />
                     </FormControl>
                     {description && <FormDescription>{description}</FormDescription>}
-                    <FormMessage />
+                    <FormMessage>{error?.message}</FormMessage> {/* Displaying the error message */}
                 </FormItem>
             )}
         />
     );
 }
-
 
 export function FileField({ name, control, label, description }: FileFieldProps) {
     const {

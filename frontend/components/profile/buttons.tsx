@@ -15,12 +15,12 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useRouter } from "next/navigation";
+import { User } from "@/lib/dto/user"
 
-export default function ActionButtons({ isMe, isLoading, userID }: { isMe: boolean, userID?: string, isLoading?: boolean }) {
+export default function ActionButtons({ isMe, isLoading, user, handleNewConversation }: { isMe: boolean, user?: User | null, isLoading?: boolean, handleNewConversation: () => void }) {
     const router = useRouter();
 
-
-    if (isLoading || !userID) {
+    if (isLoading || !user) {
         return (
             <motion.div
                 initial={{ opacity: 0 }}
@@ -39,7 +39,7 @@ export default function ActionButtons({ isMe, isLoading, userID }: { isMe: boole
             transition={{ delay: 0.5 }}
         >
             {isMe ? (
-                <Button className="w-full cursor-pointer" variant="outline" onClick={() => { router.push(`/profile/${userID}/edit`) }}>
+                <Button className="w-full cursor-pointer" variant="outline" onClick={() => { router.push(`/profile/${user.id}/edit`) }}>
                     <Pencil className="h-4 w-4" />
                     Edit Profile
                 </Button>
@@ -55,12 +55,12 @@ export default function ActionButtons({ isMe, isLoading, userID }: { isMe: boole
                         <AlertDialogHeader>
                             <AlertDialogTitle>Do you want to create new chat?</AlertDialogTitle>
                             <AlertDialogDescription>
-                                It looks like you haven't chat with "username" yet?
+                                It looks like you haven't chat with <b>{user.username}</b> yet?
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction>Continue</AlertDialogAction>
+                            <AlertDialogAction onClick={handleNewConversation}>Continue</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>

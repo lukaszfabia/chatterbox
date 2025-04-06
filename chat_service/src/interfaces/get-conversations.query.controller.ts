@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Response } from "express";
 import asyncHandler from "express-async-handler";
 import { GetConversationsQueryHandler } from "../application/queries/get-conversations.query.handler";
 import { GetConversationsQuery } from "../domain/queries/get-conversations.query";

@@ -5,7 +5,7 @@ import { CommandHanlder } from "./command.handler";
 
 export class CreateNewChatCommandHandler implements CommandHanlder<CreateNewChatCommand> {
 
-    constructor(private repo: IChatRepository) { }
+    constructor(private readonly repo: IChatRepository) { }
 
     async execute(c: CreateNewChatCommand): Promise<ConversationDTO | null> {
         return await this.repo.createConversation(c.members)

@@ -1,12 +1,11 @@
 import { Server, Socket } from 'socket.io';
 import { IWebSocketService } from './websocket.interface';
 import { MessageDTO } from '../../domain/dto/message.dto';
-import { RabbitMQService } from '../rabbitmq/rabbitmq';
 
 export class WebSocketService implements IWebSocketService {
     private clients: Map<string, Socket> = new Map();
 
-    constructor(private server: Server, private rabbitmq: RabbitMQService) { }
+    constructor(private server: Server) { }
 
 
     init() {
@@ -44,7 +43,7 @@ export class WebSocketService implements IWebSocketService {
     }
 
     async connect(client: Socket, userID: string): Promise<void> {
-        this.clients.set(userID, client)
+        this.clients.set(userID, client);
     }
 
     async disconnect(userID: string): Promise<void> {

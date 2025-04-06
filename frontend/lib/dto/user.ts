@@ -1,4 +1,7 @@
-export interface User {
+import { DenormalizedUser } from "./message";
+import { DTO } from "./model";
+
+export interface User extends DTO {
     id: string;
     createdAt: string;
     updatedAt: string;
@@ -20,4 +23,13 @@ export function initials(placeholder: string, lhs?: string | null, rhs?: string 
     }
 
     return placeholder.charAt(0)
+}
+
+
+export function denormalizeUser(u: User): DenormalizedUser {
+    return {
+        userID: u.id,
+        avatarURL: u.avatarURL,
+        username: u.username
+    }
 }

@@ -35,6 +35,10 @@ export const profileSchema = z.object({
         .nullable(),
 });
 
+export const messageSchema = z.object({
+    message: z.string().min(1, 'Message cannot be empty').max(500, 'Message cannot exceed 500 characters'),
+});
+
 export function getUnionSchema(lhs: z.ZodObject<any>, rhs: z.ZodObject<any>) {
     return z.discriminatedUnion("mode", [lhs, rhs]);
 }
