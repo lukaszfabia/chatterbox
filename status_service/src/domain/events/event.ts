@@ -1,1 +1,3 @@
-export interface Event { }
+export abstract class Event {
+    public name = 'Event'
+}

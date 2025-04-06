@@ -1,5 +1,5 @@
 import { Event } from "./event";
 
-export class UserStatusUpdatedEvent implements Event {
-    constructor(public readonly userID: string, public readonly isOnline: boolean) { }
+export class UserStatusUpdatedEvent extends Event {
+    constructor(public readonly userID: string, public readonly isOnline: boolean) { super() }
 }

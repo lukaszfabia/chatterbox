@@ -5,30 +5,36 @@ import { UserLoggedInEvent } from '../../domain/events/user-logged-out.event';
 import { UserStatusUpdatedEventHandler } from '../../application/events/user-status-updated.handler';
 import { RedisService } from '../database/redis';
 import { UserLoggedInEventHandler } from '../../application/events/user-logged-in.handler';
-import { UserLoggedOutEvent } from '../../domain/events/user-logged-in-event';
+import { UserLoggedOutEvent } from '../../domain/events/user-logged-in.event';
 import { UserLoggedOutEventHandler } from '../../application/events/user-logged-out.handler';
 import { Router } from './routes';
 import http from 'http';
 import { Server } from 'socket.io';
 import { WebSocketService } from '../ws/websocket';
-import { MessageSentEventHandler } from '../../application/events/message-sent.handler';
-import { MessageSentEvent } from '../../domain/events/message-send.event';
+import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from '../../../docs/swagger';
+import { hostname } from 'os';
 
-
+const corsConfig = {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    credentials: true,
+};
 
 export default async function startServer() {
     const app = express();
-    const port = process.env.PORT || 8005;
+    const port = process.env.PORT || 8004;
 
 
     const repo = new RedisService()
-    const rabbitMQService = new RabbitMQService();
-    await rabbitMQService.connect();
 
-    rabbitMQService.registerHandler(UserStatusUpdatedEvent.name, new UserStatusUpdatedEventHandler(repo));
-    rabbitMQService.registerHandler(UserLoggedInEvent.name, new UserLoggedInEventHandler(repo));
-    rabbitMQService.registerHandler(UserLoggedOutEvent.name, new UserLoggedOutEventHandler(repo));
-    rabbitMQService.registerHandler(MessageSentEvent.name, new MessageSentEventHandler(repo, rabbitMQService));
+    const rabbitMQService = new RabbitMQService();
+    await rabbitMQService.connect()
+
+    rabbitMQService.registerHandler<UserStatusUpdatedEvent>(UserStatusUpdatedEvent.name, new UserStatusUpdatedEventHandler(repo));
+    rabbitMQService.registerHandler<UserLoggedInEvent>(UserLoggedInEvent.name, new UserLoggedInEventHandler(repo));
+    rabbitMQService.registerHandler<UserLoggedOutEvent>(UserLoggedOutEvent.name, new UserLoggedOutEventHandler(repo));
 
     await Promise.all([
         rabbitMQService.consume<UserStatusUpdatedEvent>(UserStatusUpdatedEvent.name),
@@ -38,10 +44,7 @@ export default async function startServer() {
 
     const server = http.createServer(app);
     const io = new Server(server, {
-        cors: {
-            origin: "http://localhost:3000", // change it later
-            methods: ["GET", "POST"],
-        },
+        cors: corsConfig
     });
 
 
@@ -50,7 +53,9 @@ export default async function startServer() {
 
     const router = new Router(repo);
 
-    app.use(express.json());
+    app.use(express.json(), cors(corsConfig));
+
+    app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
     app.use('/api/v1/status', router.config());
 

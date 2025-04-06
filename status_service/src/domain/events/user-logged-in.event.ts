@@ -1,5 +1,5 @@
 import { Event } from "./event";
 
-export class UserLoggedInEvent extends Event {
+export class UserLoggedOutEvent extends Event {
     constructor(public readonly userID: string) { super() }
 }

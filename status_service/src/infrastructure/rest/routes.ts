@@ -11,7 +11,28 @@ export class Router {
         const router = express.Router();
         const handler = new GetUserStatusQueryHandler(this.repo)
         const userStatusController = new GetUserStatusController(handler)
-        router.get("/check", userStatusController.getStatus.bind(userStatusController))
+
+
+        /**
+        * @swagger
+        * /api/v1/status/check/{id}:
+        *   get:
+        *     summary: Get users status by user id  
+        *     parameters:
+        *       - in: path
+        *         name: id
+        *         required: true
+        *         schema:
+        *           type: string
+        *     responses:
+        *       200:
+        *         description: OK
+        *       400:
+        *         description: Bad Request 
+        *       404:
+        *         description: Not Found 
+        */
+        router.get("/check/:id", userStatusController.getStatus.bind(userStatusController))
 
 
         return router

@@ -9,6 +9,7 @@ export class UserLoggedInEventHandler implements EventHandler<UserLoggedInEvent>
     ) { }
 
     async handle(event: UserLoggedInEvent): Promise<void> {
+        console.log('Handling', UserLoggedInEvent.name)
         await this.repo.setUserStatus(new UserStatus(event.userID, true));
     }
 }

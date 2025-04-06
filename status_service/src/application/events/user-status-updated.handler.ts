@@ -9,6 +9,7 @@ export class UserStatusUpdatedEventHandler implements EventHandler<UserStatusUpd
     ) { }
 
     async handle(event: UserStatusUpdatedEvent): Promise<void> {
+        console.log('[x] Handling ', UserStatusUpdatedEvent.name)
         await this.repo.setUserStatus(new UserStatus(event.userID, event.isOnline));
     }
 }

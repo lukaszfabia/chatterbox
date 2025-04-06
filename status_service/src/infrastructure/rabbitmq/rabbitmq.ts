@@ -1,3 +1,4 @@
+import { EventDispatcher } from "../../application/events/dispatcher";
 import { EventHandler } from "../../application/events/event.handler";
 import { Event } from "../../domain/events/event";
 import { EventBus } from "./bus";
@@ -9,15 +10,16 @@ export class RabbitMQService implements EventBus {
   private connected: boolean = false;
   private retryAttempts: number = 0;
   private maxRetryAttempts: number = 5;
-  private retryDelay: number = 5000; // 5 seconds
-  private eventHandlers: Map<string, EventHandler<Event>> = new Map();
+  private retryDelay: number = 5000;
+  private dispatcher: EventDispatcher;
 
   constructor() {
-    this.connect().catch(console.error);
+    this.dispatcher = new EventDispatcher();
   }
 
-  registerHandler(eventName: string, handler: EventHandler<Event>) {
-    this.eventHandlers.set(eventName, handler);
+  public registerHandler<T extends Event>(event: string, handler: EventHandler<T>): void {
+    console.log('Registering ', event)
+    this.dispatcher.register(event, handler);
   }
 
   async connect(): Promise<void> {
@@ -32,7 +34,6 @@ export class RabbitMQService implements EventBus {
       const host = process.env.RABBITMQ_HOST || "localhost";
 
       const rabbitmqURL = `amqp://${user}:${pass}@${host}:${port}`;
-      console.log('rabbitmqURL', rabbitmqURL)
 
       const connection = await client.connect(rabbitmqURL);
 
@@ -145,14 +146,8 @@ export class RabbitMQService implements EventBus {
             const event = JSON.parse(msg.content.toString()) as T;
             console.log(`[x] Received event from ${queueName}:`, event);
 
-            const handler = this.eventHandlers.get(queueName);
-            if (handler) {
-              await handler.handle(event);
-              this.channel.ack(msg);
-            } else {
-              console.warn(`No handler found for event: ${queueName}`);
-              this.channel.nack(msg, false, false);
-            }
+            await this.dispatcher.dispatch(event, queueName);
+            this.channel.ack(msg);
           } catch (error) {
             console.error(`Error processing message from ${queueName}:`, error);
             this.channel.nack(msg, false, false);

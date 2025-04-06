@@ -1,6 +1,6 @@
 import { Event } from "./event";
 
 
-export class MessageSentEvent implements Event {
-    constructor(public readonly messageID: string, public readonly userID: string) { }
+export class MessageSentEvent extends Event {
+    constructor(public readonly messageID: string, public readonly userID: string) { super() }
 }
