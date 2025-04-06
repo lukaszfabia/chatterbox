@@ -16,3 +16,7 @@ python-jose
 asyncpg
 
 aio_pika
+pyjwt
+greenlet
+python-dotenv
+requests
