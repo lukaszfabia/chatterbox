@@ -23,12 +23,14 @@ export class MessageCreatedEventHandler implements EventHandler<MessageCreatedEv
         const isOnline = await this.ws.isonline(receiverID);
 
         if (isOnline) {
+            console.log('User is online, sending by ws')
             await this.ws.send(lastMessage);
         } else {
             const receiver = event.message.members.find(m => m.userID === receiverID);
             const username = receiver?.username ?? 'anon';
 
             const nofi = new GotNewMessageEvent(receiverID, username, lastMessage.content);
+            console.log('Creating ', GotNewMessageEvent.name, nofi)
             await this.rabbitmq.publish(GotNewMessageEvent.name, nofi);
         }
     }

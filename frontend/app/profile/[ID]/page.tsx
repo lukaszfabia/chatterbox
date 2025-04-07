@@ -14,6 +14,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useStatus } from "@/context/status-context";
 import { ParamValue } from "next/dist/server/request/params";
 import { useChat } from "@/context/chat-context";
+import { toast } from "sonner";
 
 
 export default function Profile() {
@@ -82,12 +83,24 @@ export default function Profile() {
     return <NotFound404 />
   }
 
-  const handleNewConv = () => {
+
+  const handleNewConv = async () => {
     if (user && currUserProfile) {
-      initConversation(currUserProfile, user);
-      router.push(`/messages`)
+      const chat = await initConversation(currUserProfile, user);
+      if (chat) {
+        // router.push(`/chat/${chat.id}`);
+        router.push("/chat")
+      } else {
+        toast("Oops!", {
+          description: "Failed to create/fetch chat",
+          action: {
+            label: "Ok",
+            onClick: () => { },
+          },
+        });
+      }
     }
-  }
+  };
 
 
   return (

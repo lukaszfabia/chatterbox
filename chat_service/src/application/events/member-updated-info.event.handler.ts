@@ -7,7 +7,7 @@ export class MemberUpdatedInfoEventHandler implements EventHandler<MemberUpdated
 
     async handle(event: MemberUpdatedInfoEvent): Promise<void> {
         const modified = await this.repo.updateMember(event.userID, event.avatarURL, event.username)
-        console.log('modified count:', modified)
+        console.log('Modified count:', modified)
     }
 
 }

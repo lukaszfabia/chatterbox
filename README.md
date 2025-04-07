@@ -1,55 +1,42 @@
 # Chatterbox
 
-Simple `chat web app` writted with microservices (**CQRS** pattern).
+Simple `chat web app` writted with microservices (simplified **CQRS** pattern and event-driven architecture).
 
 
-Every microservice has _personal_ database:
+## Getting started 
 
-For all
-/api/v1
+Before we start copy `.env.sample` in the root of the project and fill blank keys. You also need to do it with other services.
 
-- [`Profile Service`](profile_service): PostgreSQL /profile
+```bash
+cp .env.sample .env
+```
 
-- [`Auth Service`](auth_service): PostgreSQL /auth
+Just make sure you have installed `Docker`, `docker-compose`. 
 
-- [`Notification Service`](notification_service): MongoDB /notification
+```bash
+docker-compose up -d
+```
 
-- [`Chat Service`](chat_service): MongoDB
+## Features
 
-- [`Status Service`](status_service): Redis /status 
+- Real time communication if both of users are **online**
 
-TODO 
+- Simple notification system. Provides sending emails and getting real time notifications when user is online.
 
-AuthService(logowanie, sso, rejestracja)
-ChatSerivce(message handling) node.js
-ProfileService(info o ludziach) spring 
-NotificationService - powiadomienia
-Serwis zw. z sledzeniem statusu ludzi (czy online) node.js
+- System to track online status.
 
-Plan prac 20.03 - 25.04
-
-Wizja, przypadki użycia 
-
-Ustalenie architektury aplikacji, technologii, inicjacja projektu, bez infrastruktury chmurowej
-
-Praca nad serwisem uwierzytelniania użytkownika
-
-//
-
-do auth service 
-
-- sso z googlem 
-
-do noti service 
-
-- implementacja websocketa do nasluchiwania powiadomien
-
-...
-
-zacząć robic chat i status serivce ...
+- Simple account managment.
 
 
-CQRS, event driven 
-status serivce - odpowiedzialnosc
 
-reagowanie na zalogowanie sie i wylogowanie ze strony, czyli obsluga eventu logged in/out 
+## Services
+
+- [`Profile Service`](profile_service)
+
+- [`Auth Service`](auth_service)
+
+- [`Notification Service`](notification_service)
+
+- [`Chat Service`](chat_service)
+
+- [`Status Service`](status_service)

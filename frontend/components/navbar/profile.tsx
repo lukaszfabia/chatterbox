@@ -15,7 +15,7 @@ import trim from '@/lib/trim';
 import { Calendar, LogOutIcon, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { MyUserAvatar } from '../images';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../ui/sheet';
 import { useState } from 'react';
 
 const AvatarWithSkeleton = ({ user }: { user: User }) => {
@@ -23,12 +23,7 @@ const AvatarWithSkeleton = ({ user }: { user: User }) => {
         <div className="relative">
             <Avatar>
                 <AnimatePresence mode="wait">
-                    {user.avatarURL && user.avatarURL.length > 0 ?
-                        <MyUserAvatar src={user.avatarURL} className="w-10 h-10" /> :
-                        <AvatarFallback className="text-xs font-semibold">
-                            {initials(user.username, user.firstName, user.lastName)}
-                        </AvatarFallback>
-                    }
+                    <MyUserAvatar src={user.avatarURL} size="w-10 h-10" placeholder={initials(user.username, user.firstName, user.lastName)} />
                 </AnimatePresence>
             </Avatar>
         </div>

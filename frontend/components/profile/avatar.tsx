@@ -1,9 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { initials, User } from "@/lib/dto/user";
-import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
+import { Avatar } from "@radix-ui/react-avatar";
 import { AnimatePresence, motion } from "framer-motion";
-import { host, MyUserAvatar } from "../images";
-import { AvatarImage } from "../ui/avatar";
+import { MyUserAvatar } from "../images";
 
 function UserAvatar({ user, isOnline, isLoading = false }: { user?: User | null; isOnline: boolean; isLoading?: boolean }) {
     return (
@@ -20,27 +19,8 @@ function UserAvatar({ user, isOnline, isLoading = false }: { user?: User | null;
                             >
                                 <Skeleton className="rounded-full w-32 h-32 border-4 border-background" />
                             </motion.div>
-                        ) : user.avatarURL ? (
-                            <motion.div
-                                key="avatar"
-                                initial={{ scale: 0.8, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                            >
-                                <MyUserAvatar src={user.avatarURL} className="rounded-full w-32 h-32 border-4 border-background object-cover" />
-                            </motion.div>
-                        ) : (
-                            <motion.div
-                                key="fallback"
-                                initial={{ scale: 0.8, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                className="rounded-full w-32 h-32 border-4 border-background bg-gray-200 dark:bg-gray-800 flex items-center justify-center"
-                            >
-                                <AvatarFallback className="md:text-4xl text-3xl font-semibold">
-                                    {initials(user.username, user.firstName, user.lastName)}
-                                </AvatarFallback>
-                            </motion.div>
-                        )}
+                        ) : <MyUserAvatar src={user.avatarURL} placeholder={initials(user.username, user.firstName, user.lastName)} size="w-32 h-32" />
+                        }
                     </AnimatePresence>
                 </Avatar>
 

@@ -38,7 +38,7 @@ export function TextInputField({ name, control, label, placeholder, description,
                         <Input type={type} placeholder={placeholder} {...field} />
                     </FormControl>
                     {description && <FormDescription>{description}</FormDescription>}
-                    <FormMessage>{error?.message}</FormMessage> {/* Displaying the error message */}
+                    <FormMessage>{error?.message}</FormMessage>
                 </FormItem>
             )}
         />
@@ -62,7 +62,7 @@ export function TextAreaField({ name, control, label, placeholder, description }
                         <Textarea placeholder={placeholder} {...field} />
                     </FormControl>
                     {description && <FormDescription>{description}</FormDescription>}
-                    <FormMessage>{error?.message}</FormMessage> {/* Displaying the error message */}
+                    <FormMessage>{error?.message}</FormMessage>
                 </FormItem>
             )}
         />

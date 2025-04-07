@@ -2,6 +2,7 @@ package rabbitmq
 
 import (
 	"encoding/json"
+	"log"
 	"profile_service/internal/domain/events"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -24,6 +25,8 @@ func (r *RabbitMQ) Publish(queueName string, event events.Event) error {
 	if err != nil {
 		return FailedToMarshalEvent(err)
 	}
+
+	log.Printf("Publishing new %s -> %s", queueName, event)
 
 	err = r.Channel.Publish(
 		"",

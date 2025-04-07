@@ -18,6 +18,7 @@ func (r *RabbitMQ) Consume(queue string, handler func(body []byte) error) error 
 
 	go func() {
 		for msg := range msgs {
+			log.Printf("[x] Received message %s\n", msg.Body)
 			err := handler(msg.Body)
 			if err != nil {
 				log.Printf("Error handling event from queue %s: %v", queue, err)

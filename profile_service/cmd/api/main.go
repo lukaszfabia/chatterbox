@@ -61,7 +61,7 @@ func main() {
 	aggregate := aggregates.NewProfileAggregate(repo.ProfileRepository())
 
 	queryService := queries.NewProfileQueryService(repo.ProfileRepository())
-	commandService := commands.NewProfileCommandService(*aggregate)
+	commandService := commands.NewProfileCommandService(*aggregate, rabbit)
 
 	dispatcher, queues := addEvents(aggregate, rabbit)
 

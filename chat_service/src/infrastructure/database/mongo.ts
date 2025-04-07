@@ -79,8 +79,6 @@ export class MongoService implements IChatRepository {
       .limit(limit)
       .toArray();
 
-    console.log('chats', chats)
-
     return chats.map(ConversationDTO.fromMongoDocument);
   }
 
@@ -123,8 +121,6 @@ export class MongoService implements IChatRepository {
       { returnDocument: "after" }
     );
 
-    console.log('updatedConversation', updatedConversation)
-
     if (!updatedConversation) {
       console.log('No last message')
       return null;
@@ -140,8 +136,6 @@ export class MongoService implements IChatRepository {
 
     const res = messages.map((message) => MessageDTO.fromMongoDocument(message))
 
-    console.log(res)
-
     return res
   }
 
@@ -152,12 +146,24 @@ export class MongoService implements IChatRepository {
   }
 
   async createConversation(members: User[]): Promise<ConversationDTO | null> {
+    const memberIDs = members.map((m) => m.userID).sort();
+
     const existingConversation = await this.conversations.findOne({
-      members: members
+      $expr: {
+        $and: [
+          { $eq: [{ $size: "$members" }, memberIDs.length] },
+          {
+            $setIsSubset: [
+              memberIDs,
+              { $map: { input: "$members", as: "m", in: "$$m.userID" } }
+            ]
+          }
+        ]
+      }
     });
 
     if (existingConversation) {
-      console.log('Conversation already exists')
+      console.log('Conversation already exists');
       return ConversationDTO.fromMongoDocument(existingConversation);
     }
 
@@ -175,6 +181,7 @@ export class MongoService implements IChatRepository {
 
     return null;
   }
+
 
   async updateMember(
     userID: string,

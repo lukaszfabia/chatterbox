@@ -6,7 +6,7 @@ import { transformTime } from "@/lib/time";
 import { Separator } from "@radix-ui/react-separator";
 import { ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { Avatar } from "@radix-ui/react-avatar";
 import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
 import { MyUserAvatar } from "../images";
@@ -24,27 +24,7 @@ function UserAvatar({ user, isLoading = false }: { user?: User | null, isLoading
                     >
                         <Skeleton className="rounded-full w-20 h-20 border-4 border-background" />
                     </motion.div>
-                ) : user.avatarURL && user.avatarURL.length != 0 ? (
-                    <motion.div
-                        key="avatar"
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                    >
-                        <MyUserAvatar src={user.avatarURL} className="w-20 h-20" />
-                    </motion.div>
-                ) : (
-                    <motion.div
-                        key="fallback"
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="rounded-full w-20 h-20 border-4 border-background bg-gray-200 flex items-center justify-center"
-                    >
-                        <AvatarFallback className="text-2xl font-semibold">
-                            {initials(user.username, user.firstName, user.lastName)}
-                        </AvatarFallback>
-                    </motion.div>
-                )}
+                ) : <MyUserAvatar src={user.avatarURL} placeholder={initials(user.username, user.firstName, user.lastName)} size="w-20 h-20" />}
             </AnimatePresence>
         </Avatar>
     )

@@ -53,9 +53,9 @@ export default function ActionButtons({ isMe, isLoading, user, handleNewConversa
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle>Do you want to create new chat?</AlertDialogTitle>
+                            <AlertDialogTitle>Do you want to create new chat or continue chatting with {user.username}?</AlertDialogTitle>
                             <AlertDialogDescription>
-                                It looks like you haven't chat with <b>{user.username}</b> yet?
+                                Click <b>Continue</b> to go to page with chat.
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

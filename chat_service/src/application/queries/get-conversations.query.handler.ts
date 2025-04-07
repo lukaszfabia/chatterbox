@@ -8,6 +8,7 @@ export class GetConversationsQueryHandler implements QueryHandler<GetConversatio
     constructor(private repo: IChatRepository) { }
 
     async execute(q: GetConversationsQuery): Promise<ConversationDTO[]> {
+        console.log('Getting message for user with ', q.userID)
         return await this.repo.getConversationForMember(q.userID)
     }
 }

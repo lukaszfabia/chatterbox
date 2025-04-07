@@ -14,7 +14,7 @@ type ChatCtxProps = {
     conversations: ConversationDTO[],
     messages: MessageDTO[],
     sendMessage: (msg: MessageDTO) => Promise<void>;
-    initConversation: (sender: User, receiver: User) => Promise<void>;
+    initConversation: (sender: User, receiver: User) => Promise<ConversationDTO | null>;
     selectChat: (chatID: string) => void;
 };
 
@@ -27,7 +27,7 @@ const ChatCtx = createContext<ChatCtxProps>({
     conversations: [],
     messages: [],
     sendMessage: async (msg: MessageDTO) => { },
-    initConversation: async (sender: User, receiver: User) => { },
+    initConversation: async (sender: User, receiver: User) => null,
     selectChat: (chatID: string) => { },
 });
 
@@ -52,6 +52,24 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         chatID ? `/chat/${chatID}/messages` : null,
         fetcher
     );
+
+    useEffect(() => {
+        if (!currUserProfile?.id) return;
+
+        setChatID(null);
+        setMessages([]);
+
+        mutate('/chat/conversations', null, { revalidate: false });
+        mutate((key) => typeof key === 'string' && key.startsWith('/chat/'), null, { revalidate: false });
+    }, [currUserProfile?.id]);
+
+
+    useEffect(() => {
+        if (currUserProfile?.id) {
+            mutate('/chat/conversations');
+        }
+    }, [currUserProfile?.id]);
+
 
     useEffect(() => {
         const socket = io(addr);
@@ -126,9 +144,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
         if (conversation) {
             mutate('/chat/conversations');
+            return conversation;
         } else {
             setError('Failed to init conversation');
         }
+        return null;
     };
 
     return (

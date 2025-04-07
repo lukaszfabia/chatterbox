@@ -10,7 +10,7 @@ import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const links = [
-    { "link": "messages", "content": "Messages" },
+    { "link": "chat", "content": "Messages" },
     { "link": "explore", "content": "Explore" },
     { "link": "docs", "content": "Docs" },
 ];

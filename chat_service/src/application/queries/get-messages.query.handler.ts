@@ -8,6 +8,7 @@ export class GetMessagesQueryHandler implements QueryHandler<GetMessagesQuery> {
     constructor(private repo: IChatRepository) { }
 
     async execute(q: GetMessagesQuery): Promise<MessageDTO[]> {
-        return await this.repo.getMessages(q.chatID, 10)
+        console.log('Gettings messages ', q.chatID)
+        return await this.repo.getMessages(q.chatID, 500)
     }
 }

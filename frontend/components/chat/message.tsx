@@ -1,7 +1,8 @@
 import { MessageDTO, DenormalizedUser } from "@/lib/dto/message";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
+import { Avatar } from "@radix-ui/react-avatar";
 import { MyUserAvatar } from "../images";
+import { initials } from "@/lib/dto/user";
 
 interface MessageProps {
     message: MessageDTO;
@@ -17,10 +18,7 @@ export function Message({ message, sender, isCurrentUser }: MessageProps) {
         )}>
             {!isCurrentUser && (
                 <Avatar>
-                    {sender?.avatarURL ?
-                        <MyUserAvatar src={sender.avatarURL} className="w-10 h-10" /> :
-                        <AvatarFallback>{sender.username[0]}</AvatarFallback>
-                    }
+                    <MyUserAvatar src={sender.avatarURL} placeholder={initials(sender.username)} size="w-10 h-10" />
                 </Avatar>
             )}
 
