@@ -11,7 +11,6 @@ import (
 
 func (h *NotificationHandler) IsAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Validation...")
 		authorization := r.Header.Get("Authorization")
 
 		// no bearer token
@@ -33,13 +32,16 @@ func (h *NotificationHandler) IsAuth(next http.Handler) http.Handler {
 		id, err := pkg.DecodeJWT(tokenStr)
 
 		if err != nil {
-			log.Println("Error during decoding token")
+			log.Printf("Error during decoding token: %s\n", err.Error())
 			rest.Unauthorized(w)
 			return
 		}
 
 		ctx := context.WithValue(r.Context(), "userID", id)
 		r = r.WithContext(ctx)
+
+		// go to next handler
+		log.Printf("Done... %v\n", id)
 
 		next.ServeHTTP(w, r)
 	})

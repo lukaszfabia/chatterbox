@@ -17,6 +17,23 @@ interface ChatListProps {
     isLoading?: boolean;
 }
 
+function ChatListSkeleton({ amount = 4 }: { amount?: number }) {
+    return (
+        <div>
+            {Array.from({ length: amount }).map((_, i) => (
+                <div key={i} className="flex items-center gap-3 p-3 hover:bg-muted/50 cursor-pointer rounded-lg">
+                    <Skeleton className="w-12 h-12 rounded-full" />
+                    <div className="flex-1 flex min-w-0 flex-col gap-2">
+                        <Skeleton className="h-5 w-32" />
+                        <Skeleton className="h-4 w-48" />
+                    </div>
+                    <Skeleton className="h-3 w-12" />
+                </div>
+            ))}
+        </div>
+    )
+}
+
 export function ChatList({
     conversations,
     onConversationSelect,
@@ -32,21 +49,6 @@ export function ChatList({
             ? c.members.some((u) => u.username.toLowerCase().includes(normalized))
             : true;
     });
-
-    const renderConversationSkeletons = () => (
-        <>
-            {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex items-center gap-3 p-3 hover:bg-muted/50 cursor-pointer rounded-lg">
-                    <Skeleton className="w-12 h-12 rounded-full" />
-                    <div className="flex-1 flex min-w-0 flex-col gap-2">
-                        <Skeleton className="h-5 w-32" />
-                        <Skeleton className="h-4 w-48" />
-                    </div>
-                    <Skeleton className="h-3 w-12" />
-                </div>
-            ))}
-        </>
-    );
 
     return (
         <div className="w-1/4 border-r bg-muted/50 flex flex-col">
@@ -65,7 +67,7 @@ export function ChatList({
             <ScrollArea className="flex-1">
                 <div className="p-2 space-y-1">
                     {isLoading ? (
-                        renderConversationSkeletons()
+                        <ChatListSkeleton />
                     ) : (
                         filtered.map((conversation: ConversationDTO) => (
                             <ConversationItem

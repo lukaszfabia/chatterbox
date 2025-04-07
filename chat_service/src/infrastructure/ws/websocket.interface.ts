@@ -7,6 +7,6 @@ export interface IWebSocketService {
     disconnect(userID: string): Promise<void>;
     handleIncomingMessage(client: Socket, message: MessageDTO): Promise<void>;
     isonline(userID: string): Promise<boolean>;
-    join(client: Socket, chatID: string): Promise<void>;
-    leave(client: Socket, chatID: string): Promise<void>;
+    join(client: Socket, chatID: string, userID: string): Promise<void>;
+    leave(client: Socket, chatID: string, userID: string): Promise<void>;
 }

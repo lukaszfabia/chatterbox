@@ -42,6 +42,7 @@ func NewNotificationHandler(
 // @Failure      400 {object} nil "Invalid request"
 // @Router       /notifications [get]
 func (h *NotificationHandler) GetNotifications(w http.ResponseWriter, r *http.Request) {
+	log.Println("Getting some notifications")
 	page := r.URL.Query().Get("page")
 	limit := r.URL.Query().Get("limit")
 
@@ -51,32 +52,22 @@ func (h *NotificationHandler) GetNotifications(w http.ResponseWriter, r *http.Re
 	}
 
 	pageInt, err := strconv.Atoi(page)
-	if err != nil || pageInt <= 0 {
-		log.Println("Invalid page number")
-		rest.BadRequest(w)
-		return
+	if err == nil || pageInt <= 0 {
+		queryParams.Page = pageInt
 	}
 
 	limitInt, err := strconv.Atoi(limit)
-	if err != nil || limitInt <= 0 {
-		log.Println("Invalid limit value")
-		rest.BadRequest(w)
-		return
-	}
-	if err != nil {
-		rest.BadRequest(w)
-		return
+	if err == nil || limitInt <= 0 {
+		queryParams.Limit = limitInt
 	}
 
 	userID, ok := r.Context().Value("userID").(string)
 
 	if !ok {
+		log.Println(userID)
 		rest.Unauthorized(w)
 		return
 	}
-
-	queryParams.Page = pageInt
-	queryParams.Limit = limitInt
 
 	res, err := h.queryService.GetNotifications(userID, *queryParams)
 
@@ -85,8 +76,10 @@ func (h *NotificationHandler) GetNotifications(w http.ResponseWriter, r *http.Re
 		return
 	}
 
+	log.Println(res)
+
 	rest.Ok(w, res)
 }
 
-func (h *NotificationHandler) DeleteNotification(w http.ResponseWriter, r *http.Request) {
-}
+// func (h *NotificationHandler) DeleteNotification(w http.ResponseWriter, r *http.Request) {
+// }

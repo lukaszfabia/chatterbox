@@ -7,14 +7,14 @@ import (
 )
 
 type NotificationQueryService interface {
-	GetNotifications(userID string, q queries.GetNotificationsQuery) ([]*models.Notification, error)
+	GetNotifications(userID string, q queries.GetNotificationsQuery) ([]models.Notification, error)
 }
 
 type notiQueryServiceImpl struct {
 	repo repositories.NotificationRepository
 }
 
-func (n *notiQueryServiceImpl) GetNotifications(userID string, q queries.GetNotificationsQuery) ([]*models.Notification, error) {
+func (n *notiQueryServiceImpl) GetNotifications(userID string, q queries.GetNotificationsQuery) ([]models.Notification, error) {
 	return n.repo.GetAllNotifications(userID, q)
 }
 

@@ -1,7 +1,6 @@
 import { motion } from "framer-motion"
 import { Skeleton } from "../ui/skeleton"
 import { Pencil } from "lucide-react"
-import Link from "next/link"
 import { Button } from "../ui/button"
 import {
     AlertDialog,
@@ -15,10 +14,59 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useRouter } from "next/navigation";
-import { User } from "@/lib/dto/user"
+import { denormalizeUser, User } from "@/lib/dto/user"
+import { toast } from "sonner"
+import { api } from "@/lib/api"
+import { ConversationDTO } from "@/lib/dto/message"
 
-export default function ActionButtons({ isMe, isLoading, user, handleNewConversation }: { isMe: boolean, user?: User | null, isLoading?: boolean, handleNewConversation: () => void }) {
+export default function ActionButtons({ isMe, isLoading, user, currentProfile }: { isMe: boolean, user?: User | null, isLoading?: boolean, currentProfile?: User | null }) {
     const router = useRouter();
+
+
+    const initConversation = async (sender: User, receiver: User) => {
+        console.log('Initializing conversation between', sender.username, 'and', receiver.username);
+
+        const body = {
+            members: [receiver, sender].map((user) => denormalizeUser(user)),
+        };
+
+        const conversation = await api<ConversationDTO>({
+            service: 'chat',
+            apiVersion: 'api/v1',
+            endpoint: '/chat/new/chat',
+            method: 'POST',
+            body: body,
+        });
+
+        if (conversation) {
+            console.log('Conversation created:', conversation);
+            return conversation;
+        }
+        return null;
+    };
+
+
+    const handleNewConv = async () => {
+        console.log('creating new conv...')
+        if (user && currentProfile) {
+            const chat = await initConversation(currentProfile, user);
+            if (chat) {
+                router.push("/chat")
+            } else {
+                toast("Oops!", {
+                    description: "Failed to create/fetch chat",
+                    action: {
+                        label: "Ok",
+                        onClick: () => { },
+                    },
+                });
+            }
+        } else {
+            console.log('user', user)
+            console.log('currentProfile', currentProfile)
+        }
+    };
+
 
     if (isLoading || !user) {
         return (
@@ -60,7 +108,7 @@ export default function ActionButtons({ isMe, isLoading, user, handleNewConversa
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleNewConversation}>Continue</AlertDialogAction>
+                            <AlertDialogAction onClick={handleNewConv}>Continue</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>

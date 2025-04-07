@@ -10,97 +10,55 @@ import UserAvatar from "../../../components/profile/avatar";
 import Cover from "../../../components/profile/cover";
 import { useProfile } from "@/context/profile-context";
 import NotFound404 from "@/app/not-found";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useStatus } from "@/context/status-context";
-import { ParamValue } from "next/dist/server/request/params";
-import { useChat } from "@/context/chat-context";
-import { toast } from "sonner";
 
 
 export default function Profile() {
   const { ID } = useParams();
-  const router = useRouter();
   const { isLoading, fetchByID, currUserProfile } = useProfile();
   const { fetchStatus, isConnected } = useStatus();
   const [isMe, setIsMe] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
   const [status, setStatus] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
-  const { initConversation } = useChat();
 
-  const fetchData = (ID: ParamValue) => {
+  useEffect(() => {
     if (!ID) {
       setIsError(true);
       return;
     }
 
-    fetchByID(ID.toString()).then((user) => {
-      if (user) {
-        setUser(user);
-        if (user?.id) {
-          fetchStatus(user.id).then((v) => {
-            console.log("[status] fetched for user:", user.id, v?.isOnline);
-            setStatus(v?.isOnline ?? false);
-          }).catch((e) => {
-            console.error("Status fetch error:", e);
-            setStatus(false);
-          });
-        }
-      } else {
-        setIsError(true);
-      }
-    });
-  };
-
-
-
-  useEffect(() => {
-    if (currUserProfile) {
-      setIsMe(ID === currUserProfile.id);
+    if (currUserProfile && ID === currUserProfile.id) {
+      setIsMe(true);
+      setUser(currUserProfile);
     } else {
       setIsMe(false);
+      fetchByID(ID.toString()).then((fetchedUser) => {
+        if (fetchedUser) {
+          setUser(fetchedUser);
+        } else {
+          setIsError(true);
+        }
+      }).catch(() => {
+        setIsError(true);
+      });
     }
-  }, [currUserProfile])
+  }, [ID, currUserProfile]);
 
   useEffect(() => {
-    // case when auth and handle when he goes on his profile and other profile
-    if (ID && currUserProfile) {
-      if (ID === currUserProfile.id) {
-        setUser(currUserProfile);
-      } else {
-        fetchByID(ID.toString()).then((user) => {
-          setUser(user);
-        });
-      }
+    if (ID) {
+      fetchStatus(ID.toString()).then((v) => {
+        setStatus(v?.isOnline ?? false);
+      }).catch(() => {
+        setStatus(false);
+      });
     }
-    // case when anon goes on the site and search with url bar 
-    if (!currUserProfile) {
-      fetchData(ID);
-    }
-  }, [ID, currUserProfile, fetchByID]);
+  }, [ID]);
 
   if (isError) {
     return <NotFound404 />
   }
-
-
-  const handleNewConv = async () => {
-    if (user && currUserProfile) {
-      const chat = await initConversation(currUserProfile, user);
-      if (chat) {
-        // router.push(`/chat/${chat.id}`);
-        router.push("/chat")
-      } else {
-        toast("Oops!", {
-          description: "Failed to create/fetch chat",
-          action: {
-            label: "Ok",
-            onClick: () => { },
-          },
-        });
-      }
-    }
-  };
 
 
   return (
@@ -129,7 +87,7 @@ export default function Profile() {
           isLoading={isLoading || !user}
         />
 
-        <ActionButtons user={user} isMe={isMe} isLoading={isLoading || !user} handleNewConversation={handleNewConv} />
+        <ActionButtons user={user} isMe={isMe} isLoading={isLoading || !user} currentProfile={currUserProfile} />
       </div>
     </motion.div>
   );

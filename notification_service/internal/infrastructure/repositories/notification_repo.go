@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"fmt"
+	"log"
 	"notification_serivce/internal/domain/models"
 	"notification_serivce/internal/domain/queries"
 	"notification_serivce/internal/infrastructure/database"
@@ -14,7 +15,7 @@ import (
 )
 
 type NotificationRepository interface {
-	GetAllNotifications(userID string, q queries.GetNotificationsQuery) ([]*models.Notification, error)
+	GetAllNotifications(userID string, q queries.GetNotificationsQuery) ([]models.Notification, error)
 	DeleteNotification(id string) error
 	AddNotification(noti models.Notification) (*models.Notification, error)
 }
@@ -63,11 +64,11 @@ func (n *notificationRepoImpl) DeleteNotification(id string) error {
 	return nil
 }
 
-func (n *notificationRepoImpl) GetAllNotifications(userID string, q queries.GetNotificationsQuery) ([]*models.Notification, error) {
+func (n *notificationRepoImpl) GetAllNotifications(userID string, q queries.GetNotificationsQuery) ([]models.Notification, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	filter := bson.M{"userID": userID}
+	filter := bson.M{"userid": userID}
 	opts := options.Find().
 		SetSkip(int64(q.Page-1) * int64(q.Limit)).
 		SetSort(bson.D{{Key: "sentAt", Value: -1}}).
@@ -75,12 +76,14 @@ func (n *notificationRepoImpl) GetAllNotifications(userID string, q queries.GetN
 
 	cursor, err := n.database.GetNoSql().Find(ctx, filter, opts)
 	if err != nil {
+		log.Println(err.Error())
 		return nil, fmt.Errorf("failed to find notifications: %w", err)
 	}
 	defer cursor.Close(ctx)
 
-	var notifications []*models.Notification
-	if err = cursor.All(ctx, notifications); err != nil {
+	var notifications []models.Notification
+	if err = cursor.All(ctx, &notifications); err != nil {
+		log.Println(err.Error())
 		return nil, fmt.Errorf("failed to decode notifications: %w", err)
 	}
 

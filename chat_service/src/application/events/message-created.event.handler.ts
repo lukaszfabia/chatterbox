@@ -26,7 +26,8 @@ export class MessageCreatedEventHandler implements EventHandler<MessageCreatedEv
             console.log('User is online, sending by ws')
             await this.ws.send(lastMessage);
         } else {
-            const receiver = event.message.members.find(m => m.userID === receiverID);
+            console.log('event', event)
+            const receiver = event.message.members.find(m => m.userID !== receiverID);
             const username = receiver?.username ?? 'anon';
 
             const nofi = new GotNewMessageEvent(receiverID, username, lastMessage.content);

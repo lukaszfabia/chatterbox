@@ -27,21 +27,20 @@ func NewWebSocketServer() *WebSocketServer {
 }
 
 func (ws *WebSocketServer) HandleConnection(w http.ResponseWriter, r *http.Request) {
+	tokenParam := r.URL.Query().Get("token")
 	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+
+	var token string
+	if tokenParam != "" {
+		token = tokenParam
+	} else if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {
+		token = strings.TrimPrefix(authHeader, "Bearer ")
+	} else {
 		http.Error(w, "Authorization token required", http.StatusUnauthorized)
 		return
 	}
 
-	token := strings.TrimPrefix(authHeader, "Bearer ")
 	id, err := pkg.DecodeJWT(token)
-	if err != nil {
-		http.Error(w, "Invalid token", http.StatusUnauthorized)
-		return
-	}
-
-	userID := id.String()
-
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("Failed to upgrade WebSocket:", err)
@@ -49,22 +48,22 @@ func (ws *WebSocketServer) HandleConnection(w http.ResponseWriter, r *http.Reque
 	}
 
 	ws.mu.Lock()
-	ws.clients[userID] = conn
+	ws.clients[id] = conn
 	ws.mu.Unlock()
 
 	defer func() {
 		ws.mu.Lock()
-		delete(ws.clients, userID)
+		delete(ws.clients, id)
 		ws.mu.Unlock()
 		conn.Close()
 	}()
 
-	log.Printf("User %s connected to WebSocket", userID)
+	log.Printf("User %s connected to WebSocket", id)
 
 	for {
 		_, _, err := conn.ReadMessage()
 		if err != nil {
-			log.Printf("User %s disconnected", userID)
+			log.Printf("User %s disconnected", id)
 			break
 		}
 	}

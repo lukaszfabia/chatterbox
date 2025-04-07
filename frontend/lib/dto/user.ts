@@ -26,7 +26,8 @@ export function initials(placeholder: string, lhs?: string | null, rhs?: string 
 }
 
 
-export function denormalizeUser(u: User): DenormalizedUser {
+export function denormalizeUser(u?: User | null): DenormalizedUser | null {
+    if (!u) return null;
     return {
         userID: u.id,
         avatarURL: u.avatarURL,

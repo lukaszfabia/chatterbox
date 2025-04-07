@@ -22,6 +22,18 @@ export interface ConversationDTO extends DTO {
     id: string,
     members: DenormalizedUser[],
     lastMessage?: MessageDTO,
-    updatedAt?: string,
+    updatedAt: string,
 }
 
+
+export function getConversation(id: string, conversations: ConversationDTO[]): ConversationDTO | null {
+    return conversations.find((v) => id === v.id) ?? null;
+}
+
+export function sortConversations(conversations: ConversationDTO[]): ConversationDTO[] {
+    return conversations.sort((lhs, rhs) => {
+        const d1 = new Date(lhs.updatedAt)
+        const d2 = new Date(rhs.updatedAt)
+        return d1.getTime() > d2.getTime() ? -1 : 1
+    })
+}

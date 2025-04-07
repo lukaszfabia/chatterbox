@@ -6,10 +6,10 @@ import (
 	"net/http"
 )
 
-type response struct {
-	HTTPCode int `json:"status"`
-	Data     any `json:"data,omitempty"`
-}
+// type response struct {
+// 	HTTPCode int `json:"status"`
+// 	Data     any `json:"data,omitempty"`
+// }
 
 // Creates new server response
 func NewResponse(w http.ResponseWriter, httpCode int, data any) {
@@ -17,10 +17,7 @@ func NewResponse(w http.ResponseWriter, httpCode int, data any) {
 
 	w.WriteHeader(httpCode)
 
-	err := json.NewEncoder(w).Encode(&response{
-		HTTPCode: httpCode,
-		Data:     data,
-	})
+	err := json.NewEncoder(w).Encode(data)
 
 	if err != nil {
 		log.Printf("Error encoding response: %v", err)
@@ -43,5 +40,6 @@ func Created(w http.ResponseWriter, data any) {
 }
 
 func BadRequest(w http.ResponseWriter) {
+	log.Println("Bad request, invalid form")
 	NewResponse(w, http.StatusBadRequest, nil)
 }

@@ -14,6 +14,25 @@ interface ConversationItemProps {
     user?: DenormalizedUser | null;
 }
 
+function ConversationItemSkeleton({ onClick, isActive }: { onClick: () => void, isActive: boolean }) {
+    return (
+        <div
+            onClick={onClick}
+            className={cn(
+                "flex items-center gap-3 p-3 hover:bg-muted/50 cursor-pointer rounded-lg",
+                isActive && "bg-muted"
+            )}
+        >
+            <Skeleton className="w-12 h-12 rounded-full" />
+            <div className="flex-1 flex min-w-0 items-center space-x-5">
+                <Skeleton className="w-32 h-5" />
+                <Skeleton className="w-20 h-4" />
+            </div>
+            <Skeleton className="w-16 h-3" />
+        </div>
+    )
+}
+
 export function ConversationItem({
     conversation,
     onClick,
@@ -23,22 +42,7 @@ export function ConversationItem({
     const otherUser = conversation.members.find(member => member.userID !== user?.userID);
 
     if (!otherUser) {
-        return (
-            <div
-                onClick={onClick}
-                className={cn(
-                    "flex items-center gap-3 p-3 hover:bg-muted/50 cursor-pointer rounded-lg",
-                    isActive && "bg-muted"
-                )}
-            >
-                <Skeleton className="w-12 h-12 rounded-full" />
-                <div className="flex-1 flex min-w-0 items-center space-x-5">
-                    <Skeleton className="w-32 h-5" />
-                    <Skeleton className="w-20 h-4" />
-                </div>
-                <Skeleton className="w-16 h-3" />
-            </div>
-        );
+        return <ConversationItemSkeleton isActive={isActive} onClick={onClick} />
     }
 
     return otherUser && (

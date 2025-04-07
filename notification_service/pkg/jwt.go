@@ -27,7 +27,7 @@ Returns:
   - id uuid.UUID: decoded sub
   - error occured during executing
 */
-func DecodeJWT(tokenStr string) (uuid.UUID, error) {
+func DecodeJWT(tokenStr string) (string, error) {
 	hmacSampleSecret := []byte(os.Getenv("JWT_SECRET"))
 
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
@@ -40,7 +40,7 @@ func DecodeJWT(tokenStr string) (uuid.UUID, error) {
 
 	if err != nil {
 		log.Println(err)
-		return uuid.Nil, FailedToParseToken(err)
+		return "", FailedToParseToken(err)
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
@@ -48,27 +48,27 @@ func DecodeJWT(tokenStr string) (uuid.UUID, error) {
 		if !ok || time.Now().Unix() > int64(exp) {
 			msg := "Token expired or invalid"
 			log.Println(msg)
-			return uuid.Nil, InvalidToken(err)
+			return "", InvalidToken(err)
 		}
 
 		sub, ok := claims["sub"].(string)
 		if !ok {
 			msg := "Invalid token subject"
 			log.Println(msg)
-			return uuid.Nil, InvalidToken(err)
+			return "", InvalidToken(err)
 		}
 
 		userID, err := uuid.Parse(sub)
 		if err != nil {
 			msg := "Invalid UUID in token"
 			log.Println(msg)
-			return uuid.Nil, InvalidToken(err)
+			return "", InvalidToken(err)
 		}
 
-		return userID, nil
+		return userID.String(), nil
 	} else {
 		msg := "Invalid token claims"
 		log.Println(msg)
-		return uuid.Nil, InvalidToken(err)
+		return "", InvalidToken(err)
 	}
 }

@@ -12,6 +12,7 @@ type FormFieldProps = {
     placeholder: string;
     description?: string;
     type?: string;
+    onChange?: (value: string) => void;
 };
 
 interface FileFieldProps {
@@ -19,6 +20,7 @@ interface FileFieldProps {
     control: any;
     label: string;
     description?: string;
+
 }
 
 export function TextInputField({ name, control, label, placeholder, description, type = "text" }: FormFieldProps) {
@@ -45,7 +47,7 @@ export function TextInputField({ name, control, label, placeholder, description,
     );
 }
 
-export function TextAreaField({ name, control, label, placeholder, description }: FormFieldProps) {
+export function TextAreaField({ name, control, label, placeholder, description, onChange: externalOnChange, }: FormFieldProps) {
     const {
         field,
         fieldState: { error },
@@ -59,7 +61,12 @@ export function TextAreaField({ name, control, label, placeholder, description }
                 <FormItem>
                     <FormLabel>{label}</FormLabel>
                     <FormControl>
-                        <Textarea placeholder={placeholder} {...field} />
+                        <Textarea placeholder={placeholder} {...field}
+                            onChange={(e) => {
+                                field.onChange(e);
+                                externalOnChange?.(e.target.value);
+                            }}
+                        />
                     </FormControl>
                     {description && <FormDescription>{description}</FormDescription>}
                     <FormMessage>{error?.message}</FormMessage>

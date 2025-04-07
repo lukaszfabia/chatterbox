@@ -55,12 +55,12 @@ func SendEmail(n models.Notification, email string) error {
 
 	log.Println(n)
 
-	d := mail.NewDialer("smtp.gmail.com", 587, senderMail, senderPassword)
+	// d := mail.NewDialer("smtp.gmail.com", 587, senderMail, senderPassword)
 
-	if err := d.DialAndSend(m); err != nil {
-		log.Printf("Error sending email: %v", err)
-		return errors.New("failed to send email")
-	}
+	// if err := d.DialAndSend(m); err != nil {
+	// 	log.Printf("Error sending email: %v", err)
+	// 	return errors.New("failed to send email")
+	// }
 
 	log.Printf("Email has been sent to %s", email)
 

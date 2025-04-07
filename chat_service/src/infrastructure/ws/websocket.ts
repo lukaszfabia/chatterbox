@@ -4,9 +4,9 @@ import { MessageDTO } from '../../domain/dto/message.dto';
 
 export class WebSocketService implements IWebSocketService {
     private clients: Map<string, Socket> = new Map();
+    private rooms: Map<string, Set<string>> = new Map();
 
     constructor(private server: Server) { }
-
 
     init() {
         this.server.on('connection', (client: Socket) => {
@@ -24,6 +24,34 @@ export class WebSocketService implements IWebSocketService {
                         this.clients.delete(userID);
                     }
                 });
+            });
+
+            client.on('typing', ({ chatID, userID, username }: { chatID: string, userID: string, username: string }) => {
+                if (!chatID || !username) {
+                    console.warn('Invalid typing payload:', { chatID, username });
+                    return;
+                }
+
+                console.log(`Typing: ${username} in chat ${chatID}`);
+
+                const usersInRoom = this.rooms.get(chatID);
+
+                if (usersInRoom) {
+                    usersInRoom.forEach((user) => {
+                        const userSocket = this.clients.get(user);
+                        if (userSocket) {
+                            userSocket.emit('typing', { username });
+                        }
+                    });
+                }
+            });
+
+            client.on('joinRoom', (chatID: string, userID: string) => {
+                this.join(client, chatID, userID);
+            });
+
+            client.on('leaveRoom', (chatID: string, userID: string) => {
+                this.leave(client, chatID, userID);
             });
         });
     }
@@ -59,14 +87,20 @@ export class WebSocketService implements IWebSocketService {
         }
     }
 
-    async join(client: Socket, chatID: string): Promise<void> {
+    async join(client: Socket, chatID: string, userID: string): Promise<void> {
         client.join(chatID);
         console.log(`${client.id} joined chat ${chatID}`);
+
+        if (!this.rooms.has(chatID)) {
+            this.rooms.set(chatID, new Set());
+        }
+        this.rooms.get(chatID)?.add(userID);
     }
 
-    async leave(client: Socket, chatID: string): Promise<void> {
+    async leave(client: Socket, chatID: string, userID: string): Promise<void> {
         client.leave(chatID);
         console.log(`${client.id} left chat ${chatID}`);
-    }
 
+        this.rooms.get(chatID)?.delete(userID);
+    }
 }

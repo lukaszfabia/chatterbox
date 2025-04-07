@@ -52,7 +52,7 @@ func main() {
 	queues := addEvents(aggregate, dispatcher)
 
 	// handlers
-	router := handlers.NewRouter(commandService, queryService)
+	router := handlers.NewRouter(commandService, queryService, ws)
 	server := rest.NewServer(router)
 
 	done := make(chan bool, 1)

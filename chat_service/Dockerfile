@@ -11,4 +11,6 @@ COPY . /chat_service
 
 RUN npm install -g typescript tsx
 
+EXPOSE 8005
+
 CMD ["npx", "tsx", "src/app.ts"]

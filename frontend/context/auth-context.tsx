@@ -7,6 +7,7 @@ import { TokenDTO } from "@/lib/dto/tokens";
 import { UpdateUserDTO } from "@/lib/dto/update";
 import getUserID from "@/lib/jwt";
 import getToken, { ACCESS, REFRESH } from "@/lib/token";
+import { useRouter } from "next/navigation";
 import { createContext, ReactNode, useCallback, useContext, useState } from "react";
 
 function clearStorage() {
@@ -45,6 +46,7 @@ const AuthCtx = createContext<AuthCtxProps>({
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [userID, setUserID] = useState<string | null>(() => getUserID());
     const [isAuth, setIsAuth] = useState<boolean>(() => !!getToken(ACCESS));
+    const router = useRouter();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -101,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             clearStorage();
             setUserID(null);
             setIsAuth(false);
+            router.push("/login")
         } catch (error) {
             console.log('error', error)
         }

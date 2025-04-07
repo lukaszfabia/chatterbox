@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, } from '../ui/avatar';
 import { initials, User } from "@/lib/dto/user";
 import { AnimatePresence } from "framer-motion";
 import {
@@ -16,7 +16,12 @@ import { Calendar, LogOutIcon, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { MyUserAvatar } from '../images';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../ui/sheet';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNotification } from '@/context/notification-context';
+import { Skeleton } from '../ui/skeleton';
+import { ScrollArea } from '@radix-ui/react-scroll-area';
+import { transformTime } from '@/lib/time';
+import { getSorted } from '@/lib/dto/notification';
 
 const AvatarWithSkeleton = ({ user }: { user: User }) => {
     return user && (
@@ -32,6 +37,11 @@ const AvatarWithSkeleton = ({ user }: { user: User }) => {
 
 const AvatarWithActions = ({ user, logout }: { user: User, logout: () => void }) => {
     const [openSheet, setOpenSheet] = useState(false);
+    const { notifications } = useNotification();
+
+    useEffect(() => {
+        console.log('notifications', notifications)
+    }, [])
 
     return (
         <>
@@ -68,12 +78,38 @@ const AvatarWithActions = ({ user, logout }: { user: User, logout: () => void })
                             Here you can find received notifications.
                         </SheetDescription>
                     </SheetHeader>
+
+                    <ScrollArea className="flex-1 overflow-y-auto pr-2">
+                        <div className="space-y-4 mt-4">
+                            {notifications ? (
+                                getSorted(notifications).map((notification) => (
+                                    <div className="p-4 hover:bg-accent transition-colors duration-200 cursor-pointer" key={notification.id}>
+                                        <h1 className="font-semibold">{notification.sub}</h1>
+                                        <p>{notification.info}</p>
+                                        <p className="text-sm text-muted-foreground">
+                                            {transformTime(notification.sentAt)}
+                                        </p>
+                                    </div>
+                                ))
+                            ) : (
+                                [...Array(3)].map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className="p-4"
+                                    >
+                                        <Skeleton className="h-5 w-3/4 mb-2" />
+                                        <Skeleton className="h-4 w-full mb-1" />
+                                        <Skeleton className="h-3 w-1/2" />
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </ScrollArea>
                 </SheetContent>
             </Sheet>
         </>
-    )
-
-}
+    );
+};
 
 export default AvatarWithActions;
 

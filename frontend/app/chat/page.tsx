@@ -1,8 +1,8 @@
 "use client";
 
-import { MessageDTO, ConversationDTO } from "@/lib/dto/message";
+import { MessageDTO, ConversationDTO, getConversation, sortConversations } from "@/lib/dto/message";
 import { useEffect, useState } from "react";
-import { useChat } from "@/context/chat-context";
+import { ChatProvider, useChat } from "@/context/chat-context";
 import { useProfile } from "@/context/profile-context";
 import { denormalizeUser } from "@/lib/dto/user";
 import { messageSchema } from "@/components/forms/schemas";
@@ -13,7 +13,7 @@ import { ChatList } from "@/components/chat/chat-list";
 
 export default function Chat() {
     const { chatID } = useParams();
-    const { conversations, selectChat, messages, sendMessage } = useChat();
+    const { conversations, selectChat, messages, sendMessage, isLoading: isChatLoading, emitTyping, typingUser } = useChat();
     const { currUserProfile: currentUser, isLoading: isProfileLoading } = useProfile();
     const [currentConversation, setCurrentConversation] = useState<ConversationDTO | null>(
         chatID ? getConversation(chatID as string, conversations) : null
@@ -43,15 +43,6 @@ export default function Chat() {
         }
     };
 
-    if (isProfileLoading || !currentUser) {
-        return (
-            // change on a spinner later
-            <div className="flex min-h-screen items-center justify-center p-4 w-full">
-                Loading...
-            </div>
-        );
-    }
-
     if (!conversations || conversations.length === 0) {
         return (
             <div className="flex min-h-screen items-center justify-center p-4 w-full">
@@ -67,7 +58,8 @@ export default function Chat() {
             <div className="w-full flex justify-center">
                 <div className="flex h-[80vh] w-full max-w-full border rounded-lg shadow-lg overflow-hidden">
                     <ChatList
-                        conversations={conversations}
+                        conversations={sortConversations(conversations)}
+                        isLoading={isChatLoading || isProfileLoading}
                         currentUser={denormalizeUser(currentUser)}
                         currentConversation={currentConversation}
                         onConversationSelect={(conversation) => {
@@ -78,7 +70,9 @@ export default function Chat() {
                         }}
                     />
                     <ChatInterface
-                        conversations={conversations}
+                        emitTyping={emitTyping}
+                        typingUser={typingUser}
+                        conversations={sortConversations(conversations)}
                         currentConversation={currentConversation}
                         messages={messages}
                         currentUser={denormalizeUser(currentUser)}
@@ -92,8 +86,4 @@ export default function Chat() {
             </div>
         </div>
     );
-}
-
-function getConversation(id: string, conversations: ConversationDTO[]): ConversationDTO | null {
-    return conversations.find((v) => id === v.id) ?? null;
 }

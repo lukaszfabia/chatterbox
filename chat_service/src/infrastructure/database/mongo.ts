@@ -146,6 +146,7 @@ export class MongoService implements IChatRepository {
   }
 
   async createConversation(members: User[]): Promise<ConversationDTO | null> {
+    console.log('Trying to create new conversation')
     const memberIDs = members.map((m) => m.userID).sort();
 
     const existingConversation = await this.conversations.findOne({
