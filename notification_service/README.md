@@ -4,7 +4,7 @@
 [![docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)]()
 [![swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)]()
 
-# Profile Service API - Chatterbox
+# Notification Service API - Chatterbox
 
 Profile Service stores user basic information. Talks with `Auth Service`, `Notification Service`, `Chat Service`.
 
@@ -14,21 +14,14 @@ Profile Service stores user basic information. Talks with `Auth Service`, `Notif
 
 ## Responsibility
 
-- Managing profiles.
+- Real time notifications via **websocket**
 
-- Hanlding files.
+- Sending information emails 
 
 ## Event kinds
 
 - Incoming events
 
-    - `UserCreatedEvent` from **Auth Service**
+    - `EmailNotificationEvent` to **Profile Service**
 
-    - `UserUpdatedEvent` from **Auth Service**
-    - `UserDeletedEvent` from **Auth Service**
-
-- Outcoming events
-
-    - `EmailNotificationEvent` to **Notification Service**
-
-    - `MemberUpdatedInfoEvent` to **Notification Service**
+    - `GotNewMessageEvent` from **Chat Service**
