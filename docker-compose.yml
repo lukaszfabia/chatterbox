@@ -35,108 +35,108 @@ services:
   #   networks:
   #     - chatterbox_net
 
-  rabbitmq:
-    image: rabbitmq:management
-    container_name: rabbitmq
-    environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
-    ports:
-      - "${RABBITMQ_PORT}:5672"
-      - "${RABBITMQ_UI_PORT}:15672"
-    healthcheck:
-      test: [ "CMD", "rabbitmqctl", "status" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - chatterbox_net
+  # rabbitmq:
+  #   image: rabbitmq:management
+  #   container_name: rabbitmq
+  #   environment:
+  #     - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+  #     - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+  #   ports:
+  #     - "${RABBITMQ_PORT}:5672"
+  #     - "${RABBITMQ_UI_PORT}:15672"
+  #   healthcheck:
+  #     test: [ "CMD", "rabbitmqctl", "status" ]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - chatterbox_net
 
-  chat_service_db:
-    image: mongo:latest
-    container_name: chat_data
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${CHAT_MONGO_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${CHAT_MONGO_PASS}
-    ports:
-      - "${CHAT_MONGO_PORT}:27017"
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - chatterbox_net
+  # chat_service_db:
+  #   image: mongo:latest
+  #   container_name: chat_data
+  #   restart: unless-stopped
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: ${CHAT_MONGO_USER}
+  #     MONGO_INITDB_ROOT_PASSWORD: ${CHAT_MONGO_PASS}
+  #   ports:
+  #     - "${CHAT_MONGO_PORT}:27017"
+  #   healthcheck:
+  #     test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - chatterbox_net
 
-  profile_service_db:
-    image: mongo:latest
-    container_name: profile_data
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${PROFILE_MONGO_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${PROFILE_MONGO_PASS}
-    ports:
-      - "${PROFILE_MONGO_PORT}:27017"
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - chatterbox_net
+  # profile_service_db:
+  #   image: mongo:latest
+  #   container_name: profile_data
+  #   restart: unless-stopped
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: ${PROFILE_MONGO_USER}
+  #     MONGO_INITDB_ROOT_PASSWORD: ${PROFILE_MONGO_PASS}
+  #   ports:
+  #     - "${PROFILE_MONGO_PORT}:27017"
+  #   healthcheck:
+  #     test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - chatterbox_net
 
-  notification_service_db:
-    image: mongo:latest
-    container_name: notifications_data
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${NOTIFICATION_MONGO_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${NOTIFICATION_MONGO_PASS}
-    ports:
-      - "${NOTIFICATION_MONGO_PORT}:27017"
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - chatterbox_net
+  # notification_service_db:
+  #   image: mongo:latest
+  #   container_name: notifications_data
+  #   restart: unless-stopped
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: ${NOTIFICATION_MONGO_USER}
+  #     MONGO_INITDB_ROOT_PASSWORD: ${NOTIFICATION_MONGO_PASS}
+  #   ports:
+  #     - "${NOTIFICATION_MONGO_PORT}:27017"
+  #   healthcheck:
+  #     test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - chatterbox_net
 
-  auth_service_db:
-    image: postgres:latest
-    container_name: auth_data
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${AUTH_POSTGRES_DB}
-      POSTGRES_USER: ${AUTH_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${AUTH_POSTGRES_PASSWORD}
-    ports:
-      - "${AUTH_POSTGRES_PORT}:5432"
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${AUTH_POSTGRES_USER} -d ${AUTH_POSTGRES_DB}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - chatterbox_net
+  # auth_service_db:
+  #   image: postgres:latest
+  #   container_name: auth_data
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: ${AUTH_POSTGRES_DB}
+  #     POSTGRES_USER: ${AUTH_POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${AUTH_POSTGRES_PASSWORD}
+  #   ports:
+  #     - "${AUTH_POSTGRES_PORT}:5432"
+  #   healthcheck:
+  #     test: [ "CMD-SHELL", "pg_isready -U ${AUTH_POSTGRES_USER} -d ${AUTH_POSTGRES_DB}" ]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - chatterbox_net
 
-  status_service_db:
-    image: redis:latest
-    container_name: status_data
-    restart: unless-stopped
-    environment:
-      REDIS_PASSWORD: ${STATUS_REDIS_PASSWORD}
-    ports:
-      - "${STATUS_REDIS_PORT}:6379"
-    command: redis-server --requirepass ${STATUS_REDIS_PASSWORD}
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-    networks:
-      - chatterbox_net
+  # status_service_db:
+  #   image: redis:latest
+  #   container_name: status_data
+  #   restart: unless-stopped
+  #   environment:
+  #     REDIS_PASSWORD: ${STATUS_REDIS_PASSWORD}
+  #   ports:
+  #     - "${STATUS_REDIS_PORT}:6379"
+  #   command: redis-server --requirepass ${STATUS_REDIS_PASSWORD}
+  #   healthcheck:
+  #     test: [ "CMD", "redis-cli", "ping" ]
+  #     interval: 10s
+  #     timeout: 3s
+  #     retries: 5
+  #   networks:
+  #     - chatterbox_net
 
   status_service:
     container_name: status_service_app
@@ -149,11 +149,11 @@ services:
       - "8004:8004" # change it later
     networks:
       - chatterbox_net
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      status_service_db:
-        condition: service_healthy
+    # depends_on:
+    #   rabbitmq:
+    #     condition: service_healthy
+    #   status_service_db:
+    #     condition: service_healthy
     restart: unless-stopped
 
   auth_service:
@@ -167,11 +167,11 @@ services:
       - "8001:8001"
     networks:
       - chatterbox_net
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      auth_service_db:
-        condition: service_healthy
+    # depends_on:
+    #   rabbitmq:
+    #     condition: service_healthy
+    #   auth_service_db:
+    #     condition: service_healthy
     restart: unless-stopped
 
   profile_service:
@@ -185,11 +185,11 @@ services:
       - "8002:8002"
     networks:
       - chatterbox_net
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      profile_service_db:
-        condition: service_healthy
+    # depends_on:
+    #   rabbitmq:
+    #     condition: service_healthy
+    #   profile_service_db:
+    #     condition: service_healthy
     restart: unless-stopped
 
   notification_service:
@@ -203,11 +203,11 @@ services:
       - "8003:8003"
     networks:
       - chatterbox_net
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      notification_service_db:
-        condition: service_healthy
+    # depends_on:
+    #   rabbitmq:
+    #     condition: service_healthy
+    #   notification_service_db:
+    #     condition: service_healthy
     restart: unless-stopped
 
   chat_service:
@@ -221,11 +221,11 @@ services:
       - "8005:8005"
     networks:
       - chatterbox_net
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      chat_service_db:
-        condition: service_healthy
+      # depends_on:
+      # rabbitmq:
+      #   condition: service_healthy
+      # chat_service_db:
+      #   condition: service_healthy
     restart: unless-stopped
 
 networks:
