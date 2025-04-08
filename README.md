@@ -2,8 +2,7 @@
 
 Simple `chat web app` writted with microservices (simplified **CQRS** pattern and event-driven architecture).
 
-
-## Getting started 
+## Getting started
 
 Before we start copy `.env.sample` in the root of the project and fill blank keys. You also need to do it with other services.
 
@@ -11,7 +10,7 @@ Before we start copy `.env.sample` in the root of the project and fill blank key
 cp .env.sample .env
 ```
 
-Just make sure you have installed `Docker`, `docker-compose`. 
+Just make sure you have installed `Docker`, `docker-compose`.
 
 ```bash
 docker-compose up -d
@@ -26,8 +25,6 @@ docker-compose up -d
 - System to track online status.
 
 - Simple account managment.
-
-
 
 ## Services
 

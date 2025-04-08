@@ -9,17 +9,6 @@
 
 One of a five services implemented for `Chatterbox` app. Listens on **:8004**. Talks with `AuthService`, `ChatService` and yourself.
 
-## Getting Started
-
-To get started with this service. Just to the root of project and then comment in [docker-compose.yml](../docker-compose.yml) useless services that you don't want to start. But remember to leave RabbitMQ broker and Redis database. Finnaly run command below. It'll run your services in detached mode (no logs). 
-
-```bash
-docker-compose up -d
-```
-
-Following command should build images and setup Status Service with broker and database.
-
-
 ## Architecure
 
 `Simplified CQRS` with `Event-driven`.
@@ -28,7 +17,7 @@ Following command should build images and setup Status Service with broker and d
 
 - Hanlding user online
 
-- Providing user status, by **rest** and **events** 
+- Providing user status, by **rest** and **events**
 
 ## How does it works?
 
@@ -36,24 +25,14 @@ Starting with the most important feature – Handling user online state. The sys
 
 Why Redis? The reason for choosing Redis is that we have many writes to the database and need an efficient way to store the temporary state.
 
-
 ### Event kinds
 
 - Handled in service range
 
-    - [UserStatusUpdatedEvent](/src/domain/events/user-status-updated.event.ts)
-
+  - [UserStatusUpdatedEvent](/src/domain/events/user-status-updated.event.ts)
 
 - Incoming events from `Auth Service`
 
-    - [UserLoggedInEvent](/src/domain/events/user-logged-in-event.ts)
+  - [UserLoggedInEvent](/src/domain/events/user-logged-in-event.ts)
 
-    - [UserLoggedOutEvent](/src/domain/events/user-logged-out-event.ts)
-
-- Incoming events from `Chat Service`
-
-    - [MessageSentEvent](/src/domain/events/message-send.event.ts)
-
-- Outcoming events for `Chat Serivce`
-
-    - [StatusEvent](/src/domain/events/status.event.ts)
+  - [UserLoggedOutEvent](/src/domain/events/user-logged-out-event.ts)
