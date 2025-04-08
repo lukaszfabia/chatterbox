@@ -28,8 +28,9 @@ docker-compose up -d
 - Simple account managment.
 
 
-
 ## Services
+
+Check services to get know how does it works!
 
 - [`Profile Service`](profile_service)
 
