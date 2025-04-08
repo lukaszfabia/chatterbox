@@ -14,7 +14,6 @@ import { WebSocketService } from '../ws/websocket';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from '../../../docs/swagger';
-import { hostname } from 'os';
 
 const corsConfig = {
     origin: 'http://localhost:3000',

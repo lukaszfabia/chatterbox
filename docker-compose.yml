@@ -1,21 +1,39 @@
 services:
+  frontend:
+    container_name: chatterbox_frontend
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "3000:3000"
+    networks:
+      - chatterbox_net
+    depends_on:
+      - chat_service
+      - profile_service
+      - notification_service
+      - auth_service
+      - status_service
+    restart: unless-stopped
+
   # nginx:
   #   image: nginx:latest
   #   container_name: nginx_proxy
   #   restart: unless-stopped
   #   ports:
-  #     - "80:80"
-  #     - "443:443"
+  #     - "8000:80"
   #   volumes:
-  #     # config files
-  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-  #     - ./nginx/certs:/etc/nginx/certs
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
   #   depends_on:
   #     - chat_service
   #     - profile_service
   #     - notification_service
   #     - auth_service
   #     - status_service
+  #   networks:
+  #     - chatterbox_net
 
   rabbitmq:
     image: rabbitmq:management
