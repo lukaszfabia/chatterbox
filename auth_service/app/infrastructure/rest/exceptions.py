@@ -3,6 +3,18 @@ from fastapi import status
 
 
 # Add custom exceptions..
+
+
+class OAuthFailed(HTTPException):
+    def __init__(
+        self,
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Invalid token or failed to parse token id.",
+        headers=None,
+    ):
+        super().__init__(status_code, detail, headers)
+
+
 class FailedToUpdate(HTTPException):
     def __init__(
         self,

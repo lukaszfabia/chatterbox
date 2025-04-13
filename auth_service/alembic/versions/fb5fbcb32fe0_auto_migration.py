@@ -1,8 +1,8 @@
-"""migrate_user
+"""auto migration
 
-Revision ID: a42573d9b103
-Revises: 
-Create Date: 2025-03-25 15:08:18.778141
+Revision ID: fb5fbcb32fe0
+Revises: 3123c55a47f0
+Create Date: 2025-04-13 15:02:15.898897
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'a42573d9b103'
-down_revision: Union[str, None] = None
+revision: str = 'fb5fbcb32fe0'
+down_revision: Union[str, None] = '3123c55a47f0'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -24,6 +24,8 @@ def upgrade() -> None:
     op.create_table('users',
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('deleted_at', sa.Date(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('username', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('password', sa.String(), nullable=True),

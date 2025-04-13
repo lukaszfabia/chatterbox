@@ -11,6 +11,7 @@ sqlalchemy
 
 requests
 oauthlib
+authlib
 pyOpenSSL
 python-jose
 asyncpg
@@ -20,3 +21,5 @@ pyjwt
 greenlet
 python-dotenv
 requests
+
+itsdangerous

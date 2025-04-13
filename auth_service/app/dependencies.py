@@ -1,11 +1,17 @@
 from fastapi import Depends
-from app.application.commands.command_handlers import (
+
+from app.application.commands.continue_with_command import ContinueWithCommandService
+from app.application.commands.create_user_command_service import (
     CreateUserCommandService,
-    LogoutUserCommandService,
-    UpdateUserCommandService,
+)
+from app.application.commands.delete_user_command_service import (
     DeleteUserCommandService,
 )
-from app.application.queries.query_handlers import AuthUserQueryService
+from app.application.commands.update_user_command_service import (
+    UpdateUserCommandService,
+)
+from app.application.queries.auth_user_query_service import AuthUserQueryService
+from app.application.queries.log_out_user_query import LogoutUserQueryService
 from app.infrastructure.rabbitmq import RabbitMQHandler
 from app.infrastructure.repository.user_repo import UserRepository
 from app.infrastructure.database import get_session
@@ -54,5 +60,14 @@ def get_delete_user_command_service(
 def get_logout_user_command_service(
     user_repo: UserRepository = Depends(get_user_repository),
     rabbit_handler: RabbitMQHandler = Depends(get_rabbitmq),
-) -> LogoutUserCommandService:
-    return LogoutUserCommandService(user_repo=user_repo, rabbit_handler=rabbit_handler)
+) -> LogoutUserQueryService:
+    return LogoutUserQueryService(user_repo=user_repo, rabbit_handler=rabbit_handler)
+
+
+def get_continue_with_command_service(
+    user_repo: UserRepository = Depends(get_user_repository),
+    rabbit_handler: RabbitMQHandler = Depends(get_rabbitmq),
+) -> ContinueWithCommandService:
+    return ContinueWithCommandService(
+        user_repo=user_repo, rabbit_handler=rabbit_handler
+    )
