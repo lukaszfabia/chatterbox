@@ -18,22 +18,22 @@ services:
       - status_service
     restart: unless-stopped
 
-  # nginx:
-  #   image: nginx:latest
-  #   container_name: nginx_proxy
-  #   restart: unless-stopped
-  #   ports:
-  #     - "8000:80"
-  #   volumes:
-  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-  #   depends_on:
-  #     - chat_service
-  #     - profile_service
-  #     - notification_service
-  #     - auth_service
-  #     - status_service
-  #   networks:
-  #     - chatterbox_net
+  nginx:
+    image: nginx:latest
+    container_name: nginx_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - chat_service
+      - profile_service
+      - notification_service
+      - auth_service
+      - status_service
+    networks:
+      - chatterbox_net
 
   rabbitmq:
     image: rabbitmq:management
