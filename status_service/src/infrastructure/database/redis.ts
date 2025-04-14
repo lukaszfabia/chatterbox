@@ -2,6 +2,12 @@ import { RedisClientType, createClient } from 'redis';
 import { IStatusRepository } from '../../domain/repository/status.repository';
 import { UserStatus } from '../../domain/models/status';
 
+/**
+ * Implements IStatusRepository using Redis as the backend for storing and retrieving user statuses.
+ * 
+ * This service connects to Redis, handles the setting and getting of user statuses, and manages 
+ * the connection lifecycle.
+ */
 export class RedisService implements IStatusRepository {
     private redisClient: RedisClientType;
     private isConnected = false;
@@ -11,6 +17,14 @@ export class RedisService implements IStatusRepository {
     constructor() {
         this.initializeConnection();
     }
+
+    /**
+     * Initializes the Redis connection with retry logic.
+     * 
+     * Tries to establish a connection with Redis, retrying a specified number of times before failing.
+     * 
+     * @param retryCount - The number of attempts already made to connect.
+     */
     private async initializeConnection(retryCount = 0): Promise<void> {
         try {
             this.redisClient = this.createClient();
@@ -26,6 +40,11 @@ export class RedisService implements IStatusRepository {
         }
     }
 
+    /**
+     * Creates a Redis client.
+     * 
+     * @returns The created Redis client.
+     */
     private createClient(): RedisClientType {
         const host = process.env.REDIS_HOST ?? 'localhost';
         const port = process.env.REDIS_PORT ?? '6379';
@@ -43,15 +62,15 @@ export class RedisService implements IStatusRepository {
         });
 
         client.on('connect', () => {
-            console.log('Connecting to Redis')
+            console.log('Connecting to Redis');
         });
 
         client.on('ready', () => {
-            console.log('Redis is ready to work')
+            console.log('Redis is ready to work');
         });
 
         client.on('error', (err) => {
-            console.log('error', err)
+            console.log('error', err);
             this.isConnected = false;
         });
 
@@ -62,6 +81,9 @@ export class RedisService implements IStatusRepository {
         return client as RedisClientType;
     }
 
+    /**
+     * Connects to the Redis client.
+     */
     private async connect(): Promise<void> {
         if (!this.redisClient) {
             throw new Error('Redis client not initialized');
@@ -69,12 +91,22 @@ export class RedisService implements IStatusRepository {
         await this.redisClient.connect();
     }
 
+    /**
+     * Checks whether the Redis client is connected.
+     * 
+     * @throws Error if the client is not connected.
+     */
     private checkConnection(): void {
         if (!this.isConnected) {
             throw new Error('Redis client is not connected');
         }
     }
 
+    /**
+     * Sets the status of a user in Redis.
+     * 
+     * @param user - The UserStatus object representing the user's current status.
+     */
     async setUserStatus(user: UserStatus): Promise<void> {
         this.checkConnection();
 
@@ -87,6 +119,12 @@ export class RedisService implements IStatusRepository {
         }
     }
 
+    /**
+     * Retrieves the status of a user from Redis.
+     * 
+     * @param userID - The unique identifier of the user whose status is being retrieved.
+     * @returns A Promise resolving to the UserStatus object of the user, or a default offline status if not found.
+     */
     async getUserStatus(userID: string): Promise<UserStatus> {
         this.checkConnection();
 
@@ -98,10 +136,18 @@ export class RedisService implements IStatusRepository {
         }
     }
 
+    /**
+     * Retrieves all online users' statuses.
+     * 
+     * @returns An empty array, as this feature is not implemented in RedisService.
+     */
     async getOnlineUsers(): Promise<UserStatus[]> {
         return [];
     }
 
+    /**
+     * Closes the Redis connection when the module is destroyed.
+     */
     async onModuleDestroy() {
         if (this.redisClient) {
             await this.redisClient.quit();

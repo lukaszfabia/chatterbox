@@ -4,6 +4,10 @@ import { Event } from "../../domain/events/event";
 import { EventBus } from "./bus";
 import client, { Connection, Channel, ConsumeMessage } from "amqplib";
 
+/**
+ * A service that integrates with RabbitMQ to publish and consume events.
+ * Implements the EventBus interface, enabling message-based communication between components.
+ */
 export class RabbitMQService implements EventBus {
   private connection!: Connection;
   private channel!: Channel;
@@ -13,15 +17,28 @@ export class RabbitMQService implements EventBus {
   private retryDelay: number = 5000;
   private dispatcher: EventDispatcher;
 
+  /**
+   * Constructor to initialize the RabbitMQService instance.
+   */
   constructor() {
     this.dispatcher = new EventDispatcher();
   }
 
+  /**
+   * Registers an event handler for a specific event type.
+   * 
+   * @param event - The name of the event.
+   * @param handler - The handler for the event.
+   */
   public registerHandler<T extends Event>(event: string, handler: EventHandler<T>): void {
-    console.log('Registering ', event)
+    console.log('Registering ', event);
     this.dispatcher.register(event, handler);
   }
 
+  /**
+   * Establishes a connection to the RabbitMQ server.
+   * Retries connection up to a maximum number of attempts if it fails.
+   */
   async connect(): Promise<void> {
     if (this.connected) return;
 
@@ -29,8 +46,8 @@ export class RabbitMQService implements EventBus {
       console.log(`Connecting to RabbitMQ Server...`);
 
       const port = process.env.RABBITMQ_PORT || 5672;
-      const pass = process.env.RABBITMQ_DEFAULT_PASS || "";
-      const user = process.env.RABBITMQ_DEFAULT_USER || "";
+      const pass = process.env.RABBITMQ_DEFAULT_PASS || "lukasz";
+      const user = process.env.RABBITMQ_DEFAULT_USER || "lukasz";
       const host = process.env.RABBITMQ_HOST || "localhost";
 
       const rabbitmqURL = `amqp://${user}:${pass}@${host}:${port}`;
@@ -62,27 +79,28 @@ export class RabbitMQService implements EventBus {
     }
   }
 
+  /**
+   * Schedules the reconnection attempt to RabbitMQ if the connection fails.
+   */
   private scheduleReconnect(): void {
     if (this.retryAttempts >= this.maxRetryAttempts) {
-      console.error(
-        `Max reconnection attempts (${this.maxRetryAttempts}) reached`
-      );
+      console.error(`Max reconnection attempts (${this.maxRetryAttempts}) reached`);
       return;
     }
 
     this.retryAttempts++;
     const delay = this.retryAttempts * this.retryDelay;
 
-    console.log(
-      `Retrying connection in ${delay / 1000} seconds (attempt ${this.retryAttempts
-      }/${this.maxRetryAttempts})`
-    );
+    console.log(`Retrying connection in ${delay / 1000} seconds (attempt ${this.retryAttempts}/${this.maxRetryAttempts})`);
 
     setTimeout(() => {
       this.connect().catch(console.error);
     }, delay);
   }
 
+  /**
+   * Closes the RabbitMQ channel and connection.
+   */
   async close(): Promise<void> {
     try {
       if (this.channel) {
@@ -96,6 +114,13 @@ export class RabbitMQService implements EventBus {
     }
   }
 
+  /**
+   * Publishes an event to a specific RabbitMQ queue.
+   * 
+   * @param queueName - The name of the queue where the event will be published.
+   * @param event - The event to be published.
+   * @returns A Promise that resolves to a boolean indicating whether the event was successfully published.
+   */
   async publish(queueName: string, event: Event): Promise<boolean> {
     if (!this.connected) {
       throw new Error("Not connected to RabbitMQ");
@@ -124,6 +149,12 @@ export class RabbitMQService implements EventBus {
     }
   }
 
+  /**
+   * Consumes events from a specific RabbitMQ queue and processes them using the registered handler.
+   * 
+   * @param queueName - The name of the queue from which to consume events.
+   * @returns A Promise that resolves when the consumer starts processing messages from the queue.
+   */
   async consume<T extends Event>(queueName: string): Promise<void> {
     if (!this.connected) {
       throw new Error("Not connected to RabbitMQ");
