@@ -8,14 +8,20 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
+// Publish publishes an event to the given RabbitMQ queue.
+//
+// It ensures the queue exists (declares it if needed), marshals the event to JSON,
+// and sends it with persistent delivery mode.
+//
+// Returns an error if queue declaration, marshaling, or publishing fails.
 func (r *RabbitMQ) Publish(queueName string, event events.Event) error {
 	_, err := r.Channel.QueueDeclare(
 		queueName,
-		true,  // durable
-		false, // autoDelete
-		false, // exclusive
-		false, // noWait
-		nil,   // args
+		true,
+		false,
+		false,
+		false,
+		nil,
 	)
 	if err != nil {
 		return FailedToDeclareQueue(err)
@@ -29,10 +35,10 @@ func (r *RabbitMQ) Publish(queueName string, event events.Event) error {
 	log.Printf("Publishing new %s -> %s", queueName, event)
 
 	err = r.Channel.Publish(
-		"",
-		queueName,
-		false,
-		false,
+		"",        // exchange
+		queueName, // routing key
+		false,     // mandatory
+		false,     // immediate
 		amqp.Publishing{
 			ContentType:  "application/json",
 			Body:         body,
@@ -41,7 +47,7 @@ func (r *RabbitMQ) Publish(queueName string, event events.Event) error {
 	)
 
 	if err != nil {
-		FailedToPulblish(err)
+		return FailedToPulblish(err)
 	}
 
 	return nil

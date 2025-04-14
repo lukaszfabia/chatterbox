@@ -9,11 +9,16 @@ import (
 	"reflect"
 )
 
+// UserDeletedHandler is responsible for handling the UserDeletedEvent.
+// It processes the event, updates the profile state (marks the user as deleted),
+// and publishes a notification event.
 type UserDeletedHandler struct {
-	aggregate aggregates.ProfileAggregate
-	bus       messaging.EventBus
+	aggregate aggregates.ProfileAggregate // The aggregate responsible for managing profile states.
+	bus       messaging.EventBus          // The event bus used to publish notifications.
 }
 
+// NewUserDeletedEventHandler creates a new instance of UserDeletedHandler.
+// It accepts the aggregate and event bus to wire up the handler.
 func NewUserDeletedEventHandler(aggregate aggregates.ProfileAggregate, bus messaging.EventBus) EventHandler {
 	return &UserDeletedHandler{
 		aggregate: aggregate,
@@ -21,14 +26,18 @@ func NewUserDeletedEventHandler(aggregate aggregates.ProfileAggregate, bus messa
 	}
 }
 
+// Handle processes the incoming UserDeletedEvent.
+// It deserializes the event from the message body, marks the user profile as deleted,
+// and publishes a notification event to the event bus.
 func (h *UserDeletedHandler) Handle(body []byte) error {
 	var event events.UserDeletedEvent
 	if err := json.Unmarshal(body, &event); err != nil {
 		return err
 	}
-	log.Println(event.UserID)
-	err := h.aggregate.MarkAsADeleted(event.UserID)
 
+	log.Println(event.UserID)
+
+	err := h.aggregate.MarkAsADeleted(event.UserID)
 	if err != nil {
 		log.Println(err.Error())
 		return err
@@ -36,9 +45,7 @@ func (h *UserDeletedHandler) Handle(body []byte) error {
 
 	n := events.NewNotifyDeletedEvent(event)
 
-	// publish noti
 	err = h.bus.Publish(reflect.TypeOf(n).Name(), event)
-
 	if err != nil {
 		log.Println(err.Error())
 		return err

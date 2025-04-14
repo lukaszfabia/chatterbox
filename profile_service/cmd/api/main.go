@@ -15,14 +15,23 @@ import (
 	"profile_service/internal/infrastructure/repositories"
 	"profile_service/internal/infrastructure/rest"
 	"profile_service/internal/infrastructure/rest/handlers"
-	"profile_service/pkg"
 	"reflect"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
-func init() {
-	pkg.LoadEnv()
-}
-
+// addEvents initializes and registers all event handlers with the event dispatcher.
+//
+// It binds specific domain event types (UserCreatedEvent, UserDeletedEvent, UserUpdatedEvent)
+// to corresponding handler implementations and registers them in the dispatcher.
+//
+// Parameters:
+//   - aggregate: ProfileAggregate to apply domain logic on events.
+//   - bus: EventBus used to publish further events after handling.
+//
+// Returns:
+//   - dispatcher: the initialized event dispatcher.
+//   - queueNames: a list of event queue names to listen on.
 func addEvents(aggregate *aggregates.ProfileAggregate, bus messaging.EventBus) (*events.Dispatcher, []string) {
 	dispatcher := events.NewDispatcher()
 	handlers := map[string]events.EventHandler{
@@ -48,9 +57,24 @@ func addEvents(aggregate *aggregates.ProfileAggregate, bus messaging.EventBus) (
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
+
+// main is the entry point for the Profile Service.
+//
+// Responsibilities:
+//   - Loads configuration (from env)
+//   - Connects to RabbitMQ
+//   - Instantiates repositories, aggregates, and services
+//   - Registers event handlers
+//   - Starts HTTP server
+//   - Subscribes to message queues to consume domain events
 func main() {
 
-	rabbit, err := rabbitmq.New(config.GetBrokerUrl())
+	conf, err := config.GetBrokerUrl()
+	if err != nil {
+		panic("Can't get config for broker!")
+	}
+
+	rabbit, err := rabbitmq.New(conf)
 	if err != nil {
 		panic("Failed to connect with queue")
 	}

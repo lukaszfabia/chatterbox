@@ -8,22 +8,42 @@ import (
 	"time"
 )
 
+// Profile represents a user's profile, including their personal information, images, and timestamps.
+type Profile struct {
+	ID            string     `bson:"id,omitempty" json:"id"`               // Unique identifier for the profile
+	CreatedAt     time.Time  `bson:"createdAt" json:"createdAt"`           // Time when the profile was created
+	UpdatedAt     time.Time  `bson:"updatedAt" json:"updatedAt"`           // Time when the profile was last updated
+	DeletedAt     *time.Time `bson:"deletedAt,omitempty" json:"deletedAt"` // Time when the profile was marked as deleted
+	FirstName     *string    `bson:"firstName" json:"firstName"`           // User's first name
+	LastName      *string    `bson:"lastName" json:"lastName"`             // User's last name
+	Username      string     `bson:"username" json:"username"`             // User's username (unique)
+	Email         string     `bson:"email" json:"email"`                   // User's email (unique)
+	Bio           string     `bson:"bio" json:"bio"`                       // User's bio
+	AvatarURL     *string    `bson:"avatarURL" json:"avatarURL"`           // URL to the user's avatar image
+	BackgroundURL *string    `bson:"backgroundURL" json:"backgroundURL"`   // URL to the user's background image
+}
+
+// isValidBio checks if the provided bio is valid:
+// - It must be between 1 and 512 characters long.
+// - It must be different from the old bio.
 func isValidBio(bio, old string) bool {
 	bioLen := len(bio)
-
 	return bioLen > 0 && bioLen <= 512 && bio != old
 }
 
+// canBeSet checks if the new value for a field is non-empty and different from the old value.
 func canBeSet(new *string, old string) bool {
 	if new == nil {
 		return false
 	}
-
 	return len(*new) > 0 && *new != old
 }
 
+// tryToSaveImg tries to save the new avatar and background images.
+// It updates the profile's AvatarURL and BackgroundURL if new images are provided.
 func (p *Profile) tryToSaveImg(new commands.UpdateProfileCommand) error {
 	log.Println("Saving image")
+
 	if new.AvatarFile != nil {
 		aUrl, err := pkg.SaveImage[*pkg.Avatar](new.AvatarFile, p.AvatarURL)
 		if err != nil {
@@ -32,7 +52,7 @@ func (p *Profile) tryToSaveImg(new commands.UpdateProfileCommand) error {
 		}
 		p.AvatarURL = &aUrl
 	} else {
-		log.Println("no file provided")
+		log.Println("No Avatar file provided")
 	}
 
 	if new.BackgroundFile != nil {
@@ -47,20 +67,8 @@ func (p *Profile) tryToSaveImg(new commands.UpdateProfileCommand) error {
 	return nil
 }
 
-type Profile struct {
-	ID            string     `bson:"id,omitempty" json:"id"`
-	CreatedAt     time.Time  `bson:"createdAt" json:"createdAt"`
-	UpdatedAt     time.Time  `bson:"updatedAt" json:"updatedAt"`
-	DeletedAt     *time.Time `bson:"deletedAt,omitempty" json:"deletedAt"`
-	FirstName     *string    `bson:"firstName" json:"firstName"`
-	LastName      *string    `bson:"lastName" json:"lastName"`
-	Username      string     `bson:"username" json:"username"`
-	Email         string     `bson:"email" json:"email"`
-	Bio           string     `bson:"bio" json:"bio"`
-	AvatarURL     *string    `bson:"avatarURL" json:"avatarURL"`
-	BackgroundURL *string    `bson:"backgroundURL" json:"backgroundURL"`
-}
-
+// NewProfile creates a new user profile with the given email, username, and unique ID.
+// Sets initial values for bio, creation date, and update date.
 func NewProfile(email, username, uid string) (*Profile, error) {
 	return &Profile{
 		ID:        uid,
@@ -72,6 +80,8 @@ func NewProfile(email, username, uid string) (*Profile, error) {
 	}, nil
 }
 
+// UpdateProfile updates the user's profile information based on the provided UpdateProfileCommand.
+// This includes the bio, first name, last name, and images.
 func (p *Profile) UpdateProfile(new commands.UpdateProfileCommand) {
 	log.Println("Changing data")
 	p.UpdatedAt = time.Now()
@@ -93,6 +103,8 @@ func (p *Profile) UpdateProfile(new commands.UpdateProfileCommand) {
 	}
 }
 
+// UpdateAuthInfo updates the user's email and username based on the provided UserUpdatedEvent.
+// This is usually triggered by an update in authentication information.
 func (p *Profile) UpdateAuthInfo(new events.UserUpdatedEvent) {
 	p.UpdatedAt = time.Now()
 
@@ -105,8 +117,8 @@ func (p *Profile) UpdateAuthInfo(new events.UserUpdatedEvent) {
 	}
 }
 
+// MarkDelete marks the profile as deleted by setting the DeletedAt field to the current time.
 func (p *Profile) MarkDelete() {
 	t := time.Now()
-
 	p.DeletedAt = &t
 }

@@ -9,10 +9,15 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
+// Database represents the MongoDB database connection and provides methods for interacting with the database.
 type Database struct {
+	// db is the MongoDB collection for the given database.
 	db *mongo.Collection
 }
 
+// Connect establishes a connection to MongoDB using the database and collection
+// names specified in the environment variables. It returns an instance of Database
+// and an error, if any.
 func Connect() (*Database, error) {
 	dbs, err := newDBConnection(os.Getenv("DB_NAME"), os.Getenv("MONGO_COLLECTION"))
 	if err != nil {
@@ -22,6 +27,8 @@ func Connect() (*Database, error) {
 	return dbs, nil
 }
 
+// Close terminates the connection to MongoDB and logs the result.
+// Returns an error if the connection cannot be closed properly.
 func (d *Database) Close() error {
 	log.Println("Closing connections...")
 
@@ -34,12 +41,17 @@ func (d *Database) Close() error {
 	return nil
 }
 
-func (d *Database) Sync() error {
-	return nil
-}
-
+// newDBConnection creates a new MongoDB connection to the specified database and collection.
+// It pings the database to ensure the connection is active before returning the Database instance.
 func newDBConnection(dbName, collection string) (*Database, error) {
-	client, err := mongo.Connect(config.GetNoSqlConfig())
+	conf, err := config.GetNoSqlConfig()
+
+	if err != nil {
+		log.Println("Failed to get config for nosql database")
+		return nil, err
+	}
+
+	client, err := mongo.Connect(conf)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -59,6 +71,7 @@ func newDBConnection(dbName, collection string) (*Database, error) {
 	}, nil
 }
 
+// GetNoSql returns the MongoDB collection associated with the current database instance.
 func (d *Database) GetNoSql() *mongo.Collection {
 	return d.db
 }

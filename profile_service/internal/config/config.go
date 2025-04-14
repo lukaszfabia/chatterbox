@@ -1,64 +1,47 @@
 package config
 
 import (
+	"errors"
 	"fmt"
-	"log"
 	"os"
 
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
-func GetGormConfig() *gorm.Config {
-	return &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
-	}
-}
-
-func GetSqlUrl(db string) string {
-
-	user := os.Getenv("POSTGRES_USER")
-	pass := os.Getenv("POSTGRES_PASSWORD")
-	port := os.Getenv("POSTGRES_PORT")
-	host := os.Getenv("POSTGRES_HOST")
-
-	// connection string
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, user, pass, db, port)
-
-	return dsn
-}
-
-// Please load env vars before you call it!
-//
+// GetBrokerUrl constructs the connection URL for RabbitMQ
 // Returns:
-//   - connection string to rabbitmq
-func GetBrokerUrl() string {
+//   - connection string to RabbitMQ
+//   - error if required environment variables are missing or invalid
+func GetBrokerUrl() (string, error) {
 	user := os.Getenv("RABBITMQ_DEFAULT_USER")
 	pass := os.Getenv("RABBITMQ_DEFAULT_PASS")
 	host := os.Getenv("RABBITMQ_HOST")
 	port := os.Getenv("RABBITMQ_PORT")
 
-	// connection string
-	amqpURL := fmt.Sprintf(
-		"amqp://%s:%s@%s:%s/",
-		user, pass, host, port,
-	)
+	if user == "" || pass == "" || host == "" || port == "" {
+		return "", errors.New("missing required RabbitMQ environment variables: RABBITMQ_DEFAULT_USER, RABBITMQ_DEFAULT_PASS, RABBITMQ_HOST, RABBITMQ_PORT")
+	}
 
-	return amqpURL
+	amqpURL := fmt.Sprintf("amqp://%s:%s@%s:%s/", user, pass, host, port)
+
+	return amqpURL, nil
 }
 
-func GetNoSqlConfig() *options.ClientOptions {
+// GetNoSqlConfig returns the MongoDB connection configuration
+// Returns:
+//   - MongoDB connection options
+//   - error if any required environment variables are missing or invalid
+func GetNoSqlConfig() (*options.ClientOptions, error) {
 	host := os.Getenv("MONGO_HOST")
 	port := os.Getenv("MONGO_PORT")
 	user := os.Getenv("MONGO_USER")
 	pass := os.Getenv("MONGO_PASS")
 
 	if host == "" || port == "" || user == "" || pass == "" {
-		log.Fatal("MongoDB credentials are missing. Make sure MONGO_HOST, MONGO_PORT, MONGO_USER, and MONGO_PASS are set.")
+		return nil, errors.New("missing required MongoDB environment variables: MONGO_HOST, MONGO_PORT, MONGO_USER, MONGO_PASS")
 	}
 
 	uri := fmt.Sprintf("mongodb://%s:%s@%s:%s", user, pass, host, port)
 
-	return options.Client().ApplyURI(uri)
+	return options.Client().ApplyURI(uri), nil
 }

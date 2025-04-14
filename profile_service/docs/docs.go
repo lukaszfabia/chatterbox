@@ -191,36 +191,47 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "avatarURL": {
+                    "description": "URL to the user's avatar image",
                     "type": "string"
                 },
                 "backgroundURL": {
+                    "description": "URL to the user's background image",
                     "type": "string"
                 },
                 "bio": {
+                    "description": "User's bio",
                     "type": "string"
                 },
                 "createdAt": {
+                    "description": "Time when the profile was created",
                     "type": "string"
                 },
                 "deletedAt": {
+                    "description": "Time when the profile was marked as deleted",
                     "type": "string"
                 },
                 "email": {
+                    "description": "User's email (unique)",
                     "type": "string"
                 },
                 "firstName": {
+                    "description": "User's first name",
                     "type": "string"
                 },
                 "id": {
+                    "description": "Unique identifier for the profile",
                     "type": "string"
                 },
                 "lastName": {
+                    "description": "User's last name",
                     "type": "string"
                 },
                 "updatedAt": {
+                    "description": "Time when the profile was last updated",
                     "type": "string"
                 },
                 "username": {
+                    "description": "User's username (unique)",
                     "type": "string"
                 }
             }
@@ -238,7 +249,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8000",
+	Host:             "localhost:8002",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Profile Service API",

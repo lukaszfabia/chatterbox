@@ -60,7 +60,7 @@ func (h *ProfileHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, ok := r.Context().Value("user").(*models.Profile)
+	user, ok := r.Context().Value(_user).(*models.Profile)
 	if !ok || user == nil {
 		rest.BadRequest(w)
 		return
@@ -105,8 +105,6 @@ func (h *ProfileHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 		rest.BadRequest(w)
 		return
 	}
-
-	log.Println(id)
 
 	body.UserID = id
 
@@ -157,7 +155,6 @@ func (h *ProfileHandler) GetProfiles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Construct query with pagination
 	body := &q.GetProfilesQuery{
 		Page:  pageInt,
 		Limit: limitInt,
@@ -184,7 +181,7 @@ func (h *ProfileHandler) GetProfiles(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} nil "Unauthorized"
 // @Router /api/v1/auth/me [get]
 func (h *ProfileHandler) GetAuthUserProfile(w http.ResponseWriter, r *http.Request) {
-	user, ok := r.Context().Value("user").(*models.Profile)
+	user, ok := r.Context().Value(_user).(*models.Profile)
 	if !ok || user == nil {
 		rest.Unauthorized(w)
 		return

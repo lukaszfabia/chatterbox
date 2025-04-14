@@ -6,7 +6,22 @@
 
 # Profile Service API - Chatterbox
 
-Profile Service stores user basic information. Talks with `Auth Service`, `Notification Service`, `Chat Service`.
+Profile Service stores user basic information. Talks with `Auth Service`, `Notification Service`, `Chat Service`. Uses port **:8002**
+
+## Documentation
+Run command below to start docs server. 
+
+```bash
+godoc -http=:6060
+```
+
+Change `PORT` on real port that you want to use. For example we use :6060 port to display docs.
+
+> [!TIP]
+> Press <kbd>Ctrl</kbd> + <kbd>F</kbd> + <kbd>X</kbd> and search *profile_service* to see documentation.
+
+> [!EXAMPLE]
+> http://localhost:6060/pkg/profile_service/internal/domain/models/
 
 ## Architecure
 
