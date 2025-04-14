@@ -73,7 +73,7 @@ func (h *NotificationHandler) GetNotifications(w http.ResponseWriter, r *http.Re
 		}
 	}
 
-	userID, ok := r.Context().Value("userID").(string)
+	userID, ok := r.Context().Value(_userID).(string)
 	if !ok {
 		log.Println("Unauthorized access: userID missing from context")
 		rest.Unauthorized(w)

@@ -141,4 +141,5 @@ class JWTService:
         Raises:
             HTTPException: 401 if token is invalid/expired
         """
+        print("[DEBUG] Token:", token)
         return JWTService.__verify_token(token)

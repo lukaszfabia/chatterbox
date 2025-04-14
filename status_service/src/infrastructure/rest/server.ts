@@ -49,7 +49,7 @@ export default async function startServer() {
 
 
 
-    const updateStatusCommandHandler = new UpdateStatusCommandHandler(rabbitMQService)
+    const updateStatusCommandHandler = new UpdateStatusCommandHandler(repo)
 
     const websocketService = new WebSocketService(io, updateStatusCommandHandler);
     websocketService.init();

@@ -70,7 +70,7 @@ export default function Profile() {
     >
       <div className="relative">
         <Cover url={user?.backgroundURL} isLoading={isLoading || !user} />
-        <UserAvatar user={user} isOnline={isMe ? isConnected : status} isLoading={isLoading || !user} />
+        <UserAvatar user={user} isOnline={status} isLoading={isLoading || !user} />
       </div>
 
       <div className="px-4 pt-16 pb-8">

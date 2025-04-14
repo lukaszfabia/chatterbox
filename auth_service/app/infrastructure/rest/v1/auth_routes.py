@@ -1,5 +1,4 @@
-import os
-from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Body, Depends, Request, status
 from app.application.commands.continue_with_command import ContinueWithCommandService
 from app.application.commands.create_user_command_service import (
     CreateUserCommandService,
@@ -18,7 +17,7 @@ from app.dependencies import (
     get_auth_user_query_service,
     get_update_user_command_service,
     get_delete_user_command_service,
-    get_logout_user_command_service,
+    get_logout_user_query_service,
 )
 from app.domain.commands.continue_with_command import ContinueWithCommand
 from app.domain.queries.auth_user_query import AuthUserQuery
@@ -47,7 +46,7 @@ auth_router = APIRouter(prefix="/v1/auth")
     summary="Logout the current user",
 )
 async def logout(
-    service: LogoutUserQueryService = Depends(get_logout_user_command_service),
+    service: LogoutUserQueryService = Depends(get_logout_user_query_service),
     token: str = Depends(oauth2_scheme),
 ):
     """
@@ -56,10 +55,11 @@ async def logout(
     - **token**: The OAuth2 token that must be passed as a Bearer token.
     """
     try:
-        user_id = await service.get_curr_user_id(token)
+        user_id = service.get_curr_user_id(token)
         query = LogoutUserQuery(userID=user_id)
         await service.handle(q=query)
-    except Exception:
+    except Exception as e:
+        print(e)
         raise FailedToUpdate()
 
 

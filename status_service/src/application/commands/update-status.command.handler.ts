@@ -1,6 +1,6 @@
 import { UpdateStatusCommand } from "../../domain/command/update-status.command";
-import { UserStatusUpdatedEvent } from "../../domain/events/user-status-updated.event";
-import { EventBus } from "../../infrastructure/rabbitmq/bus";
+import { UserStatus } from "../../domain/models/status";
+import { IStatusRepository } from "../../domain/repository/status.repository";
 import { CommandHandler } from "./command.handler";
 
 /**
@@ -12,24 +12,19 @@ export class UpdateStatusCommandHandler implements CommandHandler<UpdateStatusCo
     /**
      * Constructs a new instance of UpdateStatusCommandHandler.
      * 
-     * @param rabbitmq - The EventBus used to publish events. 
+     * @param repo - The status repository used to retrieve the user's status.
      */
-    constructor(private readonly rabbitmq: EventBus) { }
+    constructor(private readonly repo: IStatusRepository) { }
 
     /**
      * Executes the given UpdateStatusCommand.
      * It creates a UserStatusUpdatedEvent and publishes it to the EventBus.
      * 
      * @param command - The UpdateStatusCommand to be executed, containing userID and status information.
-     * @returns A promise that resolves to a boolean indicating the success of event publishing.
      */
     async execute(command: UpdateStatusCommand): Promise<boolean> {
-        console.log('Handling UpdateStatusCommand...');
+        console.log('User with', command.userID, 'goes into ', command.isOnline, 'mode');
 
-        const event = new UserStatusUpdatedEvent(command.userID, command.isOnline);
-
-        const res = await this.rabbitmq.publish(UserStatusUpdatedEvent.name, event);
-
-        return res;
+        return await this.repo.setUserStatus(new UserStatus(command.userID, command.isOnline))
     }
 }

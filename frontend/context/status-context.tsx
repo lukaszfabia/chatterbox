@@ -43,6 +43,19 @@ export function StatusProvider({ children }: { children: React.ReactNode }) {
         socket.on("connect", () => {
             console.log("[socket] Connected:", socket.id);
             setIsConnected(true);
+
+            if (userID) {
+                socket.emit("register", userID);
+                console.log("[socket] Emitted register:", userID);
+            }
+
+            if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
+            pingIntervalRef.current = setInterval(() => {
+                if (userID) {
+                    socket.emit("ping", { userID });
+                    console.log("[socket] Emitted ping:", userID);
+                }
+            }, 30_000);
         });
 
         socket.on("disconnect", () => {

@@ -22,12 +22,6 @@ import (
 //
 // Returns:
 //   - A pointer to a configured mux.Router that maps the API paths to the appropriate handler functions.
-//
-// Example usage:
-//
-//	router := handlers.NewRouter(commandService, queryService)
-//	http.Handle("/", router)
-//	log.Fatal(http.ListenAndServe(":8080", nil))
 func NewRouter(commandService commands.ProfileCommandService, queryService queries.ProfileQueryService) *mux.Router {
 	profileHandler := NewProfileHandler(commandService, queryService)
 

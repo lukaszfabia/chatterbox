@@ -11,7 +11,7 @@ export interface IStatusRepository {
      * 
      * @param user - The UserStatus object representing the user's current status.
      */
-    setUserStatus(user: UserStatus): Promise<void>;
+    setUserStatus(user: UserStatus): Promise<boolean>;
 
     /**
      * Retrieves the status of a specific user.

@@ -57,7 +57,7 @@ def get_delete_user_command_service(
     return DeleteUserCommandService(user_repo=user_repo, rabbit_handler=rabbit_handler)
 
 
-def get_logout_user_command_service(
+def get_logout_user_query_service(
     user_repo: UserRepository = Depends(get_user_repository),
     rabbit_handler: RabbitMQHandler = Depends(get_rabbitmq),
 ) -> LogoutUserQueryService:

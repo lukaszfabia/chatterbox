@@ -107,7 +107,7 @@ export class RedisService implements IStatusRepository {
      * 
      * @param user - The UserStatus object representing the user's current status.
      */
-    async setUserStatus(user: UserStatus): Promise<void> {
+    async setUserStatus(user: UserStatus): Promise<boolean> {
         this.checkConnection();
 
         try {
@@ -115,8 +115,10 @@ export class RedisService implements IStatusRepository {
                 EX: 3600,
             });
         } catch (error) {
-            throw error;
+            return false;
         }
+
+        return false;
     }
 
     /**
@@ -125,14 +127,14 @@ export class RedisService implements IStatusRepository {
      * @param userID - The unique identifier of the user whose status is being retrieved.
      * @returns A Promise resolving to the UserStatus object of the user, or a default offline status if not found.
      */
-    async getUserStatus(userID: string): Promise<UserStatus> {
+    async getUserStatus(userID: string): Promise<UserStatus | null> {
         this.checkConnection();
 
         try {
             const userStatus = await this.redisClient.get(`user:${userID}:status`);
             return userStatus ? JSON.parse(userStatus) : new UserStatus(userID, false);
         } catch (error) {
-            throw error;
+            return null;
         }
     }
 

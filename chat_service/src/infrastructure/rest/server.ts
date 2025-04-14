@@ -6,18 +6,20 @@ import { RabbitMQService } from '../rabbitmq/rabbitmq';
 import { WebSocketService } from '../ws/websocket';
 import { jwtMiddleware } from '../jwt/jwt.middleware';
 import { CreateMessageCommandHandler } from '../../application/commands/create-message.command.handler';
-import { CreateMessageController } from '../../interfaces/create-message.command.controller';
-import { CreateChatController } from '../../interfaces/create-new-chat.command.controller';
 import { CreateNewChatCommandHandler } from '../../application/commands/create-new-chat.command.handler';
-import { GetConversationsController } from '../../interfaces/get-conversations.query.controller';
 import { GetConversationsQueryHandler } from '../../application/queries/get-conversations.query.handler';
 import { MemberUpdatedInfoEvent } from '../../domain/events/member-updated-info.event';
 import cors from 'cors';
-import { MessageCreatedEvent } from '../../domain/events/message-sent.event';
+import { MessageCreatedEvent } from '../../domain/events/message-created.event';
 import { MemberUpdatedInfoEventHandler } from '../../application/events/member-updated-info.event.handler';
 import { MessageCreatedEventHandler } from '../../application/events/message-created.event.handler';
-import { GetMessagesController } from '../../interfaces/get-messages.controller';
 import { GetMessagesQueryHandler } from '../../application/queries/get-messages.query.handler';
+import { CreateMessageController } from './controllers/create-message.command.controller';
+import { CreateChatController } from './controllers/create-new-chat.command.controller';
+import { GetConversationsController } from './controllers/get-conversations.query.controller';
+import { GetMessagesController } from './controllers/get-messages.controller';
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from '../../../docs/swagger';
 
 
 const corsConfig = {
@@ -66,6 +68,8 @@ export default async function startServer() {
         rabbitMQService.consume<MemberUpdatedInfoEvent>(MemberUpdatedInfoEvent.name),
         rabbitMQService.consume<MessageCreatedEvent>(MessageCreatedEvent.name)
     ]);
+
+    app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
     app.use('/api/v1/chat', jwtMiddleware);
 

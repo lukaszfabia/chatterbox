@@ -97,7 +97,7 @@ function BurgerMenu({ setIsOpen, isOpen }: { setIsOpen: (isOpen: boolean) => voi
 
 
 export default function Navbar() {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
 
     return (
         <header className="p-5 backdrop-blur-2xl min-h-[70px] fixed w-full left-0 top-0 z-50">

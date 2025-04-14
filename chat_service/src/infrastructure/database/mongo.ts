@@ -5,6 +5,7 @@ import { IMessage } from "../../domain/models/message.model";
 import { IChatRepository } from "../../domain/repository/chat.repository";
 import { Collection, MongoClient, ObjectId } from "mongodb";
 
+
 export class MongoService implements IChatRepository {
   private readonly MESSAGE_COLLECTION = "messages";
   private readonly CONVERSATION_COLLECTION = "conversations";
@@ -12,6 +13,10 @@ export class MongoService implements IChatRepository {
   private messages: Collection<IMessage>;
   private conversations: Collection<IConversation>;
 
+  /**
+   * Creates a new instance of MongoService.
+   * @param uri Optional custom MongoDB URI. Defaults to env-based connection string.
+   */
   constructor(
     private readonly uri: string = `mongodb://${encodeURIComponent(
       process.env.MONGO_USER || ""
@@ -21,26 +26,21 @@ export class MongoService implements IChatRepository {
     if (!this.uri) throw new Error("MongoDB URI is required");
   }
 
+  /**
+   * Connects to MongoDB and initializes collections and indexes.
+   */
   async connect(): Promise<void> {
     try {
       this.client = new MongoClient(this.uri);
-
       await this.client.connect();
-
-      console.log('Connected to MongoDB')
+      console.log('Connected to MongoDB');
 
       const dbName = process.env.MONGO_DB_NAME;
-
-      if (!dbName) {
-        throw Error("Please provide MONGO_DB_NAME");
-      }
+      if (!dbName) throw Error("Please provide MONGO_DB_NAME");
 
       const db = this.client.db(dbName);
-
       this.messages = db.collection<IMessage>(this.MESSAGE_COLLECTION);
-      this.conversations = db.collection<IConversation>(
-        this.CONVERSATION_COLLECTION
-      );
+      this.conversations = db.collection<IConversation>(this.CONVERSATION_COLLECTION);
 
       await this.createIndexes();
     } catch (error) {
@@ -48,11 +48,17 @@ export class MongoService implements IChatRepository {
     }
   }
 
+  /**
+   * Creates necessary indexes for optimized queries.
+   */
   private async createIndexes(): Promise<void> {
-    await this.conversations.createIndex({ participants: 1 });
-    await this.messages.createIndex({ conversationId: 1, timestamp: -1 });
+    await this.conversations.createIndex({ "members.userID": 1 });
+    await this.messages.createIndex({ chatID: 1, sentAt: -1 });
   }
 
+  /**
+   * Closes the MongoDB connection.
+   */
   async close(): Promise<void> {
     try {
       await this.client?.close();
@@ -63,11 +69,23 @@ export class MongoService implements IChatRepository {
     }
   }
 
+  /**
+   * Fetches a conversation by its ID.
+   * @param chatID ID of the conversation.
+   * @returns A ConversationDTO or null if not found.
+   */
   async getConversationById(chatID: string): Promise<ConversationDTO | null> {
     const chat = await this.conversations.findOne({ _id: new ObjectId(chatID) });
     return chat ? ConversationDTO.fromMongoDocument(chat) : null;
   }
 
+  /**
+   * Fetches paginated conversations for a given member.
+   * @param memberID ID of the user.
+   * @param page Page number (default 1).
+   * @param limit Number of items per page (default 10).
+   * @returns Array of ConversationDTOs.
+   */
   async getConversationForMember(
     memberID: string,
     page = 1,
@@ -82,6 +100,15 @@ export class MongoService implements IChatRepository {
     return chats.map(ConversationDTO.fromMongoDocument);
   }
 
+  /**
+   * Appends a new message to a conversation and updates the last message info.
+   * @param receiverID ID of the receiver.
+   * @param senderID ID of the sender.
+   * @param content Message content.
+   * @param chatID ID of the conversation.
+   * @param sentAt Timestamp of when the message was sent.
+   * @returns Updated ConversationDTO or null if failed.
+   */
   async appendMessage(
     receiverID: string,
     senderID: string,
@@ -90,63 +117,59 @@ export class MongoService implements IChatRepository {
     sentAt: number
   ): Promise<ConversationDTO | null> {
     const message: IMessage = {
-      senderID: senderID,
-      content: content,
-      sentAt: sentAt,
-      chatID: chatID,
+      senderID,
+      content,
+      sentAt,
+      chatID,
       status: "sent",
-      receiverID: receiverID,
+      receiverID,
     };
 
     const added = await this.messages.insertOne(message);
-
-    if (!added.insertedId) {
-      console.log("Failed to append message");
-      return null;
-    }
-
-    const filter = { _id: new ObjectId(chatID) };
+    if (!added.insertedId) return null;
 
     const updatedConversation = await this.conversations.findOneAndUpdate(
-      filter,
+      { _id: new ObjectId(chatID) },
       {
         $set: {
-          lastMessage: {
-            ...message,
-            _id: added.insertedId,
-          },
+          lastMessage: { ...message, _id: added.insertedId },
           updatedAt: new Date(),
         },
       },
       { returnDocument: "after" }
     );
 
-    if (!updatedConversation) {
-      console.log('No last message')
-      return null;
-    }
-
-    return ConversationDTO.fromMongoDocument(updatedConversation);
+    return updatedConversation ? ConversationDTO.fromMongoDocument(updatedConversation) : null;
   }
 
+  /**
+   * Retrieves messages for a given chat.
+   * @param chatID ID of the conversation.
+   * @param limit Maximum number of messages to retrieve.
+   * @returns Array of MessageDTOs.
+   */
   async getMessages(chatID: string, limit: number): Promise<MessageDTO[]> {
-    const messages = await this.messages.find({ chatID: chatID }).sort({ sentAt: 1 }).limit(limit).toArray();
-
-    if (!messages || messages.length === 0) return [];
-
-    const res = messages.map((message) => MessageDTO.fromMongoDocument(message))
-
-    return res
+    const messages = await this.messages.find({ chatID }).sort({ sentAt: 1 }).limit(limit).toArray();
+    return messages.map((message) => MessageDTO.fromMongoDocument(message));
   }
 
-
+  /**
+   * Deletes a conversation by its ID.
+   * @param chatID ID of the conversation.
+   * @returns Deleted ConversationDTO or null.
+   */
   async deleteConversation(chatID: string): Promise<ConversationDTO | null> {
     const deleted = await this.conversations.findOneAndDelete({ _id: new ObjectId(chatID) });
     return deleted ? ConversationDTO.fromMongoDocument(deleted) : null;
   }
 
+  /**
+   * Creates a new conversation with specified members.
+   * If a conversation with the same members exists, it is returned instead.
+   * @param members Array of users participating in the conversation.
+   * @returns Created or existing ConversationDTO.
+   */
   async createConversation(members: User[]): Promise<ConversationDTO | null> {
-    console.log('Trying to create new conversation')
     const memberIDs = members.map((m) => m.userID).sort();
 
     const existingConversation = await this.conversations.findOne({
@@ -164,17 +187,15 @@ export class MongoService implements IChatRepository {
     });
 
     if (existingConversation) {
-      console.log('Conversation already exists');
       return ConversationDTO.fromMongoDocument(existingConversation);
     }
 
     const newConversation: IConversation = {
       updatedAt: new Date(),
-      members: members,
+      members,
     };
 
     const added = await this.conversations.insertOne(newConversation);
-
     if (added.insertedId) {
       newConversation._id = added.insertedId;
       return ConversationDTO.fromMongoDocument(newConversation);
@@ -183,7 +204,13 @@ export class MongoService implements IChatRepository {
     return null;
   }
 
-
+  /**
+   * Updates a member’s avatar and/or username in all conversations.
+   * @param userID ID of the user to update.
+   * @param avatarURL Optional new avatar URL.
+   * @param username Optional new username.
+   * @returns Number of modified conversations.
+   */
   async updateMember(
     userID: string,
     avatarURL?: string | null,
@@ -192,11 +219,11 @@ export class MongoService implements IChatRepository {
     const filter = { "members.userID": userID };
     const update = {};
 
-    if (avatarURL !== undefined || avatarURL !== null) {
+    if (avatarURL !== null) {
       update["members.$[elem].avatarURL"] = avatarURL;
     }
 
-    if (username !== undefined || username !== null) {
+    if (username !== null) {
       update["members.$[elem].username"] = username;
     }
 
@@ -206,6 +233,6 @@ export class MongoService implements IChatRepository {
       { arrayFilters: [{ "elem.userID": userID }] }
     );
 
-    return result.modifiedCount
+    return result.modifiedCount;
   }
 }

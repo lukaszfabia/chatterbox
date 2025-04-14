@@ -4,6 +4,12 @@ import { Event } from "../../domain/events/event";
 import client, { Connection, Channel, ConsumeMessage } from "amqplib";
 import { EventDispatcher } from "../../application/events/dispatcher";
 
+/**
+ * Implements the `EventBus` interface to interact with RabbitMQ as a message bus.
+ * Provides methods for publishing and consuming events.
+ *
+ * @class RabbitMQService
+ */
 export class RabbitMQService implements EventBus {
     private connection!: Connection;
     private channel!: Channel;
@@ -17,11 +23,25 @@ export class RabbitMQService implements EventBus {
         this.dispatcher = new EventDispatcher();
     }
 
+    /**
+     * Registers an event handler for a specific event type.
+     * 
+     * @param event - The name of the event to register the handler for.
+     * @param handler - The handler to be invoked when the event is consumed.
+     * 
+     * @template T - The type of the event.
+     */
     public registerHandler<T extends Event>(event: string, handler: EventHandler<T>): void {
-        console.log('Registering ', event)
+        console.log('Registering ', event);
         this.dispatcher.register(event, handler);
     }
 
+    /**
+     * Establishes a connection to the RabbitMQ server.
+     * 
+     * Tries to connect to RabbitMQ and sets up the channel. In case of failure, 
+     * it retries to connect based on a retry mechanism.
+     */
     async connect(): Promise<void> {
         if (this.connected) return;
 
@@ -62,6 +82,10 @@ export class RabbitMQService implements EventBus {
         }
     }
 
+    /**
+     * Schedules a reconnection to RabbitMQ in case the connection is lost.
+     * The reconnection is attempted with a delay and a maximum number of attempts.
+     */
     private scheduleReconnect(): void {
         if (this.retryAttempts >= this.maxRetryAttempts) {
             console.error(`Max reconnection attempts (${this.maxRetryAttempts}) reached`);
@@ -78,19 +102,33 @@ export class RabbitMQService implements EventBus {
         }, delay);
     }
 
+    /**
+     * Closes the connection and the channel to RabbitMQ.
+     * 
+     * This method attempts to gracefully close the channel and connection.
+     * If there is an error during the process, it will throw an error.
+     */
     async close(): Promise<void> {
         try {
             if (this.channel) {
                 await this.channel.close();
                 console.log("RabbitMQ channel closed");
             }
-            this.connected = false
+            this.connected = false;
         } catch (error) {
             console.error("Error closing RabbitMQ connection:", error);
             throw error;
         }
     }
 
+    /**
+     * Publishes an event to a specified queue in RabbitMQ.
+     * 
+     * @param queueName - The name of the queue to which the event will be published.
+     * @param event - The event to be published.
+     * @returns A promise that resolves to `true` if the event is successfully published, 
+     *          and `false` otherwise.
+     */
     async publish(queueName: string, event: Event): Promise<boolean> {
         if (!this.connected) {
             throw new Error("Not connected to RabbitMQ");
@@ -121,6 +159,12 @@ export class RabbitMQService implements EventBus {
         }
     }
 
+    /**
+     * Consumes events from a specified queue and processes them using registered handlers.
+     * 
+     * @param queueName - The name of the queue from which events will be consumed.
+     * @template T - The type of the event.
+     */
     async consume<T extends Event>(queueName: string): Promise<void> {
         if (!this.connected) {
             throw new Error("Not connected to RabbitMQ");

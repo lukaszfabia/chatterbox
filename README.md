@@ -10,6 +10,9 @@ Before we start copy `.env.sample` in the root of the project and fill blank key
 cp .env.sample .env
 ```
 
+> [!TIP]
+> To generate .env's just use `init.sh`!
+
 Just make sure you have installed `Docker`, `docker-compose`.
 
 ```bash

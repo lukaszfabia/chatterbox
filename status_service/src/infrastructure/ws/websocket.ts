@@ -53,6 +53,13 @@ export class WebSocketService {
      * @param userID - The ID of the user.
      */
     private async registerUser(client: Socket, userID: string) {
+
+        const existing = this.clients.get(userID);
+        if (existing) {
+            existing.socket.disconnect();
+        }
+
+
         this.clients.set(userID, {
             socket: client,
             lastPing: Date.now(),
