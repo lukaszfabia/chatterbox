@@ -10,6 +10,10 @@ import (
 	"strings"
 )
 
+type key string
+
+const _userID key = "userID"
+
 // IsAuth is a middleware that checks if the incoming request contains a valid JWT token
 // in the Authorization header. If valid, it extracts the user ID from the token and
 // passes it to the next handler in the chain. If the token is missing or invalid,
@@ -39,7 +43,7 @@ func (h *NotificationHandler) IsAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "userID", id)
+		ctx := context.WithValue(r.Context(), _userID, id)
 		r = r.WithContext(ctx)
 
 		log.Printf("Authorization successful for user ID: %v\n", id)
