@@ -9,23 +9,24 @@ import (
 	"notification_serivce/internal/config"
 	aggregates "notification_serivce/internal/domain/aggretates"
 	e "notification_serivce/internal/domain/events"
+	"notification_serivce/internal/infrastructure/email"
 	"notification_serivce/internal/infrastructure/messaging/rabbitmq"
+	"notification_serivce/internal/infrastructure/notifier"
 	"notification_serivce/internal/infrastructure/repositories"
 	"notification_serivce/internal/infrastructure/rest"
 	"notification_serivce/internal/infrastructure/rest/handlers"
 	"notification_serivce/internal/infrastructure/ws"
-	"notification_serivce/pkg"
 	"reflect"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
-func init() {
-	pkg.LoadEnv()
-}
+// addEvents registers event handlers for different event types and returns the queue names for consuming.
+func addEvents(aggregate *aggregates.NotificationAggregate, dispatcher *events.Dispatcher, emailNotifier, wsNotifier notifier.Notifier) []string {
 
-func addEvents(aggregate *aggregates.NotificationAggregate, dispatcher *events.Dispatcher) []string {
 	handlers := map[string]events.EventHandler{
-		fmt.Sprint(reflect.TypeOf(e.GotNewMessageEvent{}).Name()):     events.NewGotNewMessageEventHandler(*aggregate),
-		fmt.Sprint(reflect.TypeOf(e.EmailNotificationEvent{}).Name()): events.NewEmailNotificationEventHandler(*aggregate),
+		fmt.Sprint(reflect.TypeOf(e.GotNewMessageEvent{}).Name()):     events.NewGotNewMessageEventHandler(*aggregate, wsNotifier),
+		fmt.Sprint(reflect.TypeOf(e.EmailNotificationEvent{}).Name()): events.NewEmailNotificationEventHandler(*aggregate, emailNotifier),
 	}
 
 	queueNames := make([]string, 0, len(handlers))
@@ -40,19 +41,22 @@ func addEvents(aggregate *aggregates.NotificationAggregate, dispatcher *events.D
 func main() {
 
 	repo := repositories.New()
-	ws := ws.NewWebSocketServer()
+	webSocketServer := ws.NewWebSocketServer()
 
-	aggregate := aggregates.NewNotificationAggregate(repo.NotificationRepository(), ws)
+	wsNotifier := ws.NewWebSocketNotifier(webSocketServer)
+	emailNotifier := email.NewEmailNotifier()
+
+	aggregate := aggregates.NewNotificationAggregate(repo.NotificationRepository())
 
 	queryService := queries.NewNotiQueryService(repo.NotificationRepository())
 	commandService := commands.NewNotificationCommandService(*aggregate)
 
 	dispatcher := events.NewDispatcher()
 
-	queues := addEvents(aggregate, dispatcher)
+	queues := addEvents(aggregate, dispatcher, emailNotifier, wsNotifier)
 
 	// handlers
-	router := handlers.NewRouter(commandService, queryService, ws)
+	router := handlers.NewRouter(commandService, queryService, webSocketServer)
 	server := rest.NewServer(router)
 
 	done := make(chan bool, 1)

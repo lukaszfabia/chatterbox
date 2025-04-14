@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Notification management service",
+        "description": "Notification delivery service",
         "title": "Notification Service API",
         "contact": {},
         "version": "1.0"
@@ -60,21 +60,27 @@
             "type": "object",
             "properties": {
                 "id": {
+                    "description": "Unique identifier for the notification",
                     "type": "string"
                 },
                 "info": {
+                    "description": "Information/content of the notification",
                     "type": "string"
                 },
                 "isDelivered": {
+                    "description": "Flag indicating whether the notification has been delivered",
                     "type": "boolean"
                 },
                 "sentAt": {
+                    "description": "Timestamp when the notification was sent",
                     "type": "string"
                 },
                 "sub": {
+                    "description": "Subject of the notification",
                     "type": "string"
                 },
                 "userID": {
+                    "description": "The ID of the user receiving the notification",
                     "type": "string"
                 }
             }

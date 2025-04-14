@@ -9,66 +9,58 @@ import (
 	"github.com/google/uuid"
 )
 
+// Token represents a structure containing an access token and a refresh token.
 type Token struct {
 	Access  string `json:"access"`
 	Refresh string `json:"refresh"`
 }
 
-/*
-Decodes token
-
-Params:
-
-  - tokenStr string: token received in header
-  - serivce database.Service: checks is token blacklisted
-
-Returns:
-
-  - id uuid.UUID: decoded sub
-  - error occured during executing
-*/
+// DecodeJWT decodes and validates a JWT token string using HMAC signing.
+// It returns the subject (user UUID) if the token is valid.
+//
+// Parameters:
+//   - tokenStr: The JWT token string.
+//
+// Returns:
+//   - string: UUID string of the user (from "sub" claim).
+//   - error: An error if the token is invalid or expired.
 func DecodeJWT(tokenStr string) (string, error) {
 	hmacSampleSecret := []byte(os.Getenv("JWT_SECRET"))
 
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			log.Printf("Unexpected signing method: %v", token.Header["alg"])
 			return nil, UnsupportedAlgorithm(token.Header["alg"])
 		}
 		return hmacSampleSecret, nil
 	})
-
 	if err != nil {
-		log.Println(err)
+		log.Printf("Failed to parse JWT token: %v\n", err)
 		return "", FailedToParseToken(err)
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		exp, ok := claims["exp"].(float64)
-		if !ok || time.Now().Unix() > int64(exp) {
-			msg := "Token expired or invalid"
-			log.Println(msg)
-			return "", InvalidToken(err)
-		}
-
-		sub, ok := claims["sub"].(string)
-		if !ok {
-			msg := "Invalid token subject"
-			log.Println(msg)
-			return "", InvalidToken(err)
-		}
-
-		userID, err := uuid.Parse(sub)
-		if err != nil {
-			msg := "Invalid UUID in token"
-			log.Println(msg)
-			return "", InvalidToken(err)
-		}
-
-		return userID.String(), nil
-	} else {
-		msg := "Invalid token claims"
-		log.Println(msg)
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		log.Printf("Invalid JWT claims or token is not valid\n")
 		return "", InvalidToken(err)
 	}
+
+	exp, ok := claims["exp"].(float64)
+	if !ok || time.Now().Unix() > int64(exp) {
+		log.Printf("Token expired: exp=%v\n", claims["exp"])
+		return "", InvalidToken(err)
+	}
+
+	sub, ok := claims["sub"].(string)
+	if !ok {
+		log.Printf("Missing subject in token\n")
+		return "", InvalidToken(err)
+	}
+
+	userID, err := uuid.Parse(sub)
+	if err != nil {
+		log.Printf("Invalid UUID format in token subject: %v\n", err)
+		return "", InvalidToken(err)
+	}
+
+	return userID.String(), nil
 }

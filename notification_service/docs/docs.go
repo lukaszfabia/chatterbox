@@ -66,21 +66,27 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
+                    "description": "Unique identifier for the notification",
                     "type": "string"
                 },
                 "info": {
+                    "description": "Information/content of the notification",
                     "type": "string"
                 },
                 "isDelivered": {
+                    "description": "Flag indicating whether the notification has been delivered",
                     "type": "boolean"
                 },
                 "sentAt": {
+                    "description": "Timestamp when the notification was sent",
                     "type": "string"
                 },
                 "sub": {
+                    "description": "Subject of the notification",
                     "type": "string"
                 },
                 "userID": {
+                    "description": "The ID of the user receiving the notification",
                     "type": "string"
                 }
             }
@@ -102,7 +108,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Notification Service API",
-	Description:      "Notification management service",
+	Description:      "Notification delivery service",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

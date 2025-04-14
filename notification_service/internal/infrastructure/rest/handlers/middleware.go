@@ -1,3 +1,4 @@
+// provides HTTP request handlers for the notification service.
 package handlers
 
 import (
@@ -9,13 +10,16 @@ import (
 	"strings"
 )
 
+// IsAuth is a middleware that checks if the incoming request contains a valid JWT token
+// in the Authorization header. If valid, it extracts the user ID from the token and
+// passes it to the next handler in the chain. If the token is missing or invalid,
+// it responds with an Unauthorized status.
 func (h *NotificationHandler) IsAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authorization := r.Header.Get("Authorization")
 
-		// no bearer token
 		if authorization == "" {
-			log.Println("Unauthorized")
+			log.Println("Unauthorized: Missing Authorization header")
 			rest.Unauthorized(w)
 			return
 		}
@@ -23,16 +27,14 @@ func (h *NotificationHandler) IsAuth(next http.Handler) http.Handler {
 		tokenStr := strings.TrimPrefix(authorization, "Bearer ")
 
 		if tokenStr == "" {
-			log.Println("Token missing after trimming Bearer prefix")
+			log.Println("Unauthorized: Token missing after trimming Bearer prefix")
 			rest.Unauthorized(w)
 			return
 		}
 
-		// decode token
 		id, err := pkg.DecodeJWT(tokenStr)
-
 		if err != nil {
-			log.Printf("Error during decoding token: %s\n", err.Error())
+			log.Printf("Error decoding token: %s\n", err.Error())
 			rest.Unauthorized(w)
 			return
 		}
@@ -40,8 +42,7 @@ func (h *NotificationHandler) IsAuth(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), "userID", id)
 		r = r.WithContext(ctx)
 
-		// go to next handler
-		log.Printf("Done... %v\n", id)
+		log.Printf("Authorization successful for user ID: %v\n", id)
 
 		next.ServeHTTP(w, r)
 	})

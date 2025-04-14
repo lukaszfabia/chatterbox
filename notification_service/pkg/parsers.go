@@ -1,3 +1,4 @@
+// Package pkg provides utility helpers for JSON decoding and HTML email template parsing.
 package pkg
 
 import (
@@ -11,15 +12,38 @@ import (
 	"text/template"
 )
 
+// DecodeJSON decodes a JSON body from an HTTP request into the provided generic type T.
+//
+// Example:
+//
+//	type MyStruct struct { Name string }
+//	data, err := DecodeJSON[MyStruct](r)
+//
+// Parameters:
+//   - r (*http.Request): HTTP request containing the JSON body.
+//
+// Returns:
+//   - *T: A pointer to the decoded struct.
+//   - error: An error if decoding fails.
 func DecodeJSON[T any](r *http.Request) (*T, error) {
-	form := new(T) // new instance of T
+	form := new(T)
 	if err := json.NewDecoder(r.Body).Decode(form); err != nil {
 		return nil, IvnalidJson(err)
 	}
-
 	return form, nil
 }
 
+// ParseHTMLToString parses an HTML template with the provided name and data into a string.
+//
+// It expects templates to be located under: internal/infrastructure/email/templates
+//
+// Parameters:
+//   - templateName: The name of the template file (e.g., "welcome.html").
+//   - data: The data to inject into the template.
+//
+// Returns:
+//   - A rendered string with the injected data.
+//   - An error if something goes wrong.
 func ParseHTMLToString(templateName string, data any) (string, error) {
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -35,8 +59,7 @@ func ParseHTMLToString(templateName string, data any) (string, error) {
 	}
 
 	var buf bytes.Buffer
-	err = tmpl.Execute(&buf, data)
-	if err != nil {
+	if err := tmpl.Execute(&buf, data); err != nil {
 		log.Printf("Error executing template %s: %v", templateName, err)
 		return "", errors.New("failed to execute email template")
 	}

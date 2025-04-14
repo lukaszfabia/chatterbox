@@ -6,53 +6,55 @@ import (
 	"notification_serivce/internal/domain/events"
 	"notification_serivce/internal/domain/models"
 	"notification_serivce/internal/domain/repositories"
-	"notification_serivce/internal/infrastructure/email"
-	"notification_serivce/internal/infrastructure/ws"
 	"reflect"
 )
 
+// NotificationAggregate is responsible for handling notifications in the system.
+// It interacts with the repository to create, update, and manage notifications.
 type NotificationAggregate struct {
-	repo     repositories.NotificationRepository
-	wsServer *ws.WebSocketServer
+	repo repositories.NotificationRepository // Repository to store notifications
 }
 
-func NewNotificationAggregate(repo repositories.NotificationRepository, wsServer *ws.WebSocketServer) *NotificationAggregate {
+// NewNotificationAggregate creates and returns a new instance of NotificationAggregate.
+// It takes a repository as an argument for managing notifications.
+func NewNotificationAggregate(repo repositories.NotificationRepository) *NotificationAggregate {
 	return &NotificationAggregate{
-		repo:     repo,
-		wsServer: wsServer,
+		repo: repo,
 	}
 }
 
-func (n *NotificationAggregate) Send(event events.EmailNotificationEvent) error {
-	noti := models.NewEmailNotification(event)
+// CreateNotification processes an event and creates a corresponding notification.
+// It handles different event types and generates the appropriate notification model.
+//
+// Parameters:
+// - event: The event that triggered the creation of the notification. It can be of different types.
+//
+// Returns:
+// - A pointer to the created Notification and an error (if any).
+func (n *NotificationAggregate) CreateNotification(event events.Event) (*models.Notification, error) {
+	var notification *models.Notification
+	var eventType string
 
-	eventType := reflect.TypeOf(event).Name()
+	switch e := event.(type) {
+	case events.EmailNotificationEvent:
+		notification = models.NewEmailNotification(e)
+		eventType = reflect.TypeOf(e).Name()
+
+	case events.GotNewMessageEvent:
+		notification = models.NewUserNotification(e)
+		eventType = reflect.TypeOf(e).Name()
+
+	default:
+		return nil, fmt.Errorf("unsupported event type: %T", event)
+	}
+
 	log.Printf("Processing event of type: %s", eventType)
-	err := email.SendEmail(noti, event.Email)
 
-	noti.IsDelivered = err == nil
-
-	if _, err := n.repo.AddNotification(noti); err != nil {
+	if _, err := n.repo.AddNotification(*notification); err != nil {
 		log.Printf("Failed to add notification for event %s: %v", eventType, err)
-		return fmt.Errorf("failed to add notification: %w", err)
+		return nil, fmt.Errorf("failed to add notification: %w", err)
 	}
 
-	log.Printf("Created notification: %v", noti)
-
-	return nil
-}
-
-func (n *NotificationAggregate) SendPush(event events.GotNewMessageEvent) error {
-	notification := models.NewUserNotification(event)
-
-	err := n.wsServer.SendNotification(notification)
-
-	notification.IsDelivered = err == nil
-
-	if _, err := n.repo.AddNotification(notification); err != nil {
-		log.Println("Failed to create notification")
-		return err
-	}
-
-	return nil
+	log.Printf("Created notification: %v", notification)
+	return notification, nil
 }
