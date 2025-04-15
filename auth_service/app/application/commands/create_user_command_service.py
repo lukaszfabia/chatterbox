@@ -2,6 +2,7 @@ from typing import Optional
 from app.application.serivce import Service
 from app.domain.commands.create_user_command import CreateUserCommand
 from app.domain.dto.token_dto import TokenDTO
+from app.domain.events.user_logged_in_event import UserLoggedInEvent
 from app.domain.models.user import User
 
 
@@ -46,6 +47,8 @@ class CreateUserCommandService(Service):
             return None
 
         await self.rabbit_handler.publish(user.get_created_user_event())
+
+        await self.rabbit_handler.publish(UserLoggedInEvent(userID=user.id))
 
         return TokenDTO(
             access_token=self.jwt.create_access_token(user.id),

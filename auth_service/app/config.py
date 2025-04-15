@@ -52,3 +52,6 @@ oauth.register(
     server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
     client_kwargs={"scope": "openid email profile"},
 )
+
+
+FRONT_URL = os.getenv("FRONT_URL") or "http://localhost:3000"

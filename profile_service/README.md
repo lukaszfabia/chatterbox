@@ -20,7 +20,7 @@ Change `PORT` on real port that you want to use. For example we use :6060 port t
 > [!TIP]
 > Press <kbd>Ctrl</kbd> + <kbd>F</kbd> + <kbd>X</kbd> and search *profile_service* to see documentation.
 
-> [!EXAMPLE]
+> [!TIP]
 > http://localhost:6060/pkg/profile_service/internal/domain/models/
 
 ## Architecure

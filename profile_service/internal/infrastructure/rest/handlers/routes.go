@@ -32,7 +32,16 @@ func NewRouter(commandService commands.ProfileCommandService, queryService queri
 	router.PathPrefix("/api/v1/profile/media/").Handler(http.StripPrefix("/api/v1/profile/media/", fileServer))
 
 	// Swagger documentation routes
-	router.PathPrefix("/api/v1/swagger/").Handler(httpSwagger.WrapHandler)
+	// Redirect z /api/v1/docs do /api/v1/docs/
+	router.HandleFunc("/api/v1/docs", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/api/v1/docs/", http.StatusMovedPermanently)
+	})
+
+	router.Methods(http.MethodOptions, http.MethodHead).PathPrefix("/api/v1/docs/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	// Swagger UI
 	router.PathPrefix("/api/v1/docs/").Handler(httpSwagger.WrapHandler)
 
 	// Profile routes (e.g., GetProfile, GetProfiles)

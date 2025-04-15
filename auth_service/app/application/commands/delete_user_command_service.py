@@ -1,6 +1,7 @@
 from typing import Optional
 from app.application.serivce import Service
 from app.domain.commands.delete_user_command import DeleteUserCommand
+from app.domain.events.user_logged_out_event import UserLoggedOutEvent
 from app.domain.models.user import User
 
 
@@ -45,5 +46,6 @@ class DeleteUserCommandService(Service):
                 )
 
             await self.rabbit_handler.publish(user.get_deleted_user_event())
+            await self.rabbit_handler.publish(UserLoggedOutEvent(userID=user.id))
         except Exception as e:
             raise e

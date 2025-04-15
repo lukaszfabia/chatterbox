@@ -2,7 +2,7 @@
 
 import { MessageDTO, ConversationDTO, getConversation, sortConversations } from "@/lib/dto/message";
 import { useEffect, useState } from "react";
-import { ChatProvider, useChat } from "@/context/chat-context";
+import { useChat } from "@/context/chat-context";
 import { useProfile } from "@/context/profile-context";
 import { denormalizeUser } from "@/lib/dto/user";
 import { messageSchema } from "@/components/forms/schemas";
@@ -10,6 +10,7 @@ import { z } from "zod";
 import { useParams } from "next/navigation";
 import { ChatInterface } from "@/components/chat/chat-interface";
 import { ChatList } from "@/components/chat/chat-list";
+import Loading from "@/components/indicator";
 
 export default function Chat() {
     const { chatID } = useParams();
@@ -28,6 +29,10 @@ export default function Chat() {
             }
         }
     }, [chatID, conversations, selectChat]);
+
+    if (isProfileLoading || isChatLoading) {
+        return <Loading />
+    }
 
     const handleSendMessage = async (values: z.infer<typeof messageSchema>) => {
         if (currentConversation && currentUser) {

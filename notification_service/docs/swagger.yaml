@@ -21,7 +21,7 @@ definitions:
         description: The ID of the user receiving the notification
         type: string
     type: object
-host: localhost:8003
+host: 0.0.0.0:8003
 info:
   contact: {}
   description: Notification delivery service

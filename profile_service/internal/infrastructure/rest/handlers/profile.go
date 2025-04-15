@@ -16,11 +16,12 @@ import (
 	// @title Profile Service API
 	// @version 1.0
 	// @description Profile management microservice
-	// @host localhost:8002
+	// @host 0.0.0.0:8002
 	// @BasePath /api/v1
 	// @securityDefinitions.apikey BearerAuth
 	// @in header
 	// @name Authorization
+	// @InfoInstanceName docs
 )
 
 type ProfileHandler struct {

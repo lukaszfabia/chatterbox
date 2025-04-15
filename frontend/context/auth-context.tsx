@@ -1,5 +1,6 @@
 "use client";
 
+import { microservices } from "@/config/config";
 import { api } from "@/lib/api";
 import { LoginDTO } from "@/lib/dto/login";
 import { RegisterDTO } from "@/lib/dto/register";
@@ -29,6 +30,7 @@ type AuthCtxProps = {
     authenticate: (data: LoginDTO | RegisterDTO, type: "login" | "register") => void;
     deleteAcc: () => void;
     updateAcc: (data: UpdateUserDTO) => Promise<string | null>;
+    continueWith: (ssoProvider: string) => Promise<void>;
 }
 
 const AuthCtx = createContext<AuthCtxProps>({
@@ -40,6 +42,7 @@ const AuthCtx = createContext<AuthCtxProps>({
     authenticate: async () => { },
     deleteAcc: async () => { },
     updateAcc: async (data: UpdateUserDTO) => "",
+    continueWith: async (ssoProvider: string) => { },
 })
 
 
@@ -50,6 +53,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+
+    const continueWith = async (ssoProvider: string) => {
+        const url = `http://${microservices.auth}/api/v1/auth/${ssoProvider}/login`
+
+        console.log('url', url)
+        const miniPage = window.open(url, "_blank", "width=500,height=600")
+
+
+        const receiveMessage = (event: MessageEvent) => {
+            if (event.origin !== window.location.origin) return;
+
+            const { access_token, refresh_token } = event.data;
+            if (access_token && refresh_token) {
+                localStorage.setItem(ACCESS, access_token);
+                localStorage.setItem(REFRESH, refresh_token);
+                setIsAuth(true);
+                setUserID(getUserID());
+                miniPage?.close();
+                window.removeEventListener("message", receiveMessage);
+            }
+        };
+
+        window.addEventListener("message", receiveMessage);
+    }
+
 
     const updateAcc = useCallback(async (data: UpdateUserDTO) => {
         if (userID) {
@@ -76,14 +104,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const deleteAcc = useCallback(async () => {
         if (userID) {
             try {
-                await logout()
-                await api<string>({
-                    body: { "userID": userID },
+                await api<any>({
                     service: "auth",
                     method: "DELETE",
                     apiVersion: "api/v1",
                     endpoint: `/auth/me/`,
                 })
+
+                clearStorage();
+                setUserID(null);
+                setIsAuth(false);
+                router.push("/login")
 
             } catch (error) {
                 console.log('errror', error)
@@ -137,7 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
     return (
-        <AuthCtx.Provider value={{ isAuth, isLoading, error, userID, authenticate, logout, deleteAcc, updateAcc }}>
+        <AuthCtx.Provider value={{ continueWith, isAuth, isLoading, error, userID, authenticate, logout, deleteAcc, updateAcc }}>
             {children}
         </AuthCtx.Provider>
     );

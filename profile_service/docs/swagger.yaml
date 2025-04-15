@@ -36,7 +36,7 @@ definitions:
         description: User's username (unique)
         type: string
     type: object
-host: localhost:8002
+host: 0.0.0.0:8002
 info:
   contact: {}
   description: Profile management microservice

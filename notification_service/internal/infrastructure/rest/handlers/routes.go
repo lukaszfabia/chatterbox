@@ -18,8 +18,16 @@ func NewRouter(commandService commands.NotificationCommandService, queryService 
 	router.HandleFunc("/ws", ws.HandleConnection)
 
 	apiRouter := router.PathPrefix("/api/v1").Subrouter()
-	apiRouter.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
-	apiRouter.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler)
+	router.HandleFunc("/api/v1/docs", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/api/v1/docs/", http.StatusMovedPermanently)
+	})
+
+	router.Methods(http.MethodOptions, http.MethodHead).PathPrefix("/api/v1/docs/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	// Swagger UI
+	router.PathPrefix("/api/v1/docs/").Handler(httpSwagger.WrapHandler)
 
 	notiHandler := NewNotificationHandler(commandService, queryService)
 

@@ -19,7 +19,7 @@ Auth Service helps to authenthicate user on website. It behaves like firebase au
 
 - Generating JWT tokens.
 
-- Handling **Continue With ...** (in future)
+- Handling **Continue With Google** (more in future)
 
 ## Event kinds
 

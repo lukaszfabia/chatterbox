@@ -1,7 +1,25 @@
+"use client";
+
+import Loading from "@/components/indicator";
+import { useAuth } from "@/context/auth-context";
 import { ChatProvider } from "@/context/chat-context";
-import React, { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import React, { ReactNode, useEffect } from "react";
 
 export default function ChatLayout({ children }: { children: ReactNode }) {
+    const { isAuth, isLoading } = useAuth();
+    const router = useRouter();
+
+    if (isLoading) {
+        return <Loading />;
+    }
+
+    useEffect(() => {
+        if (!isAuth && !isLoading) {
+            router.push("/login")
+        }
+    }, [isAuth, isLoading])
+
     return (
         <ChatProvider>
             <div className="w-full">

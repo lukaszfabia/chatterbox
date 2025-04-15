@@ -44,6 +44,10 @@ export const api = async <T>({
         });
 
         if (response.ok) {
+            if (response.status === 204) {
+                return null;
+            }
+
             const data: T = await response.json();
             console.log(data)
             return data;

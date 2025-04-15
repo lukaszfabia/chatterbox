@@ -27,6 +27,14 @@ import { getUnionSchema, loginSchema, registerSchema } from "./schemas";
 import { TextInputField } from "./form-components";
 
 
+type AuthFieldsProps = {
+    isLoading: boolean,
+    error?: string | null,
+    type: "login" | "register",
+    onSubmit: (values: z.infer<typeof formSchema>) => void,
+    continueWith: (ssoProvider: string) => void
+}
+
 
 const formSchema = getUnionSchema(loginSchema, registerSchema)
 
@@ -61,7 +69,7 @@ function AuthSwitchPrompt({ type }: { type: "login" | "register" }) {
     );
 }
 
-function AuthFormFields({ error, type, onSubmit }: { error?: string | null, type: "login" | "register", onSubmit: (values: z.infer<typeof formSchema>) => void }) {
+function AuthFormFields({ isLoading, error, type, onSubmit, continueWith }: AuthFieldsProps) {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -123,7 +131,7 @@ function AuthFormFields({ error, type, onSubmit }: { error?: string | null, type
                         {error && <p className="text-red-400">{error}</p>}
 
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                            <Button type="submit" className="w-full mt-4 flex items-center justify-center gap-2">
+                            <Button disabled={isLoading} type="submit" className="w-full mt-4 flex items-center justify-center gap-2">
                                 <span>{type === "login" ? "Sign In" : "Sign Up"}</span>
                                 <ArrowRight />
                             </Button>
@@ -138,7 +146,7 @@ function AuthFormFields({ error, type, onSubmit }: { error?: string | null, type
                 </div>
 
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button variant="outline" className="w-full flex items-center justify-center gap-2">
+                    <Button variant="outline" className="w-full flex items-center justify-center gap-2 cursor-pointer" onClick={() => continueWith("google")}>
                         <Image src="/icons/google.svg" alt="Google Logo" width={20} height={20} />
                         Continue with Google
                     </Button>
@@ -155,7 +163,7 @@ function AuthFormFields({ error, type, onSubmit }: { error?: string | null, type
 }
 
 
-function AuthFormLayout({ error, type, authenticate }: { error?: string | null, type: "login" | "register", authenticate: (data: LoginDTO | RegisterDTO, type: "login" | "register") => void }) {
+function AuthFormLayout({ isLoading, error, type, authenticate, continueWith }: { isLoading: boolean, error?: string | null, type: "login" | "register", authenticate: (data: LoginDTO | RegisterDTO, type: "login" | "register") => void, continueWith: (ssoProvider: string) => void }) {
     const handleSubmit = (values: z.infer<typeof formSchema>) => {
         const payload: LoginDTO | RegisterDTO = values.mode === "register"
             ? { username: values.username!, email: values.email!, password: values.password }
@@ -170,14 +178,14 @@ function AuthFormLayout({ error, type, authenticate }: { error?: string | null, 
     return (
         <>
             {type === "register" && <AuthImageSection type={type} />}
-            <AuthFormFields type={type} onSubmit={handleSubmit} error={error} />
+            <AuthFormFields type={type} onSubmit={handleSubmit} error={error} isLoading={isLoading} continueWith={continueWith} />
             {type === "login" && <AuthImageSection type={type} />}
         </>
     );
 }
 
 export default function AuthPage({ type }: { type: "login" | "register" }) {
-    const { authenticate, isAuth, userID, error } = useAuth();
+    const { authenticate, isAuth, userID, error, isLoading, continueWith } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -194,7 +202,7 @@ export default function AuthPage({ type }: { type: "login" | "register" }) {
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="w-full max-w-5xl flex flex-col md:flex-row shadow-lg rounded-lg overflow-hidden bg-gray-50 border-gray-200 dark:bg-gray-950 border dark:border-gray-800"
             >
-                <AuthFormLayout type={type} authenticate={authenticate} error={error} />
+                <AuthFormLayout continueWith={continueWith} type={type} authenticate={authenticate} error={error} isLoading={isLoading} />
             </motion.div>
         </section>
     );

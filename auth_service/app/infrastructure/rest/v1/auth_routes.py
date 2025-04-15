@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Body, Depends, Request, status
+from fastapi.responses import RedirectResponse
 from app.application.commands.continue_with_command import ContinueWithCommandService
 from app.application.commands.create_user_command_service import (
     CreateUserCommandService,
@@ -34,7 +35,7 @@ from app.infrastructure.rest.exceptions import (
     OAuthFailed,
     UnsupportedProvider,
 )
-from app.config import HANDLED_PROVIDERS, oauth2_scheme, oauth
+from app.config import FRONT_URL, HANDLED_PROVIDERS, oauth2_scheme, oauth
 
 auth_router = APIRouter(prefix="/v1/auth")
 
@@ -197,8 +198,7 @@ async def login_with_sso(provider: str, request: Request):
 
 @auth_router.get(
     "/{provider}/login/callback",
-    status_code=status.HTTP_201_CREATED,
-    response_model=TokenDTO,
+    status_code=status.HTTP_302_FOUND,
 )
 async def auth_callback(
     provider: str,
@@ -240,7 +240,9 @@ async def auth_callback(
         )
 
         token = await service.handle(ent=ent)
-        return token
-
-    except Exception:
+        return RedirectResponse(
+            url=f"{FRONT_URL}/auth/callback?access_token={token.access_token}&refresh_token={token.refresh_token}"
+        )
+    except Exception as e:
+        print(e)
         raise OAuthFailed()

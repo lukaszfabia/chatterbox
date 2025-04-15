@@ -115,7 +115,9 @@ class UserRepository:
         return user
 
     @handle_tx
-    async def create_with_sso(self, email: str, sso_provider: str) -> Optional[User]:
+    async def create_with_sso(
+        self, email: str, sso_provider: str
+    ) -> tuple[Optional[User], bool]:
         """
         Creates a new user in the system, with sso provider.
 
@@ -131,10 +133,12 @@ class UserRepository:
 
         Returns:
             Optional[User]: The created user instance if successful, None otherwise.
+
+            bool: Has user been created.
         """
         existsing: Optional[User] = await self.get_user_by_email_or_username(s=email)
         if existsing:
-            return existsing
+            return (existsing, False)
 
         user = User(
             email=email, sso_provider=sso_provider, username=email.split("@")[0]
@@ -142,7 +146,7 @@ class UserRepository:
 
         self.db.add(user)
 
-        return user
+        return (user, True)
 
     @handle_tx
     async def update_user(

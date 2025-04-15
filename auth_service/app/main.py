@@ -12,8 +12,8 @@ def create_app() -> FastAPI:
     load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
     app = FastAPI(
-        root_path="/auth_service",
-        disable_startup=True,
+        # root_path="/auth_service",
+        # disable_startup=False,
         title=f"{APP_NAME} - Auth Service",
         description="Authenticate users and handle login flows using OAuth2 with various providers.",
         version="1.0.0",

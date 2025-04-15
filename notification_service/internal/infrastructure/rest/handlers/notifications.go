@@ -13,11 +13,12 @@ import (
 	// @title Notification Service API
 	// @version 1.0
 	// @description Notification delivery service
-	// @host localhost:8003
+	// @host 0.0.0.0:8003
 	// @BasePath /api/v1
 	// @securityDefinitions.apikey ApiKeyAuth
 	// @in header
 	// @name Authorization
+	// @InfoInstanceName docs
 )
 
 // NotificationHandler handles requests related to notifications.

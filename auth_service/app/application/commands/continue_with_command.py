@@ -2,6 +2,7 @@ from typing import Optional
 from app.application.serivce import Service
 from app.domain.commands.continue_with_command import ContinueWithCommand
 from app.domain.dto.token_dto import TokenDTO
+from app.domain.events.user_logged_in_event import UserLoggedInEvent
 from app.domain.models.user import User
 
 
@@ -45,14 +46,19 @@ class ContinueWithCommandService(Service):
             >>> token.access_token
             'eyJhbGciOi...'
         """
-        user: Optional[User] = await self.repo.create_with_sso(
+        res: tuple[Optional[User], bool] = await self.repo.create_with_sso(
             email=ent.email, sso_provider=ent.sso_provider
         )
+
+        user, created = res
 
         if user is None:
             return None
 
-        await self.rabbit_handler.publish(user.get_created_user_event())
+        if created:
+            await self.rabbit_handler.publish(user.get_created_user_event())
+
+        await self.rabbit_handler.publish(UserLoggedInEvent(userID=user.id))
 
         return TokenDTO(
             access_token=self.jwt.create_access_token(user.id),

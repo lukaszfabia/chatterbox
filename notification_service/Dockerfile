@@ -19,6 +19,8 @@ COPY --from=builder /go/bin/notification_service .
 
 RUN chmod +x ./notification_service
 
+COPY ./templates/ /app/templates/
+
 EXPOSE 8003 
 
 CMD ["./notification_service"]
