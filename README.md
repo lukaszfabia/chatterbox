@@ -99,3 +99,7 @@ The user navigates to their profile and checks their recent notifications.
 ### Go to Offline mode
 ![Loggin out](./docs/gifs/offline_mode.gif)  
 The user logs out and finds his profile to check is online or offline.
+
+### Docs view
+![Docs](./docs/imgs/docs.png)  
+View shows state of microservices, `anchor` takes you to service's docs.
