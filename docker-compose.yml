@@ -194,27 +194,6 @@ services:
     #   #   condition: service_healthy
     # restart: unless-stopped
 
-  profile_service:
-    container_name: profile_service_app
-    # build:
-    #   context: ./profile_service
-    #   dockerfile: ./Dockerfile
-    image: lukaszfabia/profile_service:latest
-    environment:
-      APP_PORT: 8002
-      APP_ENV: 0.0.0.0
-      DB_NAME: profile_data
-      MONGO_COLLECTION: profiles
-      RABBITMQ_URL: amqps://nukdaxkd:wAElTsSzP0xPqezIncwzldyLzW4v0WH7@seal.lmq.cloudamqp.com/nukdaxkd
-      JWT_SECRET: skjdgfskdjfhjsdklhfgdsaf23rjkwbg
-      MONGO_URI: mongodb+srv://lukasz:OtoZ0tlTlkQy0eKE@cluster0.l0jigjx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-
-    ports:
-      - "8002:8002"
-    networks:
-      - chatterbox_net
-    restart: unless-stopped
-
   notification_service:
     container_name: notification_service_app
     # build:
