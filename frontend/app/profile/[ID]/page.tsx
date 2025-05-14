@@ -15,9 +15,9 @@ import { useStatus } from "@/context/status-context";
 
 
 export default function Profile() {
-  const { ID } = useParams();
+  const { ID } = useParams<{ ID?: string }>();
   const { isLoading, fetchByID, currUserProfile } = useProfile();
-  const { fetchStatus, isConnected } = useStatus();
+  const { fetchStatus } = useStatus();
   const [isMe, setIsMe] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
   const [status, setStatus] = useState<boolean>(false);
@@ -44,7 +44,8 @@ export default function Profile() {
         setIsError(true);
       });
     }
-  }, [ID, currUserProfile]);
+  }, [ID, currUserProfile, fetchByID]);
+
 
   useEffect(() => {
     if (ID) {
@@ -54,7 +55,7 @@ export default function Profile() {
         setStatus(false);
       });
     }
-  }, [ID]);
+  }, [ID, fetchStatus]);
 
   if (isError) {
     return <NotFound404 />

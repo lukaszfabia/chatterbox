@@ -7,6 +7,7 @@ import { Control, useController } from "react-hook-form";
 
 type FormFieldProps = {
     name: string;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     control: Control<any>;
     label: string;
     placeholder: string;
@@ -17,6 +18,7 @@ type FormFieldProps = {
 
 interface FileFieldProps {
     name: string;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     control: any;
     label: string;
     description?: string;

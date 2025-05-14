@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
 import Image from "next/image";
 import Link from "next/link";
 import { z } from "zod"
@@ -11,11 +10,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 
 import {
     Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
 } from "@/components/ui/form"
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/context/auth-context";
@@ -61,7 +55,7 @@ function AuthSwitchPrompt({ type }: { type: "login" | "register" }) {
     return (
         <p className="text-gray-400 text-center mt-3 text-sm">
             {type === "login" ? (
-                <>Don't have an account? <Link href="/register" className="text-blue-400">Sign Up</Link></>
+                <>Don&apos;t have an account? <Link href="/register" className="text-blue-400">Sign Up</Link></>
             ) : (
                 <>Already have an account? <Link href="/login" className="text-blue-400">Sign In</Link></>
             )}
@@ -165,14 +159,13 @@ function AuthFormFields({ isLoading, error, type, onSubmit, continueWith }: Auth
 
 function AuthFormLayout({ isLoading, error, type, authenticate, continueWith }: { isLoading: boolean, error?: string | null, type: "login" | "register", authenticate: (data: LoginDTO | RegisterDTO, type: "login" | "register") => void, continueWith: (ssoProvider: string) => void }) {
     const handleSubmit = (values: z.infer<typeof formSchema>) => {
-        const payload: LoginDTO | RegisterDTO = values.mode === "register"
+        const mode = values.mode as "login" | "register";
+
+        const payload: LoginDTO | RegisterDTO = mode === "register"
             ? { username: values.username!, email: values.email!, password: values.password }
             : { email_or_username: values.email_or_username!, password: values.password };
 
-        console.log('handling submit for', values.mode)
-        console.log("Submitted values:", values);
-
-        authenticate(payload, values.mode);
+        authenticate(payload, mode);
     };
 
     return (

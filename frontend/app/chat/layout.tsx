@@ -10,15 +10,15 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
     const { isAuth, isLoading } = useAuth();
     const router = useRouter();
 
+    useEffect(() => {
+        if (!isAuth && !isLoading) {
+            router.push("/login");
+        }
+    }, [isAuth, isLoading, router]);
+
     if (isLoading) {
         return <Loading />;
     }
-
-    useEffect(() => {
-        if (!isAuth && !isLoading) {
-            router.push("/login")
-        }
-    }, [isAuth, isLoading])
 
     return (
         <ChatProvider>
@@ -26,5 +26,5 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
                 {children}
             </div>
         </ChatProvider>
-    )
+    );
 }

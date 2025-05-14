@@ -1,8 +1,8 @@
 const MAX = 20;
 
 export default function trim(s: string, max: number = MAX): string {
-    if (s.length < MAX) {
+    if (s.length < max) {
         return s
     }
-    return s.substring(0, MAX)
+    return s.substring(0, max)
 }

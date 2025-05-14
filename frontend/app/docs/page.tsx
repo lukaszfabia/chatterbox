@@ -41,7 +41,7 @@ const checkServiceStatus = async (url: string) => {
         });
 
         return response.ok;
-    } catch (error) {
+    } catch {
         return false;
     } finally {
         clearTimeout(timeoutId);

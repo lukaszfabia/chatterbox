@@ -14,13 +14,13 @@ import { useProfile } from "@/context/profile-context";
 export default function Explore() {
     const [phrase, setPhrase] = useState<string>("");
     const [users, setUsers] = useState<User[]>([]);
-    const { fetchProfiles } = useProfile();
+    const { fetchProfiles, isLoading } = useProfile();
 
     useEffect(() => {
         fetchProfiles().then((users) => {
             setUsers(users);
         });
-    }, [])
+    }, [fetchProfiles])
 
 
     const filteredUsers = users.filter((user: User) => {
@@ -31,8 +31,6 @@ export default function Explore() {
             (user.bio && user.bio.toLowerCase().includes(p))
         )
     });
-
-    const isLoading = false;
 
     return (
         <section className="md:max-w-5xl min-h-screen max-w-xl mx-auto mt-20 bg-background rounded-t-xl px-5 md:px-20">

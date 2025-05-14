@@ -16,7 +16,7 @@ import { Calendar, LogOutIcon, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { MyUserAvatar } from '../images';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../ui/sheet';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNotification } from '@/context/notification-context';
 import { Skeleton } from '../ui/skeleton';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
@@ -38,10 +38,6 @@ const AvatarWithSkeleton = ({ user }: { user: User }) => {
 const AvatarWithActions = ({ user, logout }: { user: User, logout: () => void }) => {
     const [openSheet, setOpenSheet] = useState(false);
     const { notifications } = useNotification();
-
-    useEffect(() => {
-        console.log('notifications', notifications)
-    }, [])
 
     return (
         <>

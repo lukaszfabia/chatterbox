@@ -7,6 +7,7 @@ export interface Fetchable {
     method: allowedMethods;
     apiVersion: "api/v1" | "api/v2";
     service: keyof Microservice;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     body?: Record<string, any> | FormData | null;
     token?: string | null;
     endpoint?: string | null;

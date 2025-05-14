@@ -39,6 +39,16 @@ export const messageSchema = z.object({
     message: z.string().min(1, 'Message cannot be empty').max(500, 'Message cannot exceed 500 characters'),
 });
 
-export function getUnionSchema(lhs: z.ZodObject<any>, rhs: z.ZodObject<any>) {
-    return z.discriminatedUnion("mode", [lhs, rhs]);
+type ZodObjectType = z.ZodObject<z.ZodRawShape>;
+
+export function getUnionSchema(lhs: ZodObjectType, rhs: ZodObjectType) {
+    const lhsWithMode = lhs.extend({
+        mode: z.literal("login"),
+    });
+
+    const rhsWithMode = rhs.extend({
+        mode: z.literal("register"),
+    });
+
+    return z.discriminatedUnion("mode", [lhsWithMode, rhsWithMode]);
 }

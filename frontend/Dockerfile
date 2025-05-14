@@ -1,15 +1,25 @@
-FROM node:latest
+FROM node:20-alpine AS builder
 
-WORKDIR /frontend
+WORKDIR /app
 
-COPY package*.json /frontend/
+COPY package.json package-lock.json ./
+RUN npm install --frozen-lockfile
 
-RUN npm install -g npm@11.2.0
+COPY . .
 
-RUN npm install
+RUN npm run build
 
-COPY . /frontend
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm install --production --frozen-lockfile
+
+COPY --from=builder /app/.next .next
+
+COPY --from=builder /app/public /app/public
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]

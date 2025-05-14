@@ -1,12 +1,13 @@
 "use client";
-import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
-import Loading from "@/components/indicator";
 
-export default function AuthCallbackPage() {
+import { Suspense } from "react";
+import Loading from "@/components/indicator";
+import { useSearchParams } from "next/navigation";
+
+function AuthCallback() {
     const params = useSearchParams();
 
-    useEffect(() => {
+    if (typeof window !== "undefined") {
         const accessToken = params.get("access_token");
         const refreshToken = params.get("refresh_token");
 
@@ -18,9 +19,18 @@ export default function AuthCallbackPage() {
                 },
                 window.origin
             );
+
             window.close();
         }
-    }, []);
+    }
 
-    return <Loading />
+    return <Loading />;
+}
+
+export default function AuthCallbackPage() {
+    return (
+        <Suspense fallback={<Loading />}>
+            <AuthCallback />
+        </Suspense>
+    );
 }

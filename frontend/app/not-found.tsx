@@ -60,7 +60,7 @@ export default function NotFound404() {
                     variants={itemVariants}
                     className="md:text-6xl text-4xl font-extrabold leading-tight"
                 >
-                    Page <span className="text-red-500">Not</span>{' '}
+                    Page <span className="text-red-500">Not</span>{" "}
                     <span className="font-medium font-playfair text-primary">Found</span>
                 </motion.h1>
 
@@ -68,7 +68,7 @@ export default function NotFound404() {
                     variants={itemVariants}
                     className="text-lg text-muted-foreground"
                 >
-                    Oops! The page you're looking for doesn't exist or has been moved.
+                    Oops! The page you are looking for does not exist or has been moved.
                     Please check the URL or return to the homepage.
                 </motion.p>
 
