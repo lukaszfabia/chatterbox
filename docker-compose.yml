@@ -135,103 +135,54 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
-    networks:
-      - chatterbox_net
 
   status_service:
     container_name: status_service_app
     image: lukaszfabia/status_service:latest
-    # build:
-    #   context: ./status_service
-    #   dockerfile: ./Dockerfile
     env_file:
       - ./status_service/.env
     ports:
       - "8004:8004" # change it later
-    networks:
-      - chatterbox_net
-    depends_on:
-      #   rabbitmq:
-      #     condition: service_healthy
-      status_service_db:
-        condition: service_healthy
     restart: unless-stopped
 
   auth_service:
-    container_name: auth_service_app
+    # container_name: auth_service_app
     image: lukaszfabia/auth_service:latest
-    # build:
-    #   context: ./auth_service
-    #   dockerfile: ./Dockerfile
     env_file:
       - ./auth_service/.env
     ports:
       - "8001:8001"
-    networks:
-      - chatterbox_net
-    # depends_on:
-    #   # rabbitmq:
-    #   #   condition: service_healthy
-    #   auth_service_db:
-    #     condition: service_healthy
+    deploy:
+      replicas: 4
     restart: unless-stopped
-    # profile_service:
-    # container_name: profile_service_app
-    # # build:
-    # #   context: ./profile_service
-    # #   dockerfile: ./Dockerfile
-    # image: lukaszfabia/profile_service:latest
-    # env_file:
-    #   - ./profile_service/.env
-    # ports:
-    #   - "8002:8002"
-    # networks:
-    #   - chatterbox_net
-    #   # depends_on:
-    #   # rabbitmq:
-    #   #   condition: service_healthy
-    #   # profile_service_db:
-    #   #   condition: service_healthy
-    # restart: unless-stopped
+
+  profile_service:
+    container_name: profile_service_app
+    image: lukaszfabia/profile_service:latest
+    env_file:
+      - ./profile_service/.env
+    ports:
+      - "8002:8002"
+    restart: unless-stopped
 
   notification_service:
-    container_name: notification_service_app
-    # build:
-    #   context: ./notification_service
-    #   dockerfile: ./Dockerfile
+    # container_name: notification_service_app
     image: lukaszfabia/notification_service:latest
     env_file:
       - ./notification_service/.env
+    deploy:
+      replicas: 2
     ports:
       - "8003:8003"
-    networks:
-      - chatterbox_net
-      # depends_on:
-      # rabbitmq:
-      #   condition: service_healthy
-      # notification_service_db:
-      #   condition: service_healthy
     restart: unless-stopped
 
   chat_service:
-    container_name: chat_service_app
+    # container_name: chat_service_app
     image: lukaszfabia/chat_service:latest
-    # build:
-    #   context: ./chat_service
-    #   dockerfile: ./Dockerfile
     env_file:
       - ./chat_service/.env
     ports:
       - "8005:8005"
-    networks:
-      - chatterbox_net
-      # depends_on:
-      # rabbitmq:
-      #   condition: service_healthy
-      # chat_service_db:
-      #   condition: service_healthy
+    deploy:
+      replicas: 3
     restart: unless-stopped
-
-networks:
-  chatterbox_net:
-    driver: bridge
