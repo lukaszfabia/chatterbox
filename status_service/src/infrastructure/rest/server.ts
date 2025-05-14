@@ -13,11 +13,11 @@ import { Server } from 'socket.io';
 import { WebSocketService } from '../ws/websocket';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
-import { swaggerSpec } from '../../../docs/swagger';
+import { swaggerSpec } from '../../docs/swagger';
 import { UpdateStatusCommandHandler } from '../../application/commands/update-status.command.handler';
 
 const corsConfig = {
-    origin: 'http://localhost:3000',
+    origin: '*',
     methods: ['GET', 'POST'],
     credentials: true,
 };

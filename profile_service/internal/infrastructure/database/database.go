@@ -19,7 +19,7 @@ type Database struct {
 // names specified in the environment variables. It returns an instance of Database
 // and an error, if any.
 func Connect() (*Database, error) {
-	dbs, err := newDBConnection(os.Getenv("DB_NAME"), os.Getenv("MONGO_COLLECTION"))
+	dbs, err := newDBConnection(os.Getenv("DB_NAME"), "profiles")
 	if err != nil {
 		return nil, FailedToConnect(err)
 	}

@@ -3,5 +3,8 @@ import { Command } from "./command";
 
 // Command class for creating a new chat with specified members
 export class CreateNewChatCommand implements Command {
-    members: User[];  // List of members (users) to be part of the chat
+
+    constructor(
+        public readonly members: User[] // List of members (users) to be part of the chat
+    ) { }
 }

@@ -55,7 +55,9 @@ export class RabbitMQService implements EventBus {
 
             const rabbitmqURL = `amqp://${user}:${pass}@${host}:${port}`;
 
-            const connection = await client.connect(rabbitmqURL);
+            const url = process.env.RABBITMQ_URL
+
+            const connection = await client.connect(url || rabbitmqURL);
 
             this.connection = connection.connection;
             this.channel = await connection.createChannel();

@@ -1,16 +1,22 @@
-FROM node:latest
+FROM node:20 AS builder
 
-WORKDIR /status_service
+WORKDIR /app
 
-COPY package*.json /status_service/
-
+COPY package*.json ./
 RUN npm install -g npm@11.2.0
 RUN npm install
 
-COPY . /status_service
+COPY . .
+RUN npm run build
 
-RUN npm install -g typescript tsx
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
 
 EXPOSE 8004
 
-CMD ["npx", "tsx", "src/app.ts"]
+CMD ["node", "dist/src/app.js"]

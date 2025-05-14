@@ -38,12 +38,14 @@ class RabbitMQHandler:
         It also creates a channel for communication with the RabbitMQ server.
         """
         if not self.connection or self.connection.is_closed:
-            self.connection = await aio_pika.connect_robust(
-                host=self.config.host,
-                login=self.config.login,
-                password=self.config.password,
-                port=self.config.port,
-            )
+            # self.connection = await aio_pika.connect_robust(
+            #     host=self.config.host,
+            #     login=self.config.login,
+            #     password=self.config.password,
+            #     port=self.config.port,
+            # )
+
+            self.connection = await aio_pika.connect_robust(url=self.config.url)
             self.channel = await self.connection.channel()
 
     async def close(self):

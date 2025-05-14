@@ -9,19 +9,27 @@ load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 
+# @dataclass(frozen=True)
+# class RabbitConfig:
+#     login: str
+#     password: str
+#     port: int
+#     host: str
+#     url: str
+
+
 @dataclass(frozen=True)
 class RabbitConfig:
-    login: str
-    password: str
     port: int
-    host: str
+    url: str
 
 
 config_for_rabbit = RabbitConfig(
-    login=os.getenv("RABBITMQ_DEFAULT_USER"),
-    password=os.getenv("RABBITMQ_DEFAULT_PASS"),
+    # login=os.getenv("RABBITMQ_DEFAULT_USER"),
+    # password=os.getenv("RABBITMQ_DEFAULT_PASS"),
     port=int(os.getenv("RABBITMQ_PORT")) or 5672,
-    host=os.getenv("RABBITMQ_HOST") or "localhost",
+    url=str(os.getenv("RABBITMQ_URL")) or "",
+    # host=os.getenv("RABBITMQ_HOST") or "localhost",
 )
 
 

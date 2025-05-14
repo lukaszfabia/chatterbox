@@ -1,0 +1,8 @@
+*/*.tfvars
+*/*.tfstate
+*/*.backup
+*/*.info
+*/*.hcl
+*/.*
+
+*/*.sh

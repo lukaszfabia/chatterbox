@@ -9,7 +9,7 @@ import { UserStatus } from '../../domain/models/status';
  * the connection lifecycle.
  */
 export class RedisService implements IStatusRepository {
-    private redisClient: RedisClientType;
+    private redisClient!: RedisClientType;
     private isConnected = false;
     private readonly RECONNECT_DELAY = 5000;
     private readonly MAX_RETRIES = 3;
@@ -48,12 +48,12 @@ export class RedisService implements IStatusRepository {
     private createClient(): RedisClientType {
         const host = process.env.REDIS_HOST ?? 'localhost';
         const port = process.env.REDIS_PORT ?? '6379';
-        const pass = process.env.REDIS_PASS ?? 'lukasz';
+        // const pass = process.env.REDIS_PASS ?? 'lukasz';
         const url = `redis://${host}:${port}`;
 
         const client = createClient({
             url,
-            password: pass || undefined,
+            // password: pass || undefined,
             socket: {
                 reconnectStrategy: (retries) => {
                     return Math.min(retries * 100, 5000);

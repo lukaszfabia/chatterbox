@@ -11,10 +11,14 @@ load_dotenv()
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-db_url = (
-    f"postgresql://{os.getenv('DB_USERNAME')}:{os.getenv('DB_PASSWORD')}"
-    f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-)
+# db_url = (
+#     f"postgresql://{os.getenv('DB_USERNAME')}:{os.getenv('DB_PASSWORD')}"
+#     f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+# )
+
+# db_url = f"postgresql://{os.getenv("POSTGRES_URL")}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+db_url = f'postgresql://{os.getenv("DB_USERNAME")}:{os.getenv("DB_PASSWORD")}@{os.getenv("POSTGRES_URL")}:{os.getenv("DB_PORT")}/{os.getenv("DB_NAME")}'
+
 
 config.set_main_option("sqlalchemy.url", db_url)
 

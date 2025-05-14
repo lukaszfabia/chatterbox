@@ -1,8 +1,7 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { GetUserStatusController } from './controllers/get-user-status.controller';
 import { IStatusRepository } from '../../domain/repository/status.repository';
-import { GetUserStatusQueryHandler } from '../../application/queries/get-user-status.query.handler'
-
+import { GetUserStatusQueryHandler } from '../../application/queries/get-user-status.query.handler';
 
 export class Router {
     constructor(private repo: IStatusRepository) { }
@@ -16,7 +15,7 @@ export class Router {
 
         const userStatusController = new GetUserStatusController(handler);
 
-        /**
+        /** 
          * @swagger
          * /api/v1/status/check/{id}:
          *   get:
@@ -35,7 +34,9 @@ export class Router {
          *       404:
          *         description: Not Found 
          */
-        router.get("/check/:id", userStatusController.getStatus.bind(userStatusController));
+        router.get("/check/:id", (req: Request, res: Response) => {
+            userStatusController.getStatus(req, res);
+        });
 
         return router;
     }

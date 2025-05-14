@@ -9,21 +9,18 @@ import { Collection, MongoClient, ObjectId } from "mongodb";
 export class MongoService implements IChatRepository {
   private readonly MESSAGE_COLLECTION = "messages";
   private readonly CONVERSATION_COLLECTION = "conversations";
-  private client: MongoClient;
-  private messages: Collection<IMessage>;
-  private conversations: Collection<IConversation>;
+  private client!: MongoClient;
+  private messages!: Collection<IMessage>;
+  private conversations!: Collection<IConversation>;
 
   /**
    * Creates a new instance of MongoService.
    * @param uri Optional custom MongoDB URI. Defaults to env-based connection string.
    */
   constructor(
-    private readonly uri: string = `mongodb://${encodeURIComponent(
-      process.env.MONGO_USER || ""
-    )}:${encodeURIComponent(process.env.MONGO_PASS || "")}@${process.env.MONGO_HOST || "localhost"
-      }:${process.env.MONGO_PORT || "27017"}`
+    private readonly uri: string = process.env.MONGO_URI || ""
   ) {
-    if (!this.uri) throw new Error("MongoDB URI is required");
+    if (this.uri.length < 1) throw new Error("MongoDB URI is required");
   }
 
   /**
@@ -44,7 +41,7 @@ export class MongoService implements IChatRepository {
 
       await this.createIndexes();
     } catch (error) {
-      throw Error(error);
+      throw Error("Failed to conntect with mongo");
     }
   }
 
@@ -217,7 +214,7 @@ export class MongoService implements IChatRepository {
     username?: string | null
   ): Promise<number> {
     const filter = { "members.userID": userID };
-    const update = {};
+    const update: any = {};
 
     if (avatarURL !== null) {
       update["members.$[elem].avatarURL"] = avatarURL;

@@ -114,8 +114,8 @@ export class WebSocketService {
                 console.error("Failed to publish ping event");
                 client.emit("error", { message: "Failed to publish event" });
             }
-        } catch (error) {
-            console.error(`Error handling ping: ${error.message}`);
+        } catch {
+            console.error(`Error handling ping`);
             client.emit("error", { message: "Error handling ping" });
         }
     }
@@ -136,8 +136,8 @@ export class WebSocketService {
                 console.error("Failed to publish updateStatus event");
                 client.emit("error", { message: "Failed to publish event" });
             }
-        } catch (error) {
-            console.error(`Error handling status update: ${error.message}`);
+        } catch {
+            console.error(`Error handling status update`);
             client.emit("error", { message: "Error handling status update" });
         }
     }

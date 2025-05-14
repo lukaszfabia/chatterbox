@@ -25,7 +25,7 @@ type Database struct {
 //   - (*Database, error): The database instance and any error encountered
 //     during the connection process.
 func Connect() (*Database, error) {
-	dbs, err := newDBConnection(os.Getenv("DB_NAME"), os.Getenv("MONGO_COLLECTION"))
+	dbs, err := newDBConnection(os.Getenv("DB_NAME"), "notifications_data")
 	if err != nil {
 		return nil, FailedToConnect(err)
 	}

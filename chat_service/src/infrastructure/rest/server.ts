@@ -19,7 +19,7 @@ import { CreateChatController } from './controllers/create-new-chat.command.cont
 import { GetConversationsController } from './controllers/get-conversations.query.controller';
 import { GetMessagesController } from './controllers/get-messages.controller';
 import swaggerUi from "swagger-ui-express";
-import { swaggerSpec } from '../../../docs/swagger';
+import { swaggerSpec } from '../../docs/swagger';
 
 
 const corsConfig = {
