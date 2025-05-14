@@ -9,7 +9,6 @@ export default function getUserID(): string | null {
     try {
         const decoded = jwtDecode<{ sub: string, exp: number }>(token);
         if (decoded && decoded.sub) {
-            console.log('decoded.sub', decoded.sub)
             return decoded.sub;
         }
         return null;

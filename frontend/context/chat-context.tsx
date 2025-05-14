@@ -91,12 +91,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         socketRef.current = socket;
 
         socket.on('connect', () => {
-            console.log('Socket connected');
             socket.emit('register', currUserProfile.id);
         });
 
         socket.on('disconnect', () => {
-            console.log('Socket disconnected');
         });
 
         socket.on('error', (error) => {
@@ -105,20 +103,15 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
         socket.on('newMessage', (message: MessageDTO) => {
             if (chatID === message.chatID) {
-                console.log('New message received:', message);
                 setMessages((prevMessages) => [...prevMessages, message]);
-            } else {
-                console.log('Message ignored, chatID mismatch');
             }
             mutate('/chat/conversations');
         });
 
         socket.onAny((event, ...args) => {
-            console.log(`[DEBUG] Socket event ${event}:`, args);
         });
 
         socket.on('typing', (data) => {
-            console.log('Typing event received:', data);
             if (!data || !data.username) {
                 return;
             }
@@ -132,7 +125,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         });
 
         return () => {
-            console.log('Cleaning up socket');
             socket.disconnect();
             socketRef.current = null;
         };
@@ -140,7 +132,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (chatID) {
-            console.log('Loading messages for chat:', chatID);
         }
     }, [chatID]);
 
@@ -159,7 +150,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     const sendMessage = async (msg: MessageDTO) => {
         try {
             setIsSending(true);
-            console.log('Sending message:', msg);
 
             const response = await api<MessageDTO>({
                 service: 'chat',
@@ -193,7 +183,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     const selectChat = (id: string) => {
         if (!id) return;
 
-        console.log('Selecting chat:', id);
 
         const socket = socketRef.current;
         const userID = currUserProfile?.id;
@@ -204,11 +193,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
         if (id !== chatID && socket?.connected) {
             if (chatID) {
-                console.log(`Leaving room ${chatID}`);
                 socket.emit('leaveRoom', chatID, userID);
             }
 
-            console.log(`Joining room ${id}`);
             socket.emit('joinRoom', id, userID);
 
             setChatID(id);
@@ -218,7 +205,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 
     const emitTyping = useMemo(() => debounce((chatID: string, userID: string, username: string) => {
-        console.log(`Emit typing - chatID: ${chatID}, userID: ${userID}, username: ${username}`);
 
         if (!socketRef.current) {
             return;

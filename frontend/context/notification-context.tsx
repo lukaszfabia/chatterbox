@@ -56,7 +56,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         try {
             const token = getToken(ACCESS);
             if (!token) {
-                console.log("No authentication token found");
                 return;
             }
 
@@ -64,22 +63,18 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
                 wsRef.current.close();
             }
 
-            console.log(`Connecting to WebSocket at ${host}`);
             const ws = new WebSocket(`${host}?token=${encodeURIComponent(token)}`);
             wsRef.current = ws;
 
             ws.onopen = () => {
-                console.log("WebSocket connection established");
                 ws.send(JSON.stringify({ type: "AUTH", token }));
                 setIsConnected(true);
                 setError(null);
             };
 
             ws.onmessage = (event) => {
-                console.log("WebSocket message received:", event.data);
                 try {
                     const data = JSON.parse(event.data) as Notification;
-                    console.log("Parsed notification:", data);
                     setNewNoti(data);
                     mutate((prev) => [data, ...(prev ?? [])], { revalidate: false });
                 } catch (err) {
@@ -106,7 +101,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             };
 
             ws.onclose = (event) => {
-                console.log(`WebSocket closed (${event.code}): ${event.reason}`);
                 setIsConnected(false);
 
                 if (event.code !== 1000) {

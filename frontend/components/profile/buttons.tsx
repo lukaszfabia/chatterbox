@@ -24,8 +24,6 @@ export default function ActionButtons({ isMe, isLoading, user, currentProfile }:
 
 
     const initConversation = async (sender: User, receiver: User) => {
-        console.log('Initializing conversation between', sender.username, 'and', receiver.username);
-
         const body = {
             members: [receiver, sender].map((user) => denormalizeUser(user)),
         };
@@ -39,7 +37,6 @@ export default function ActionButtons({ isMe, isLoading, user, currentProfile }:
         });
 
         if (conversation) {
-            console.log('Conversation created:', conversation);
             return conversation;
         }
         return null;
@@ -47,7 +44,6 @@ export default function ActionButtons({ isMe, isLoading, user, currentProfile }:
 
 
     const handleNewConv = async () => {
-        console.log('creating new conv...')
         if (user && currentProfile) {
             const chat = await initConversation(currentProfile, user);
             if (chat) {
@@ -61,9 +57,6 @@ export default function ActionButtons({ isMe, isLoading, user, currentProfile }:
                     },
                 });
             }
-        } else {
-            console.log('user', user)
-            console.log('currentProfile', currentProfile)
         }
     };
 

@@ -41,31 +41,26 @@ export function StatusProvider({ children }: { children: React.ReactNode }) {
         socketRef.current = socket;
 
         socket.on("connect", () => {
-            console.log("[socket] Connected:", socket.id);
             setIsConnected(true);
 
             if (userID) {
                 socket.emit("register", userID);
-                console.log("[socket] Emitted register:", userID);
             }
 
             if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
             pingIntervalRef.current = setInterval(() => {
                 if (userID) {
                     socket.emit("ping", { userID });
-                    console.log("[socket] Emitted ping:", userID);
                 }
             }, 30_000);
         });
 
         socket.on("disconnect", () => {
-            console.log("[socket] Disconnected");
             setIsConnected(false);
             if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
         });
 
         socket.on("pong", (data) => {
-            console.log("[socket] Pong:", data);
         });
 
         socket.on("error", (err) => {
@@ -80,7 +75,6 @@ export function StatusProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (isConnected && userID) {
-            console.log("[socket] Registering user:", userID);
             registerUser();
 
             pingIntervalRef.current = setInterval(() => {
@@ -93,7 +87,6 @@ export function StatusProvider({ children }: { children: React.ReactNode }) {
     const registerUser = () => {
         if (userID && socketRef.current) {
             socketRef.current.emit("register", userID);
-            console.log("[socket] Emitted register:", userID);
         }
     };
 
@@ -110,7 +103,6 @@ export function StatusProvider({ children }: { children: React.ReactNode }) {
     const sendPing = () => {
         if (userID && socketRef.current) {
             socketRef.current.emit("ping", { userID });
-            console.log("[socket] Emitted ping:", userID);
         }
     };
 

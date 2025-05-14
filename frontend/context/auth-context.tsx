@@ -57,9 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const continueWith = async (ssoProvider: string) => {
         const url = `http://${microservices.auth}/api/v1/auth/${ssoProvider}/login`
 
-        console.log('url', url)
         const miniPage = window.open(url, "_blank", "width=500,height=600")
-
 
         const receiveMessage = (event: MessageEvent) => {
             if (event.origin !== window.location.origin) return;
@@ -117,7 +115,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 router.push("/login")
 
             } catch (error) {
-                console.log('errror', error)
             }
         }
     }, [])
@@ -136,13 +133,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setIsAuth(false);
             router.push("/login")
         } catch (error) {
-            console.log('error', error)
         }
     }, []);
 
     const authenticate = useCallback(async (data: LoginDTO | RegisterDTO, type: "login" | "register") => {
         setIsLoading(true);
-        console.log('Authing')
 
         setError(null);
         const tokens = await api<TokenDTO>({

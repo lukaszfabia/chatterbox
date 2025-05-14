@@ -18,7 +18,6 @@ function AppContent({ children }: { children: React.ReactNode }) {
 
         useEffect(() => {
             if (isNotificationConnected && newNoti && newNoti !== prevNoti) {
-                console.log("Showing notification toast:", newNoti);
                 toast(newNoti.info, {
                     description: newNoti.sub,
                     action: {

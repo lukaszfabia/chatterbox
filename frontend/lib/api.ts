@@ -26,8 +26,6 @@ export const api = async <T>({
     try {
         const url = `http://${microservices[service]}/${apiVersion}${endpoint}`;
 
-        console.log('url', url)
-
         const isFormData = body instanceof FormData;
 
         const defaultHeaders: Record<string, string> = {
@@ -50,11 +48,9 @@ export const api = async <T>({
             }
 
             const data: T = await response.json();
-            console.log(data)
             return data;
         }
 
-        console.log('Something went wrong!');
         return null;
     } catch (err) {
         console.error("API error: ", err);
