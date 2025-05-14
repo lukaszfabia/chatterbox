@@ -42,6 +42,7 @@ export const messageSchema = z.object({
 type ZodObjectType = z.ZodObject<z.ZodRawShape>;
 
 export function getUnionSchema(lhs: ZodObjectType, rhs: ZodObjectType) {
+    // tmp solution 
     const lhsWithMode = lhs.extend({
         mode: z.literal("login"),
     });
